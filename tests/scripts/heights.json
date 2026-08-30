@@ -1,0 +1,62 @@
+[
+ {
+  "label": "h-short",
+  "set": {
+   "legLength": 0.0,
+   "torsoLength": 0.0
+  },
+  "pose": "relaxed",
+  "view": 0,
+  "wait": 700,
+  "report": [
+   "height",
+   "chest",
+   "waist",
+   "arm",
+   "thigh",
+   "calf",
+   "neck",
+   "shoulder",
+   "taper"
+  ]
+ },
+ {
+  "label": "h-mid",
+  "set": {},
+  "pose": "relaxed",
+  "view": 0,
+  "wait": 700,
+  "report": [
+   "height",
+   "chest",
+   "waist",
+   "arm",
+   "thigh",
+   "calf",
+   "neck",
+   "shoulder",
+   "taper"
+  ]
+ },
+ {
+  "label": "h-tall",
+  "set": {
+   "legLength": 1.0,
+   "torsoLength": 1.0
+  },
+  "pose": "relaxed",
+  "view": 0,
+  "wait": 700,
+  "report": [
+   "height",
+   "chest",
+   "waist",
+   "arm",
+   "thigh",
+   "calf",
+   "neck",
+   "shoulder",
+   "taper"
+  ]
+ }
+]

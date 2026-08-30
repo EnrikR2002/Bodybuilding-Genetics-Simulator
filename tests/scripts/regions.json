@@ -1,0 +1,23 @@
+[
+ {
+  "label": "regions-front",
+  "set": {
+   "mass": 0.8,
+   "bodyFat": 0.1
+  },
+  "pose": "relaxed",
+  "regions": true,
+  "view": 0,
+  "wait": 900
+ },
+ {
+  "label": "regions-back",
+  "view": 180,
+  "wait": 300
+ },
+ {
+  "label": "regions-threeq",
+  "view": -38,
+  "wait": 300
+ }
+]

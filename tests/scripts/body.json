@@ -1,0 +1,104 @@
+[
+ {
+  "label": "b-torso",
+  "set": {
+   "mass": 0.9,
+   "legMass": 0.85,
+   "backThickness": 0.8,
+   "bodyFat": 0.06,
+   "clavicle": 0.8,
+   "hipWidth": 0.24
+  },
+  "pose": "relaxed",
+  "view": -18,
+  "el": 0.02,
+  "zoom": 0.32,
+  "target": [
+   0,
+   132,
+   0
+  ],
+  "wait": 900
+ },
+ {
+  "label": "b-arm",
+  "set": {
+   "mass": 0.9,
+   "legMass": 0.85,
+   "backThickness": 0.8,
+   "bodyFat": 0.06,
+   "clavicle": 0.8,
+   "hipWidth": 0.24
+  },
+  "pose": "frontDouble",
+  "view": -14,
+  "el": 0.02,
+  "zoom": 0.3,
+  "target": [
+   0,
+   146,
+   0
+  ],
+  "wait": 600
+ },
+ {
+  "label": "b-leg",
+  "set": {
+   "mass": 0.9,
+   "legMass": 0.85,
+   "backThickness": 0.8,
+   "bodyFat": 0.06,
+   "clavicle": 0.8,
+   "hipWidth": 0.24
+  },
+  "pose": "relaxed",
+  "view": -14,
+  "el": 0.02,
+  "zoom": 0.34,
+  "target": [
+   0,
+   52,
+   0
+  ],
+  "wait": 600
+ },
+ {
+  "label": "b-full",
+  "set": {
+   "mass": 0.9,
+   "legMass": 0.85,
+   "backThickness": 0.8,
+   "bodyFat": 0.06,
+   "clavicle": 0.8,
+   "hipWidth": 0.24
+  },
+  "pose": "relaxed",
+  "view": -30,
+  "wait": 600
+ },
+ {
+  "label": "b-fdb",
+  "set": {
+   "mass": 0.9,
+   "legMass": 0.85,
+   "backThickness": 0.8,
+   "bodyFat": 0.06,
+   "clavicle": 0.8,
+   "hipWidth": 0.24
+  },
+  "pose": "frontDouble",
+  "view": 0,
+  "wait": 600
+ },
+ {
+  "label": "b-fat",
+  "set": {
+   "mass": 0.8,
+   "legMass": 0.7,
+   "bodyFat": 0.75
+  },
+  "pose": "relaxed",
+  "view": -30,
+  "wait": 900
+ }
+]

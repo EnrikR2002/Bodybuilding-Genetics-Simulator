@@ -1,0 +1,84 @@
+[
+ {
+  "label": "ug-face",
+  "set": {},
+  "pose": "relaxed",
+  "view": -16,
+  "el": 0.02,
+  "zoom": 0.16,
+  "target": [
+   0,
+   163,
+   0
+  ],
+  "wait": 900
+ },
+ {
+  "label": "ug-torso",
+  "set": {},
+  "pose": "relaxed",
+  "view": -16,
+  "el": 0.02,
+  "zoom": 0.34,
+  "target": [
+   0,
+   128,
+   0
+  ],
+  "wait": 500
+ },
+ {
+  "label": "ug-barrel",
+  "set": {
+   "mass": 1,
+   "ribcage": 1,
+   "backThickness": 1,
+   "bodyFat": 0.8,
+   "legMass": 1
+  },
+  "pose": "relaxed",
+  "view": 0,
+  "wait": 900
+ },
+ {
+  "label": "ug-barrel-side",
+  "set": {
+   "mass": 1,
+   "ribcage": 1,
+   "backThickness": 1,
+   "bodyFat": 0.8,
+   "legMass": 1
+  },
+  "pose": "relaxed",
+  "view": -90,
+  "wait": 400
+ },
+ {
+  "label": "ug-skinny",
+  "set": {
+   "mass": 0,
+   "ribcage": 0,
+   "backThickness": 0,
+   "bodyFat": 0.05,
+   "legMass": 0,
+   "boneThickness": 0
+  },
+  "pose": "relaxed",
+  "view": 0,
+  "wait": 900
+ },
+ {
+  "label": "ug-skinny-side",
+  "set": {
+   "mass": 0,
+   "ribcage": 0,
+   "backThickness": 0,
+   "bodyFat": 0.05,
+   "legMass": 0,
+   "boneThickness": 0
+  },
+  "pose": "relaxed",
+  "view": -90,
+  "wait": 400
+ }
+]

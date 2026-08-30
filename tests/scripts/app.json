@@ -1,0 +1,5 @@
+[
+ {"label":"app-front","set":{},"view":"front","wait":900},
+ {"label":"app-side","set":{},"view":"side","wait":400},
+ {"label":"app-back","set":{},"view":"back","wait":400}
+]

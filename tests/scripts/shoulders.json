@@ -1,0 +1,26 @@
+[
+  {
+    "label": "shoulder-front-lat",
+    "set": {
+      "mass": 0.92,
+      "legMass": 0.9,
+      "backThickness": 0.85,
+      "bodyFat": 0.06,
+      "clavicle": 0.82,
+      "hipWidth": 0.22
+    },
+    "pose": "latSpread",
+    "view": "front",
+    "zoom": 0.52,
+    "target": [0, 118, 0],
+    "wait": 600
+  },
+  {
+    "label": "shoulder-rear-lat",
+    "pose": "rearLat",
+    "view": "back",
+    "zoom": 0.52,
+    "target": [0, 118, 0],
+    "wait": 600
+  }
+]

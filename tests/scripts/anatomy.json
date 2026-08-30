@@ -1,0 +1,32 @@
+[
+  {
+    "label": "an-fdb-front",
+    "set": { "mass": 0.95, "legMass": 0.9, "backThickness": 0.85, "bodyFat": 0.04, "clavicle": 0.8, "hipWidth": 0.24 },
+    "pose": "frontDouble", "view": 0, "wait": 900
+  },
+  {
+    "label": "an-fdb-threeq",
+    "view": -28, "wait": 400
+  },
+  {
+    "label": "an-torso",
+    "pose": "relaxed", "view": -12, "zoom": 0.32, "target": [0, 130, 0], "wait": 600
+  },
+  {
+    "label": "an-arm",
+    "pose": "frontDouble", "view": -12, "zoom": 0.30, "target": [0, 146, 0], "wait": 600
+  },
+  {
+    "label": "an-legs",
+    "pose": "relaxed", "view": -10, "zoom": 0.34, "target": [0, 53, 0], "wait": 600
+  },
+  {
+    "label": "an-back",
+    "pose": "backDouble", "view": 180, "zoom": 0.8, "target": null, "wait": 800
+  },
+  {
+    "label": "an-covered",
+    "set": { "mass": 0.85, "legMass": 0.8, "backThickness": 0.8, "bodyFat": 0.72 },
+    "pose": "relaxed", "view": -28, "zoom": 1, "target": null, "wait": 900
+  }
+]

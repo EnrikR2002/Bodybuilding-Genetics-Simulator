@@ -1,0 +1,10 @@
+[
+  { "label": "p-front-double", "set": {}, "pose": "frontDouble", "view": 0, "wait": 650 },
+  { "label": "p-front-lat", "pose": "latSpread", "view": 0, "wait": 500 },
+  { "label": "p-side-chest", "pose": "sideChest", "view": -52, "wait": 550 },
+  { "label": "p-side-triceps", "pose": "sideTriceps", "view": -118, "wait": 550 },
+  { "label": "p-most-muscular", "pose": "mostMuscular", "view": 0, "wait": 550 },
+  { "label": "p-abs-thigh", "pose": "absThigh", "view": 0, "wait": 550 },
+  { "label": "p-back-double", "pose": "backDouble", "view": 180, "wait": 550 },
+  { "label": "p-rear-lat", "pose": "rearLat", "view": 180, "wait": 550 }
+]

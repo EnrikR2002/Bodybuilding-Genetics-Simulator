@@ -1,0 +1,218 @@
+[
+ {
+  "label": "sw-mass-0",
+  "set": {
+   "mass": 0.0
+  },
+  "pose": "relaxed",
+  "view": 0,
+  "wait": 700
+ },
+ {
+  "label": "sw-mass-5",
+  "set": {
+   "mass": 0.5
+  },
+  "pose": "relaxed",
+  "view": 0,
+  "wait": 700
+ },
+ {
+  "label": "sw-mass-9",
+  "set": {
+   "mass": 1.0
+  },
+  "pose": "relaxed",
+  "view": 0,
+  "wait": 700
+ },
+ {
+  "label": "sw-bodyFat-0",
+  "set": {
+   "bodyFat": 0.0
+  },
+  "pose": "relaxed",
+  "view": 0,
+  "wait": 700
+ },
+ {
+  "label": "sw-bodyFat-5",
+  "set": {
+   "bodyFat": 0.5
+  },
+  "pose": "relaxed",
+  "view": 0,
+  "wait": 700
+ },
+ {
+  "label": "sw-bodyFat-9",
+  "set": {
+   "bodyFat": 1.0
+  },
+  "pose": "relaxed",
+  "view": 0,
+  "wait": 700
+ },
+ {
+  "label": "sw-ribcage-0",
+  "set": {
+   "ribcage": 0.0
+  },
+  "pose": "relaxed",
+  "view": 0,
+  "wait": 700
+ },
+ {
+  "label": "sw-ribcage-5",
+  "set": {
+   "ribcage": 0.5
+  },
+  "pose": "relaxed",
+  "view": 0,
+  "wait": 700
+ },
+ {
+  "label": "sw-ribcage-9",
+  "set": {
+   "ribcage": 1.0
+  },
+  "pose": "relaxed",
+  "view": 0,
+  "wait": 700
+ },
+ {
+  "label": "sw-legMass-0",
+  "set": {
+   "legMass": 0.0
+  },
+  "pose": "relaxed",
+  "view": 0,
+  "wait": 700
+ },
+ {
+  "label": "sw-legMass-5",
+  "set": {
+   "legMass": 0.5
+  },
+  "pose": "relaxed",
+  "view": 0,
+  "wait": 700
+ },
+ {
+  "label": "sw-legMass-9",
+  "set": {
+   "legMass": 1.0
+  },
+  "pose": "relaxed",
+  "view": 0,
+  "wait": 700
+ },
+ {
+  "label": "sw-backThickness-0",
+  "set": {
+   "backThickness": 0.0
+  },
+  "pose": "relaxed",
+  "view": 0,
+  "wait": 700
+ },
+ {
+  "label": "sw-backThickness-5",
+  "set": {
+   "backThickness": 0.5
+  },
+  "pose": "relaxed",
+  "view": 0,
+  "wait": 700
+ },
+ {
+  "label": "sw-backThickness-9",
+  "set": {
+   "backThickness": 1.0
+  },
+  "pose": "relaxed",
+  "view": 0,
+  "wait": 700
+ },
+ {
+  "label": "sw-clavicle-0",
+  "set": {
+   "clavicle": 0.0
+  },
+  "pose": "relaxed",
+  "view": 0,
+  "wait": 700
+ },
+ {
+  "label": "sw-clavicle-5",
+  "set": {
+   "clavicle": 0.5
+  },
+  "pose": "relaxed",
+  "view": 0,
+  "wait": 700
+ },
+ {
+  "label": "sw-clavicle-9",
+  "set": {
+   "clavicle": 1.0
+  },
+  "pose": "relaxed",
+  "view": 0,
+  "wait": 700
+ },
+ {
+  "label": "sw-hipWidth-0",
+  "set": {
+   "hipWidth": 0.0
+  },
+  "pose": "relaxed",
+  "view": 0,
+  "wait": 700
+ },
+ {
+  "label": "sw-hipWidth-5",
+  "set": {
+   "hipWidth": 0.5
+  },
+  "pose": "relaxed",
+  "view": 0,
+  "wait": 700
+ },
+ {
+  "label": "sw-hipWidth-9",
+  "set": {
+   "hipWidth": 1.0
+  },
+  "pose": "relaxed",
+  "view": 0,
+  "wait": 700
+ },
+ {
+  "label": "sw-boneThickness-0",
+  "set": {
+   "boneThickness": 0.0
+  },
+  "pose": "relaxed",
+  "view": 0,
+  "wait": 700
+ },
+ {
+  "label": "sw-boneThickness-5",
+  "set": {
+   "boneThickness": 0.5
+  },
+  "pose": "relaxed",
+  "view": 0,
+  "wait": 700
+ },
+ {
+  "label": "sw-boneThickness-9",
+  "set": {
+   "boneThickness": 1.0
+  },
+  "pose": "relaxed",
+  "view": 0,
+  "wait": 700
+ }
+]

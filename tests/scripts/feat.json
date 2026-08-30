@@ -1,0 +1,6 @@
+[
+ {"label":"f-callouts","set":{"mass":0.8,"bodyFat":0.1},"pose":"frontDouble","callouts":true,"view":0,"wait":900,"bench":true},
+ {"label":"f-callouts-side","view":-38,"wait":400},
+ {"label":"f-pin","callouts":false,"pin":true,"view":0,"wait":1600},
+ {"label":"f-pin-diff","set":{"mass":0.35,"legMass":0.3,"bodyFat":0.5,"clavicle":0.2,"hipWidth":0.8},"view":0,"wait":900}
+]

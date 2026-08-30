@@ -1,0 +1,80 @@
+[
+ {
+  "label": "v-relaxed-front",
+  "pose": "relaxed",
+  "view": "front",
+  "wait": 900
+ },
+ {
+  "label": "v-relaxed-side",
+  "pose": "relaxed",
+  "view": "side",
+  "wait": 300
+ },
+ {
+  "label": "v-relaxed-back",
+  "pose": "relaxed",
+  "view": "back",
+  "wait": 300
+ },
+ {
+  "label": "v-fdb-front",
+  "pose": "frontDouble",
+  "view": "front",
+  "wait": 600
+ },
+ {
+  "label": "v-fdb-threeq",
+  "pose": "frontDouble",
+  "view": -38,
+  "wait": 300
+ },
+ {
+  "label": "v-lat",
+  "pose": "latSpread",
+  "view": "front",
+  "wait": 600
+ },
+ {
+  "label": "v-sidechest",
+  "pose": "sideChest",
+  "view": -52,
+  "wait": 600
+ },
+ {
+  "label": "v-sidetri",
+  "pose": "sideTriceps",
+  "view": -118,
+  "wait": 600
+ },
+ {
+  "label": "v-backdouble",
+  "pose": "backDouble",
+  "view": 180,
+  "wait": 600
+ },
+ {
+  "label": "v-rearlat",
+  "pose": "rearLat",
+  "view": 180,
+  "wait": 600
+ },
+ {
+  "label": "v-mostmuscular",
+  "pose": "mostMuscular",
+  "view": "front",
+  "wait": 600
+ },
+ {
+  "label": "v-absthigh",
+  "pose": "absThigh",
+  "view": "front",
+  "wait": 600
+ },
+ {
+  "label": "v-vacuum",
+  "pose": "vacuum",
+  "view": "front",
+  "wait": 600
+ }
+]

@@ -1,0 +1,44 @@
+[
+  {
+    "label": "r-relaxed",
+    "set": {},
+    "pose": "relaxed",
+    "view": -28,
+    "wait": 700
+  },
+  {
+    "label": "r-fdb",
+    "set": { "mass": 0.95, "legMass": 0.9, "backThickness": 0.85, "bodyFat": 0.04, "clavicle": 0.8, "hipWidth": 0.24 },
+    "pose": "frontDouble",
+    "view": 0,
+    "wait": 700
+  },
+  {
+    "label": "r-fdb-threeq",
+    "view": -28,
+    "wait": 350
+  },
+  {
+    "label": "r-torso",
+    "pose": "relaxed",
+    "view": -12,
+    "zoom": 0.34,
+    "target": [0, 130, 0],
+    "wait": 500
+  },
+  {
+    "label": "r-legs",
+    "view": -10,
+    "zoom": 0.36,
+    "target": [0, 53, 0],
+    "wait": 450
+  },
+  {
+    "label": "r-back",
+    "pose": "backDouble",
+    "view": 180,
+    "zoom": 0.86,
+    "target": null,
+    "wait": 650
+  }
+]

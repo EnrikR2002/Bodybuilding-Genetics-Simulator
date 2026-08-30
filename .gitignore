@@ -1,0 +1,5 @@
+node_modules/
+.assets-cache/
+dist/
+shots/
+.DS_Store

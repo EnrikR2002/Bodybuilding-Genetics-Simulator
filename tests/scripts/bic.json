@@ -1,0 +1,71 @@
+[
+ {
+  "label": "bic-hi",
+  "set": {
+   "mass": 0.92,
+   "legMass": 0.9,
+   "backThickness": 0.85,
+   "bodyFat": 0.06,
+   "clavicle": 0.82,
+   "hipWidth": 0.22,
+   "bicepInsertion": 0.0,
+   "bicepPeak": 0.75
+  },
+  "pose": "frontDouble",
+  "view": -8,
+  "el": 0.02,
+  "zoom": 0.46,
+  "target": [
+   0,
+   150,
+   0
+  ],
+  "wait": 600
+ },
+ {
+  "label": "bic-mid",
+  "set": {
+   "mass": 0.92,
+   "legMass": 0.9,
+   "backThickness": 0.85,
+   "bodyFat": 0.06,
+   "clavicle": 0.82,
+   "hipWidth": 0.22,
+   "bicepInsertion": 0.5,
+   "bicepPeak": 0.75
+  },
+  "pose": "frontDouble",
+  "view": -8,
+  "el": 0.02,
+  "zoom": 0.46,
+  "target": [
+   0,
+   150,
+   0
+  ],
+  "wait": 600
+ },
+ {
+  "label": "bic-lo",
+  "set": {
+   "mass": 0.92,
+   "legMass": 0.9,
+   "backThickness": 0.85,
+   "bodyFat": 0.06,
+   "clavicle": 0.82,
+   "hipWidth": 0.22,
+   "bicepInsertion": 1.0,
+   "bicepPeak": 0.75
+  },
+  "pose": "frontDouble",
+  "view": -8,
+  "el": 0.02,
+  "zoom": 0.46,
+  "target": [
+   0,
+   150,
+   0
+  ],
+  "wait": 600
+ }
+]

@@ -1,0 +1,203 @@
+[
+ {
+  "label": "ins-bicep-hi",
+  "set": {
+   "mass": 0.92,
+   "legMass": 0.9,
+   "backThickness": 0.85,
+   "bodyFat": 0.06,
+   "clavicle": 0.82,
+   "hipWidth": 0.22,
+   "bicepInsertion": 0.0,
+   "bicepPeak": 0.75
+  },
+  "pose": "frontDouble",
+  "view": -14,
+  "el": 0.06,
+  "zoom": 0.3,
+  "target": [
+   0,
+   146,
+   0
+  ],
+  "wait": 600
+ },
+ {
+  "label": "ins-bicep-mid",
+  "set": {
+   "mass": 0.92,
+   "legMass": 0.9,
+   "backThickness": 0.85,
+   "bodyFat": 0.06,
+   "clavicle": 0.82,
+   "hipWidth": 0.22,
+   "bicepInsertion": 0.5,
+   "bicepPeak": 0.75
+  },
+  "pose": "frontDouble",
+  "view": -14,
+  "el": 0.06,
+  "zoom": 0.3,
+  "target": [
+   0,
+   146,
+   0
+  ],
+  "wait": 600
+ },
+ {
+  "label": "ins-bicep-lo",
+  "set": {
+   "mass": 0.92,
+   "legMass": 0.9,
+   "backThickness": 0.85,
+   "bodyFat": 0.06,
+   "clavicle": 0.82,
+   "hipWidth": 0.22,
+   "bicepInsertion": 1.0,
+   "bicepPeak": 0.75
+  },
+  "pose": "frontDouble",
+  "view": -14,
+  "el": 0.06,
+  "zoom": 0.3,
+  "target": [
+   0,
+   146,
+   0
+  ],
+  "wait": 600
+ },
+ {
+  "label": "ins-lat-hi",
+  "set": {
+   "mass": 0.92,
+   "legMass": 0.9,
+   "backThickness": 0.85,
+   "bodyFat": 0.06,
+   "clavicle": 0.82,
+   "hipWidth": 0.22,
+   "latInsertion": 0.0
+  },
+  "pose": "rearLat",
+  "view": 180,
+  "el": 0.02,
+  "zoom": 0.52,
+  "target": [
+   0,
+   118,
+   0
+  ],
+  "wait": 600
+ },
+ {
+  "label": "ins-lat-mid",
+  "set": {
+   "mass": 0.92,
+   "legMass": 0.9,
+   "backThickness": 0.85,
+   "bodyFat": 0.06,
+   "clavicle": 0.82,
+   "hipWidth": 0.22,
+   "latInsertion": 0.5
+  },
+  "pose": "rearLat",
+  "view": 180,
+  "el": 0.02,
+  "zoom": 0.52,
+  "target": [
+   0,
+   118,
+   0
+  ],
+  "wait": 600
+ },
+ {
+  "label": "ins-lat-lo",
+  "set": {
+   "mass": 0.92,
+   "legMass": 0.9,
+   "backThickness": 0.85,
+   "bodyFat": 0.06,
+   "clavicle": 0.82,
+   "hipWidth": 0.22,
+   "latInsertion": 1.0
+  },
+  "pose": "rearLat",
+  "view": 180,
+  "el": 0.02,
+  "zoom": 0.52,
+  "target": [
+   0,
+   118,
+   0
+  ],
+  "wait": 600
+ },
+ {
+  "label": "ins-calf-hi",
+  "set": {
+   "mass": 0.92,
+   "legMass": 0.9,
+   "backThickness": 0.85,
+   "bodyFat": 0.06,
+   "clavicle": 0.82,
+   "hipWidth": 0.22,
+   "calfInsertion": 0.0
+  },
+  "pose": "relaxed",
+  "view": 180,
+  "el": 0.02,
+  "zoom": 0.34,
+  "target": [
+   0,
+   42,
+   0
+  ],
+  "wait": 600
+ },
+ {
+  "label": "ins-calf-mid",
+  "set": {
+   "mass": 0.92,
+   "legMass": 0.9,
+   "backThickness": 0.85,
+   "bodyFat": 0.06,
+   "clavicle": 0.82,
+   "hipWidth": 0.22,
+   "calfInsertion": 0.5
+  },
+  "pose": "relaxed",
+  "view": 180,
+  "el": 0.02,
+  "zoom": 0.34,
+  "target": [
+   0,
+   42,
+   0
+  ],
+  "wait": 600
+ },
+ {
+  "label": "ins-calf-lo",
+  "set": {
+   "mass": 0.92,
+   "legMass": 0.9,
+   "backThickness": 0.85,
+   "bodyFat": 0.06,
+   "clavicle": 0.82,
+   "hipWidth": 0.22,
+   "calfInsertion": 1.0
+  },
+  "pose": "relaxed",
+  "view": 180,
+  "el": 0.02,
+  "zoom": 0.34,
+  "target": [
+   0,
+   42,
+   0
+  ],
+  "wait": 600
+ }
+]
