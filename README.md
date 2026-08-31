@@ -28,25 +28,34 @@ You only need the steps below if you want to rebuild them.
 
 ## Where the body comes from
 
-The figure is **not generated from formulas**. It is a sculpted anatomical mesh:
-the MakeHuman base body, released as CC0 in 2020 by Data Collection AB, Joel
-Palmius and Jonas Hauquier. Along with the mesh, the project uses MakeHuman's
-CC0 skeleton, its skin weights, and 144 of its sculpted morph targets.
+The current control cage is the MakeHuman base body, released as CC0 in 2020 by
+Data Collection AB, Joel Palmius and Jonas Hauquier. Along with the mesh, the
+project uses MakeHuman's CC0 skeleton, skin weights, and 144 sculpted morph
+targets. Those assets provide proportion and body-composition changes; they do
+**not** provide bodybuilding-quality muscle insertions.
 
-That choice decides everything else. Formulas can make a smooth tube that is
-roughly arm-shaped. They cannot make the small asymmetries, the tendon dips, the
-skin creases at the elbow, or the way a shoulder actually meets a chest. Those
-were sculpted by people, and the app's job is to move them around rather than to
-invent them.
+The production path therefore accepts a separate set of artist-authored trait
+correctives. When a complete endpoint pair is installed, it replaces the
+generated region deformation for that slider. Until then, the older
+bone-derived region map remains only as a visible fallback. The first accepted
+pair is the lat-insertion range; its inferior border is projected from the
+separated Z-Anatomy latissimus meshes and then sculpted into two distinct
+topology-matched endpoints.
 
 | Asset | Licence | Used for |
 |---|---|---|
 | MakeHuman `base.obj` | CC0 | the body: 13,378 quads, quad-dominant, UV-unwrapped |
 | MakeHuman `default.mhskel` + `default_weights.mhw` | CC0 | 163-bone rig and skin weights |
 | MakeHuman morph targets (144 of them) | CC0 | mass, body fat, frame, limb lengths, girths |
+| Z-Anatomy / BodyParts3D superficial muscles | CC BY-SA 4.0 / CC BY-SA 2.1 Japan | anatomical outlines, posterior surface planes, and lat insertion endpoints |
+| Blender Studio realistic human base by Julien Kaspar | CC BY | authoring and topology reference; not shipped as the runtime cage |
 | Poly Haven `brown_photostudio_02` | CC0 | studio HDRI for image-based lighting |
 
-Licence text is copied into `assets-src/` next to the assets it covers.
+Licence text and attribution are copied into `assets-src/` next to the assets
+they cover. The Blender Studio mesh was evaluated as a replacement surface,
+but its transferred skin weights did not pass the pose-deformation gate. It is
+kept as an authoring reference rather than pretending a prettier neutral mesh
+is production-ready when shoulders and hips tear in motion.
 
 ---
 
@@ -57,7 +66,9 @@ Every shape change runs the same chain, start to finish, inside one frame:
 ```
 rest cage (13,378 quads)
   -> sculpted morph targets        params.js   size, frame, body composition
-  -> insertion remap               regions.js  where each belly sits on its bone
+  -> authored trait correctives    params.js   real insertion endpoint sculpts
+  -> atlas surface relief          params.js   separated posterior muscle planes
+  -> procedural fallback           regions.js  only for missing endpoint pairs
   -> definition / softening        regions.js  lean sharpens, fat blurs
   -> Catmull-Clark subdivision     subdiv.js   107,024 triangles
   -> normals
@@ -72,14 +83,13 @@ mesh, so a morph that widens the pelvis moves the hip joints with it. There is
 nothing to keep in sync, because there is only one thing — which is why the mesh
 never tears at the shoulder when a slider moves.
 
-**Insertions are a real mechanic, not a size change.** Each muscle arrives from
-the bake knowing, per vertex, how strongly it belongs to that muscle, how far
-along its bone it sits, and which way it grows. An insertion slider slides the
-belly along the bone and shortens its run — and, importantly, *removes* the
-volume where the belly no longer is. Raise the biceps insertion and the arm
-genuinely empties out above the elbow. See `shots/sheet-bic.png`.
+**Production insertions are authored shapes, not size changes.** Each slider has
+two vertex-matched endpoint sculpts. For example, the lat endpoints change the
+inferior border, exposed lumbar fascia, tendon transition, and silhouette as a
+single controlled shape. `regions.js` supplies an interim approximation only
+when those assets have not yet been installed.
 
-**The muscle map is derived, not painted.** `tools/bake-regions.mjs` builds a
+**The fallback muscle map is derived, not painted.** `tools/bake-regions.mjs` builds a
 frame that follows each bone run, then asks of every vertex: how far along, what
 angle around, and does the rig already agree this vertex belongs to that limb.
 The rig check is what stops the biceps region leaking onto the ribs.
@@ -187,6 +197,43 @@ copies out the 147 files listed in `tools/assets-manifest.mjs`.
 `npm run bake` writes `public/models/body.bin` and `public/models/regions.bin`.
 Both take a few seconds.
 
+## Authoring production anatomy
+
+```bash
+npm run sculpt:export
+npm run sculpt:import -- latInsertion 0 path/to/high-lat.obj
+npm run sculpt:import -- latInsertion 1 path/to/low-lat.obj
+npm run bake
+```
+
+The exporter writes the exact vertex-ordered neutral cage an anatomy artist
+should use. The importer validates topology and scale, converts an endpoint OBJ
+to a sparse runtime target, and the next bake picks it up automatically. The
+complete fourteen-sculpt contract and its visual acceptance tests live in
+`assets-src/authoring/README.md`.
+
+The checked-in lat and back assets can be regenerated without opening Blender's
+sculpt UI:
+
+```bash
+# Project the Z-Anatomy latissimus meshes, then author both insertion endpoints
+blender -b assets-src/anatomy-reference/superficial-muscles.blend \
+  --python tools/blender/project_lat_reference.py
+npm run sculpt:lats
+
+# Project the separated posterior muscles and rebuild their surface relief
+blender -b assets-src/anatomy-reference/superficial-muscles.blend \
+  --python tools/blender/project_back_reference.py
+npm run sculpt:back
+npm run bake
+```
+
+The posterior corrective transfers atlas depth only along the back-facing axis;
+it deliberately retains the production cage's X/Y topology and rig landmarks.
+Each muscle is normalised independently before its outline is traced, so the
+broad superficial lat cannot erase the deeper teres, rhomboid, and trapezius
+planes simply by being the nearest object everywhere.
+
 ---
 
 ## Looking at it
@@ -208,6 +255,8 @@ Useful scripts already in `tests/scripts/`:
 | `bic.json` | biceps insertion at both extremes, framed on the arms |
 | `skin.json` | joints under load, plus lean / fat / untrained |
 | `bench.json` | how long a full shape rebuild takes |
+| `lat-authored.json` | high/low lat insertion in rear spread and rear double-biceps |
+| `pose-review.json` | the seven principal stage poses with the correct rear camera |
 
 ---
 
@@ -217,6 +266,7 @@ Useful scripts already in `tests/scripts/`:
 src/
   main.js              app: state, camera, UI, loop
   body/
+    anatomy.js         negative-space seams and muscle/tendon planes
     figure.js          the deform -> subdivide -> skin chain
     morph.js           sculpted target blending
     params.js          eighteen sliders -> target weights
@@ -238,6 +288,8 @@ tools/
   bake-mesh.mjs        mesh, subdivision topology, rig, targets
   bake-regions.mjs     the muscle map
   region-table.mjs     where each muscle sits
+  author-lat-correctives.mjs  Z-Anatomy lat outlines -> endpoint sculpts
+  author-back-anatomy.mjs     separated posterior muscles -> surface relief
 tests/
   shots.mjs            screenshot harness
   sheet.mjs            contact sheets

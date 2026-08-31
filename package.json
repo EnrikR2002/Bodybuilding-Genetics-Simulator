@@ -6,6 +6,11 @@
   "scripts": {
     "assets": "node tools/fetch-assets.mjs",
     "bake": "node tools/bake-mesh.mjs && node tools/bake-regions.mjs",
+    "sculpt:export": "node tools/export-sculpt-cage.mjs",
+    "sculpt:import": "node tools/import-corrective.mjs",
+    "studio:landmarks": "node tools/export-rig-landmarks.mjs",
+    "sculpt:lats": "node tools/author-lat-correctives.mjs",
+    "sculpt:back": "node tools/author-back-anatomy.mjs",
     "textures": "node tools/bake-textures.mjs",
     "dev": "vite",
     "build": "vite build",

@@ -1,0 +1,9 @@
+[
+  { "label": "pose-front-double", "pose": "frontDouble", "view": "front", "set": { "mass": 0.72, "legMass": 0.68, "backThickness": 0.72, "bodyFat": 0.08 }, "zoom": 1.05 },
+  { "label": "pose-front-lat", "pose": "latSpread", "view": "front", "zoom": 1.05 },
+  { "label": "pose-side-chest", "pose": "sideChest", "view": "front", "zoom": 1.05 },
+  { "label": "pose-back-double", "pose": "backDouble", "view": "back", "zoom": 1.05 },
+  { "label": "pose-rear-lat", "pose": "rearLat", "view": "back", "zoom": 1.05 },
+  { "label": "pose-most-muscular", "pose": "mostMuscular", "view": "front", "zoom": 1.05 },
+  { "label": "pose-abs-thigh", "pose": "absThigh", "view": "front", "zoom": 1.05 }
+]

@@ -20,6 +20,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { readObj, readTarget, readSkeleton, readWeights, MH_TO_CM } from './mh-parse.mjs';
 import { ALL_TARGETS } from './assets-manifest.mjs';
+import { CORRECTIVE_TARGETS } from './corrective-contract.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const SRC = path.join(ROOT, 'assets-src');
@@ -54,12 +55,17 @@ log(`  ${nAll} vertices, ${nQuads} body quads`);
  * ======================================================================== */
 log('reading morph targets');
 const targets = {};
-for (const rel of ALL_TARGETS) {
+function loadTarget(rel, required) {
   const file = path.join(SRC, rel);
-  if (!fs.existsSync(file)) { console.warn('  missing ' + rel); continue; }
+  if (!fs.existsSync(file)) {
+    if (required) console.warn('  missing ' + rel);
+    return;
+  }
   const name = rel.replace(/^targets\//, '').replace(/\.target$/, '');
   targets[name] = readTarget(file);
 }
+for (const rel of ALL_TARGETS) loadTarget(rel, true);
+for (const rel of CORRECTIVE_TARGETS) loadTarget(rel, false);
 log(`  ${Object.keys(targets).length} targets`);
 
 /* Bake the ethnicity/sex/age axis straight into the rest mesh. It is fixed for
@@ -445,6 +451,7 @@ for (const [name, verts] of Object.entries(jointVerts))
 
 const header = {
   version: 3,
+  source: 'makehuman',
   units: 'decimetres', scale: MH_TO_CM,
   subdiv: SUBDIV,
   nCage: nAll, nQuads, nSubVerts, nRender, nTris: tris.length / 3,

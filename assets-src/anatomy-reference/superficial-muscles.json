@@ -1,0 +1,2723 @@
+{
+  "file": "C:\\Users\\enrik\\Desktop\\Coding Projects\\Bodybuilding Genetics Simulator\\.assets-cache\\z-anatomy\\extracted\\Z-Anatomy\\Startup.blend",
+  "object_count": 7183,
+  "types": {
+    "MESH": 4568,
+    "FONT": 1660,
+    "CAMERA": 1,
+    "LIGHT": 3,
+    "CURVE": 951
+  },
+  "matches": [
+    {
+      "name": "Superior oblique muscle.l",
+      "data": "Superior oblique muscle",
+      "vertices": 877,
+      "polygons": 1750,
+      "collections": [
+        "4: Muscular system",
+        "Head",
+        "Muscles",
+        "Muscles of head"
+      ]
+    },
+    {
+      "name": "Superior oblique muscle.r",
+      "data": "Superior oblique muscle",
+      "vertices": 877,
+      "polygons": 1750,
+      "collections": [
+        "4: Muscular system",
+        "Head",
+        "Muscles",
+        "Muscles of head"
+      ]
+    },
+    {
+      "name": "Inferior oblique muscle.r",
+      "data": "Inferior oblique muscle",
+      "vertices": 576,
+      "polygons": 1148,
+      "collections": [
+        "4: Muscular system",
+        "Head",
+        "Muscles",
+        "Muscles of head",
+        "Oculomotor nerve (III)"
+      ]
+    },
+    {
+      "name": "Trochlea of superior oblique muscle.r",
+      "data": "Trochlea of superior oblique muscle",
+      "vertices": 98,
+      "polygons": 192,
+      "collections": [
+        "4: Muscular system",
+        "Head",
+        "Muscles",
+        "Muscles of head"
+      ]
+    },
+    {
+      "name": "Inferior oblique muscle.l",
+      "data": "Inferior oblique muscle",
+      "vertices": 576,
+      "polygons": 1148,
+      "collections": [
+        "4: Muscular system",
+        "Head",
+        "Muscles",
+        "Muscles of head",
+        "Oculomotor nerve (III)"
+      ]
+    },
+    {
+      "name": "Trochlea of superior oblique muscle.l",
+      "data": "Trochlea of superior oblique muscle",
+      "vertices": 98,
+      "polygons": 192,
+      "collections": [
+        "4: Muscular system",
+        "Head",
+        "Muscles",
+        "Muscles of head"
+      ]
+    },
+    {
+      "name": "Superficial layer of temporal fascia.r",
+      "data": "Superficial layer of temporal fascia",
+      "vertices": 378,
+      "polygons": 359,
+      "collections": [
+        "4: Muscular system",
+        "Fascia",
+        "Head",
+        "Superficial muscles"
+      ]
+    },
+    {
+      "name": "Masseteric fascia.r",
+      "data": "Masseteric fascia",
+      "vertices": 226,
+      "polygons": 205,
+      "collections": [
+        "4: Muscular system",
+        "Fascia",
+        "Head",
+        "Superficial muscles"
+      ]
+    },
+    {
+      "name": "Superficial layer of temporal fascia.l",
+      "data": "Superficial layer of temporal fascia",
+      "vertices": 378,
+      "polygons": 359,
+      "collections": [
+        "4: Muscular system",
+        "Fascia",
+        "Head",
+        "Superficial muscles"
+      ]
+    },
+    {
+      "name": "Masseteric fascia.l",
+      "data": "Masseteric fascia",
+      "vertices": 226,
+      "polygons": 205,
+      "collections": [
+        "4: Muscular system",
+        "Fascia",
+        "Head",
+        "Superficial muscles"
+      ]
+    },
+    {
+      "name": "Oblique part of cricothyroid muscle.r",
+      "data": "Oblique part of cricothyroid muscle",
+      "vertices": 1032,
+      "polygons": 2060,
+      "collections": [
+        "4: Muscular system",
+        "Laryngeal muscles",
+        "Muscles",
+        "Muscles of neck",
+        "Neck",
+        "Trunk"
+      ]
+    },
+    {
+      "name": "Oblique part of cricothyroid muscle.l",
+      "data": "Oblique part of cricothyroid muscle",
+      "vertices": 1032,
+      "polygons": 2060,
+      "collections": [
+        "4: Muscular system",
+        "Laryngeal muscles",
+        "Muscles",
+        "Muscles of neck",
+        "Neck",
+        "Trunk"
+      ]
+    },
+    {
+      "name": "Ary-epiglottic part of oblique arytenoid muscle.r",
+      "data": "Ary-epiglottic part of oblique arytenoid muscle",
+      "vertices": 513,
+      "polygons": 1022,
+      "collections": [
+        "4: Muscular system",
+        "Laryngeal muscles",
+        "Muscles",
+        "Muscles of neck",
+        "Neck",
+        "Trunk"
+      ]
+    },
+    {
+      "name": "Ary-epiglottic part of oblique arytenoid muscle.l",
+      "data": "Ary-epiglottic part of oblique arytenoid muscle",
+      "vertices": 513,
+      "polygons": 1022,
+      "collections": [
+        "4: Muscular system",
+        "Laryngeal muscles",
+        "Muscles",
+        "Muscles of neck",
+        "Neck",
+        "Trunk"
+      ]
+    },
+    {
+      "name": "Superficial investing cervical fascia.r",
+      "data": "Superficial investing cervical fascia",
+      "vertices": 1770,
+      "polygons": 1715,
+      "collections": [
+        "4: Muscular system",
+        "Fascia",
+        "Neck",
+        "Superficial muscles",
+        "Trunk"
+      ]
+    },
+    {
+      "name": "Superficial investing cervical fascia.l",
+      "data": "Superficial investing cervical fascia",
+      "vertices": 1770,
+      "polygons": 1715,
+      "collections": [
+        "4: Muscular system",
+        "Fascia",
+        "Neck",
+        "Superficial muscles",
+        "Trunk"
+      ]
+    },
+    {
+      "name": "Posterior layer of thoracolumbar fascia.r",
+      "data": "Posterior layer of thoracolumbar fascia",
+      "vertices": 184,
+      "polygons": 158,
+      "collections": [
+        "4: Muscular system",
+        "Back",
+        "Fascia",
+        "Trunk"
+      ]
+    },
+    {
+      "name": "Middle layer of thoracolumbar fascia.r",
+      "data": "Middle layer of thoracolumbar fascia",
+      "vertices": 99,
+      "polygons": 82,
+      "collections": [
+        "4: Muscular system",
+        "Back",
+        "Fascia",
+        "Trunk"
+      ]
+    },
+    {
+      "name": "Anterior layer of thoracolumbar fascia.r",
+      "data": "Anterior layer of thoracolumbar fascia",
+      "vertices": 115,
+      "polygons": 90,
+      "collections": [
+        "4: Muscular system",
+        "Back",
+        "Fascia",
+        "Trunk"
+      ]
+    },
+    {
+      "name": "Posterior layer of thoracolumbar fascia.l",
+      "data": "Posterior layer of thoracolumbar fascia",
+      "vertices": 184,
+      "polygons": 158,
+      "collections": [
+        "4: Muscular system",
+        "Back",
+        "Fascia",
+        "Trunk"
+      ]
+    },
+    {
+      "name": "Middle layer of thoracolumbar fascia.l",
+      "data": "Middle layer of thoracolumbar fascia",
+      "vertices": 99,
+      "polygons": 82,
+      "collections": [
+        "4: Muscular system",
+        "Back",
+        "Fascia",
+        "Trunk"
+      ]
+    },
+    {
+      "name": "Anterior layer of thoracolumbar fascia.l",
+      "data": "Anterior layer of thoracolumbar fascia",
+      "vertices": 115,
+      "polygons": 90,
+      "collections": [
+        "4: Muscular system",
+        "Back",
+        "Fascia",
+        "Trunk"
+      ]
+    },
+    {
+      "name": "Iliocostalis lumborum muscle.r",
+      "data": "Iliocostalis lumborum muscle",
+      "vertices": 5019,
+      "polygons": 10038,
+      "collections": [
+        "4: Muscular system",
+        "Back",
+        "Erector spinae",
+        "Muscles",
+        "Trunk"
+      ]
+    },
+    {
+      "name": "Iliocostalis thoracis muscle.r",
+      "data": "Iliocostalis thoracis muscle",
+      "vertices": 2888,
+      "polygons": 5772,
+      "collections": [
+        "4: Muscular system",
+        "Back",
+        "Erector spinae",
+        "Muscles",
+        "Trunk"
+      ]
+    },
+    {
+      "name": "Iliocostalis colli muscle.r",
+      "data": "Iliocostalis colli muscle",
+      "vertices": 1027,
+      "polygons": 2050,
+      "collections": [
+        "4: Muscular system",
+        "Back",
+        "Erector spinae",
+        "Muscles",
+        "Neck",
+        "Trunk"
+      ]
+    },
+    {
+      "name": "Iliocostalis lumborum muscle.l",
+      "data": "Iliocostalis lumborum muscle",
+      "vertices": 5019,
+      "polygons": 10038,
+      "collections": [
+        "4: Muscular system",
+        "Back",
+        "Erector spinae",
+        "Muscles",
+        "Trunk"
+      ]
+    },
+    {
+      "name": "Iliocostalis thoracis muscle.l",
+      "data": "Iliocostalis thoracis muscle",
+      "vertices": 2888,
+      "polygons": 5772,
+      "collections": [
+        "4: Muscular system",
+        "Back",
+        "Erector spinae",
+        "Muscles",
+        "Trunk"
+      ]
+    },
+    {
+      "name": "Iliocostalis colli muscle",
+      "data": "Iliocostalis colli muscle",
+      "vertices": 1027,
+      "polygons": 2050,
+      "collections": [
+        "4: Muscular system",
+        "Erector spinae",
+        "Muscles",
+        "Neck",
+        "Trunk"
+      ]
+    },
+    {
+      "name": "Longissimus thoracis muscle.r",
+      "data": "Longissimus thoracis muscle",
+      "vertices": 4818,
+      "polygons": 9652,
+      "collections": [
+        "4: Muscular system",
+        "Back",
+        "Erector spinae",
+        "Muscles",
+        "Trunk"
+      ]
+    },
+    {
+      "name": "Longissimus thoracis muscle.l",
+      "data": "Longissimus thoracis muscle",
+      "vertices": 4818,
+      "polygons": 9652,
+      "collections": [
+        "4: Muscular system",
+        "Back",
+        "Erector spinae",
+        "Muscles",
+        "Trunk"
+      ]
+    },
+    {
+      "name": "Longissimus capitis muscle.r",
+      "data": "Longissimus capitis muscle",
+      "vertices": 785,
+      "polygons": 1574,
+      "collections": [
+        "4: Muscular system",
+        "Back",
+        "Erector spinae",
+        "Muscles",
+        "Neck",
+        "Trunk"
+      ]
+    },
+    {
+      "name": "Longissimus colli muscle.r",
+      "data": "Longissimus colli muscle",
+      "vertices": 915,
+      "polygons": 1826,
+      "collections": [
+        "4: Muscular system",
+        "Back",
+        "Erector spinae",
+        "Muscles",
+        "Neck",
+        "Trunk"
+      ]
+    },
+    {
+      "name": "Longissimus capitis muscle.l",
+      "data": "Longissimus capitis muscle",
+      "vertices": 785,
+      "polygons": 1574,
+      "collections": [
+        "4: Muscular system",
+        "Back",
+        "Erector spinae",
+        "Muscles",
+        "Neck",
+        "Trunk"
+      ]
+    },
+    {
+      "name": "Longissimus colli muscle.l",
+      "data": "Longissimus colli muscle",
+      "vertices": 915,
+      "polygons": 1826,
+      "collections": [
+        "4: Muscular system",
+        "Back",
+        "Erector spinae",
+        "Muscles",
+        "Neck",
+        "Trunk"
+      ]
+    },
+    {
+      "name": "Spinalis capitis muscle.r",
+      "data": "Spinalis capitis muscle",
+      "vertices": 1275,
+      "polygons": 2560,
+      "collections": [
+        "4: Muscular system",
+        "Back",
+        "Erector spinae",
+        "Muscles",
+        "Neck",
+        "Trunk"
+      ]
+    },
+    {
+      "name": "Spinalis colli muscle.r",
+      "data": "Spinalis colli muscle",
+      "vertices": 298,
+      "polygons": 596,
+      "collections": [
+        "4: Muscular system",
+        "Back",
+        "Erector spinae",
+        "Muscles",
+        "Neck",
+        "Trunk"
+      ]
+    },
+    {
+      "name": "Spinalis thoracis muscle.r",
+      "data": "Spinalis thoracis muscle",
+      "vertices": 2768,
+      "polygons": 5532,
+      "collections": [
+        "4: Muscular system",
+        "Back",
+        "Erector spinae",
+        "Muscles",
+        "Trunk"
+      ]
+    },
+    {
+      "name": "Spinalis capitis muscle.l",
+      "data": "Spinalis capitis muscle",
+      "vertices": 1275,
+      "polygons": 2560,
+      "collections": [
+        "4: Muscular system",
+        "Back",
+        "Erector spinae",
+        "Muscles",
+        "Neck",
+        "Trunk"
+      ]
+    },
+    {
+      "name": "Spinalis colli muscle.l",
+      "data": "Spinalis colli muscle",
+      "vertices": 298,
+      "polygons": 596,
+      "collections": [
+        "4: Muscular system",
+        "Back",
+        "Erector spinae",
+        "Muscles",
+        "Neck",
+        "Trunk"
+      ]
+    },
+    {
+      "name": "Spinalis thoracis muscle.l",
+      "data": "Spinalis thoracis muscle",
+      "vertices": 2768,
+      "polygons": 5532,
+      "collections": [
+        "4: Muscular system",
+        "Back",
+        "Erector spinae",
+        "Muscles",
+        "Trunk"
+      ]
+    },
+    {
+      "name": "Ascending part of trapezius muscle.r",
+      "data": "Ascending part of trapezius muscle",
+      "vertices": 2298,
+      "polygons": 4596,
+      "collections": [
+        "4: Muscular system",
+        "Accessory nerve (XI)",
+        "Back",
+        "Hypaxial muscles of back",
+        "Muscles",
+        "Neck",
+        "Superficial muscles",
+        "Trapezius muscle",
+        "Trunk"
+      ]
+    },
+    {
+      "name": "Descending part of trapezius muscle.r",
+      "data": "Descending part of trapezius muscle",
+      "vertices": 3376,
+      "polygons": 6760,
+      "collections": [
+        "4: Muscular system",
+        "Accessory nerve (XI)",
+        "Back",
+        "Hypaxial muscles of back",
+        "Muscles",
+        "Superficial muscles",
+        "Trapezius muscle",
+        "Trunk"
+      ]
+    },
+    {
+      "name": "Transverse part of trapezius muscle.r",
+      "data": "Transverse part of trapezius muscle",
+      "vertices": 1494,
+      "polygons": 2992,
+      "collections": [
+        "4: Muscular system",
+        "Accessory nerve (XI)",
+        "Back",
+        "Hypaxial muscles of back",
+        "Muscles",
+        "Superficial muscles",
+        "Trapezius muscle",
+        "Trunk"
+      ]
+    },
+    {
+      "name": "Ascending part of trapezius muscle.l",
+      "data": "Ascending part of trapezius muscle",
+      "vertices": 2298,
+      "polygons": 4596,
+      "collections": [
+        "4: Muscular system",
+        "Accessory nerve (XI)",
+        "Back",
+        "Hypaxial muscles of back",
+        "Muscles",
+        "Neck",
+        "Superficial muscles",
+        "Trapezius muscle",
+        "Trunk"
+      ]
+    },
+    {
+      "name": "Descending part of trapezius muscle.l",
+      "data": "Descending part of trapezius muscle",
+      "vertices": 3376,
+      "polygons": 6760,
+      "collections": [
+        "4: Muscular system",
+        "Accessory nerve (XI)",
+        "Back",
+        "Hypaxial muscles of back",
+        "Muscles",
+        "Superficial muscles",
+        "Trapezius muscle",
+        "Trunk"
+      ]
+    },
+    {
+      "name": "Transverse part of trapezius muscle.l",
+      "data": "Transverse part of trapezius muscle",
+      "vertices": 1494,
+      "polygons": 2992,
+      "collections": [
+        "4: Muscular system",
+        "Accessory nerve (XI)",
+        "Back",
+        "Hypaxial muscles of back",
+        "Muscles",
+        "Superficial muscles",
+        "Trapezius muscle",
+        "Trunk"
+      ]
+    },
+    {
+      "name": "Levator scapulae.r",
+      "data": "Levator scapulae",
+      "vertices": 1543,
+      "polygons": 3082,
+      "collections": [
+        "4: Muscular system",
+        "Back",
+        "Dorsal scapular nerve",
+        "Hypaxial muscles of back",
+        "Muscles",
+        "Neck",
+        "Trunk"
+      ]
+    },
+    {
+      "name": "Rhomboid major muscle.r",
+      "data": "Rhomboid major muscle",
+      "vertices": 2402,
+      "polygons": 4800,
+      "collections": [
+        "4: Muscular system",
+        "Back",
+        "Dorsal scapular nerve",
+        "Hypaxial muscles of back",
+        "Muscles",
+        "Trunk"
+      ]
+    },
+    {
+      "name": "Rhomboid minor muscle.r",
+      "data": "Rhomboid minor muscle",
+      "vertices": 747,
+      "polygons": 1494,
+      "collections": [
+        "4: Muscular system",
+        "Back",
+        "Dorsal scapular nerve",
+        "Hypaxial muscles of back",
+        "Muscles",
+        "Trunk"
+      ]
+    },
+    {
+      "name": "Latissimus dorsi muscle.r",
+      "data": "Latissimus dorsi muscle",
+      "vertices": 10796,
+      "polygons": 21580,
+      "collections": [
+        "4: Muscular system",
+        "Back",
+        "Hypaxial muscles of back",
+        "Muscles",
+        "Superficial muscles",
+        "Trunk"
+      ]
+    },
+    {
+      "name": "Serratus posterior inferior muscle.r",
+      "data": "Serratus posterior inferior muscle",
+      "vertices": 4471,
+      "polygons": 8958,
+      "collections": [
+        "4: Muscular system",
+        "Back",
+        "Hypaxial muscles of back",
+        "Muscles",
+        "Trunk"
+      ]
+    },
+    {
+      "name": "Serratus posterior superior muscle.r",
+      "data": "Serratus posterior superior muscle",
+      "vertices": 2759,
+      "polygons": 5518,
+      "collections": [
+        "4: Muscular system",
+        "Back",
+        "Hypaxial muscles of back",
+        "Muscles",
+        "Trunk"
+      ]
+    },
+    {
+      "name": "Levator scapulae.l",
+      "data": "Levator scapulae",
+      "vertices": 1543,
+      "polygons": 3082,
+      "collections": [
+        "4: Muscular system",
+        "Back",
+        "Dorsal scapular nerve",
+        "Hypaxial muscles of back",
+        "Muscles",
+        "Neck",
+        "Trunk"
+      ]
+    },
+    {
+      "name": "Rhomboid major muscle.l",
+      "data": "Rhomboid major muscle",
+      "vertices": 2402,
+      "polygons": 4800,
+      "collections": [
+        "4: Muscular system",
+        "Back",
+        "Dorsal scapular nerve",
+        "Hypaxial muscles of back",
+        "Muscles",
+        "Trunk"
+      ]
+    },
+    {
+      "name": "Rhomboid minor muscle.l",
+      "data": "Rhomboid minor muscle",
+      "vertices": 747,
+      "polygons": 1494,
+      "collections": [
+        "4: Muscular system",
+        "Back",
+        "Dorsal scapular nerve",
+        "Hypaxial muscles of back",
+        "Muscles",
+        "Trunk"
+      ]
+    },
+    {
+      "name": "Latissimus dorsi muscle.l",
+      "data": "Latissimus dorsi muscle",
+      "vertices": 10796,
+      "polygons": 21580,
+      "collections": [
+        "4: Muscular system",
+        "Back",
+        "Hypaxial muscles of back",
+        "Muscles",
+        "Superficial muscles",
+        "Trunk"
+      ]
+    },
+    {
+      "name": "Serratus posterior inferior muscle.l",
+      "data": "Serratus posterior inferior muscle",
+      "vertices": 4471,
+      "polygons": 8958,
+      "collections": [
+        "4: Muscular system",
+        "Back",
+        "Hypaxial muscles of back",
+        "Muscles",
+        "Trunk"
+      ]
+    },
+    {
+      "name": "Serratus posterior superior muscle.l",
+      "data": "Serratus posterior superior muscle",
+      "vertices": 2759,
+      "polygons": 5518,
+      "collections": [
+        "4: Muscular system",
+        "Back",
+        "Hypaxial muscles of back",
+        "Muscles",
+        "Trunk"
+      ]
+    },
+    {
+      "name": "Clavicular head of pectoralis major muscle.r",
+      "data": "Clavicular head of pectoralis major muscle",
+      "vertices": 425,
+      "polygons": 850,
+      "collections": [
+        "4: Muscular system",
+        "Lateral pectoral nerve",
+        "Muscles",
+        "Pectoralis major muscle",
+        "Superficial muscles",
+        "Trunk"
+      ]
+    },
+    {
+      "name": "Sternocostal head of pectoralis major muscle.r",
+      "data": "Sternocostal head of pectoralis major muscle",
+      "vertices": 1611,
+      "polygons": 3217,
+      "collections": [
+        "4: Muscular system",
+        "Lateral pectoral nerve",
+        "Muscles",
+        "Pectoralis major muscle",
+        "Superficial muscles",
+        "Trunk"
+      ]
+    },
+    {
+      "name": "(Abdominal part of pectoralis major muscle).r",
+      "data": "(Abdominal part of pectoralis major muscle)",
+      "vertices": 756,
+      "polygons": 1508,
+      "collections": [
+        "4: Muscular system",
+        "Lateral pectoral nerve",
+        "Muscles",
+        "Pectoralis major muscle",
+        "Trunk"
+      ]
+    },
+    {
+      "name": "Clavicular head of pectoralis major muscle.l",
+      "data": "Clavicular head of pectoralis major muscle",
+      "vertices": 425,
+      "polygons": 850,
+      "collections": [
+        "4: Muscular system",
+        "Lateral pectoral nerve",
+        "Muscles",
+        "Pectoralis major muscle",
+        "Superficial muscles",
+        "Trunk"
+      ]
+    },
+    {
+      "name": "Sternocostal head of pectoralis major muscle.l",
+      "data": "Sternocostal head of pectoralis major muscle",
+      "vertices": 1611,
+      "polygons": 3217,
+      "collections": [
+        "4: Muscular system",
+        "Lateral pectoral nerve",
+        "Muscles",
+        "Pectoralis major muscle",
+        "Superficial muscles",
+        "Trunk"
+      ]
+    },
+    {
+      "name": "(Abdominal part of pectoralis major muscle).l",
+      "data": "(Abdominal part of pectoralis major muscle)",
+      "vertices": 756,
+      "polygons": 1508,
+      "collections": [
+        "4: Muscular system",
+        "Lateral pectoral nerve",
+        "Muscles",
+        "Pectoralis major muscle",
+        "Trunk"
+      ]
+    },
+    {
+      "name": "Pectoralis minor muscle.r",
+      "data": "Pectoralis minor muscle",
+      "vertices": 2067,
+      "polygons": 4142,
+      "collections": [
+        "4: Muscular system",
+        "Muscles",
+        "Trunk"
+      ]
+    },
+    {
+      "name": "Serratus anterior muscle.r",
+      "data": "Serratus anterior muscle",
+      "vertices": 12618,
+      "polygons": 25240,
+      "collections": [
+        "4: Muscular system",
+        "Long thoracic nerve",
+        "Muscles",
+        "Trunk"
+      ]
+    },
+    {
+      "name": "Pectoralis minor muscle.l",
+      "data": "Pectoralis minor muscle",
+      "vertices": 2067,
+      "polygons": 4142,
+      "collections": [
+        "4: Muscular system",
+        "Muscles",
+        "Trunk"
+      ]
+    },
+    {
+      "name": "Serratus anterior muscle.l",
+      "data": "Serratus anterior muscle",
+      "vertices": 12618,
+      "polygons": 25240,
+      "collections": [
+        "4: Muscular system",
+        "Long thoracic nerve",
+        "Muscles",
+        "Trunk"
+      ]
+    },
+    {
+      "name": "Pectoral fascia.r",
+      "data": "Pectoral fascia",
+      "vertices": 1424,
+      "polygons": 1376,
+      "collections": [
+        "4: Muscular system",
+        "Fascia",
+        "Superficial muscles",
+        "Trunk"
+      ]
+    },
+    {
+      "name": "Pectoral fascia.l",
+      "data": "Pectoral fascia",
+      "vertices": 1424,
+      "polygons": 1376,
+      "collections": [
+        "4: Muscular system",
+        "Fascia",
+        "Superficial muscles",
+        "Trunk"
+      ]
+    },
+    {
+      "name": "Rectus abdominis muscle.r",
+      "data": "Rectus abdominis muscle",
+      "vertices": 10304,
+      "polygons": 20604,
+      "collections": [
+        "4: Muscular system",
+        "Abdominal part of muscular system",
+        "Muscles",
+        "Muscles of abdomen",
+        "Trunk"
+      ]
+    },
+    {
+      "name": "Rectus abdominis muscle.l",
+      "data": "Rectus abdominis muscle",
+      "vertices": 10304,
+      "polygons": 20604,
+      "collections": [
+        "4: Muscular system",
+        "Abdominal part of muscular system",
+        "Muscles",
+        "Muscles of abdomen",
+        "Trunk"
+      ]
+    },
+    {
+      "name": "External abdominal oblique muscle.r",
+      "data": "External abdominal oblique muscle",
+      "vertices": 14811,
+      "polygons": 29622,
+      "collections": [
+        "4: Muscular system",
+        "Abdominal part of muscular system",
+        "Muscles",
+        "Muscles of abdomen",
+        "Superficial muscles",
+        "Trunk"
+      ]
+    },
+    {
+      "name": "External abdominal oblique muscle.l",
+      "data": "External abdominal oblique muscle",
+      "vertices": 14811,
+      "polygons": 29622,
+      "collections": [
+        "4: Muscular system",
+        "Abdominal part of muscular system",
+        "Muscles",
+        "Muscles of abdomen",
+        "Superficial muscles",
+        "Trunk"
+      ]
+    },
+    {
+      "name": "Internal abdominal oblique muscle.r",
+      "data": "Internal abdominal oblique muscle",
+      "vertices": 14411,
+      "polygons": 28869,
+      "collections": [
+        "4: Muscular system",
+        "Abdominal part of muscular system",
+        "Muscles",
+        "Muscles of abdomen",
+        "Trunk"
+      ]
+    },
+    {
+      "name": "Internal abdominal oblique muscle.l",
+      "data": "Internal abdominal oblique muscle",
+      "vertices": 14411,
+      "polygons": 28869,
+      "collections": [
+        "4: Muscular system",
+        "Abdominal part of muscular system",
+        "Muscles",
+        "Muscles of abdomen",
+        "Trunk"
+      ]
+    },
+    {
+      "name": "Investing abdominal fascia.r",
+      "data": "Investing abdominal fascia",
+      "vertices": 5750,
+      "polygons": 5618,
+      "collections": [
+        "4: Muscular system",
+        "Abdominal part of muscular system",
+        "Fascia",
+        "Superficial muscles",
+        "Trunk"
+      ]
+    },
+    {
+      "name": "Investing abdominal fascia.l",
+      "data": "Investing abdominal fascia",
+      "vertices": 5750,
+      "polygons": 5618,
+      "collections": [
+        "4: Muscular system",
+        "Abdominal part of muscular system",
+        "Fascia",
+        "Superficial muscles",
+        "Trunk"
+      ]
+    },
+    {
+      "name": "Piriformis fascia.r",
+      "data": "Piriformis fascia",
+      "vertices": 465,
+      "polygons": 469,
+      "collections": [
+        "4: Muscular system",
+        "Fascia",
+        "Right lower limb"
+      ]
+    },
+    {
+      "name": "Piriformis fascia.l",
+      "data": "Piriformis fascia",
+      "vertices": 465,
+      "polygons": 469,
+      "collections": [
+        "4: Muscular system",
+        "Fascia",
+        "Left lower limb"
+      ]
+    },
+    {
+      "name": "Acromial part of deltoid muscle.r",
+      "data": "Acromial part of deltoid muscle",
+      "vertices": 1482,
+      "polygons": 2964,
+      "collections": [
+        "4: Muscular system",
+        "Axillary nerve",
+        "Deltoid muscle",
+        "Muscles",
+        "Muscles of upper limb",
+        "Right upper limb",
+        "Superficial muscles"
+      ]
+    },
+    {
+      "name": "Clavicular part of deltoid muscle.r",
+      "data": "Clavicular part of deltoid muscle",
+      "vertices": 1453,
+      "polygons": 2902,
+      "collections": [
+        "4: Muscular system",
+        "Axillary nerve",
+        "Deltoid muscle",
+        "Muscles",
+        "Muscles of upper limb",
+        "Right upper limb",
+        "Superficial muscles"
+      ]
+    },
+    {
+      "name": "Scapular spinal part of deltoid muscle.r",
+      "data": "Scapular spinal part of deltoid muscle",
+      "vertices": 2189,
+      "polygons": 4378,
+      "collections": [
+        "4: Muscular system",
+        "Axillary nerve",
+        "Deltoid muscle",
+        "Muscles",
+        "Muscles of upper limb",
+        "Right upper limb",
+        "Superficial muscles"
+      ]
+    },
+    {
+      "name": "Acromial part of deltoid muscle.l",
+      "data": "Acromial part of deltoid muscle",
+      "vertices": 1482,
+      "polygons": 2964,
+      "collections": [
+        "4: Muscular system",
+        "Axillary nerve",
+        "Deltoid muscle",
+        "Left upper limb",
+        "Muscles",
+        "Muscles of upper limb",
+        "Superficial muscles"
+      ]
+    },
+    {
+      "name": "Clavicular part of deltoid muscle.l",
+      "data": "Clavicular part of deltoid muscle",
+      "vertices": 1453,
+      "polygons": 2902,
+      "collections": [
+        "4: Muscular system",
+        "Axillary nerve",
+        "Deltoid muscle",
+        "Left upper limb",
+        "Muscles",
+        "Muscles of upper limb",
+        "Superficial muscles"
+      ]
+    },
+    {
+      "name": "Scapular spinal part of deltoid muscle.l",
+      "data": "Scapular spinal part of deltoid muscle",
+      "vertices": 2189,
+      "polygons": 4378,
+      "collections": [
+        "4: Muscular system",
+        "Axillary nerve",
+        "Deltoid muscle",
+        "Left upper limb",
+        "Muscles",
+        "Muscles of upper limb",
+        "Superficial muscles"
+      ]
+    },
+    {
+      "name": "Subscapularis muscle.r",
+      "data": "Subscapularis muscle",
+      "vertices": 1471,
+      "polygons": 2954,
+      "collections": [
+        "4: Muscular system",
+        "Muscles",
+        "Muscles of upper limb",
+        "Right upper limb",
+        "Rotator cuff muscles",
+        "Trunk"
+      ]
+    },
+    {
+      "name": "Supraspinatus muscle.r",
+      "data": "Supraspinatus muscle",
+      "vertices": 717,
+      "polygons": 1430,
+      "collections": [
+        "4: Muscular system",
+        "Muscles",
+        "Muscles of upper limb",
+        "Right upper limb",
+        "Rotator cuff muscles",
+        "Suprascapular nerve",
+        "Trunk"
+      ]
+    },
+    {
+      "name": "Teres minor muscle.r",
+      "data": "Teres minor muscle",
+      "vertices": 763,
+      "polygons": 1522,
+      "collections": [
+        "4: Muscular system",
+        "Axillary nerve",
+        "Muscles",
+        "Muscles of upper limb",
+        "Right upper limb",
+        "Rotator cuff muscles"
+      ]
+    },
+    {
+      "name": "Infraspinatus muscle.r",
+      "data": "Infraspinatus muscle",
+      "vertices": 1585,
+      "polygons": 3166,
+      "collections": [
+        "4: Muscular system",
+        "Muscles",
+        "Muscles of upper limb",
+        "Right upper limb",
+        "Rotator cuff muscles",
+        "Suprascapular nerve",
+        "Trunk"
+      ]
+    },
+    {
+      "name": "Subscapularis muscle.l",
+      "data": "Subscapularis muscle",
+      "vertices": 1471,
+      "polygons": 2954,
+      "collections": [
+        "4: Muscular system",
+        "Left upper limb",
+        "Muscles",
+        "Muscles of upper limb",
+        "Rotator cuff muscles",
+        "Trunk"
+      ]
+    },
+    {
+      "name": "Supraspinatus muscle.l",
+      "data": "Supraspinatus muscle",
+      "vertices": 717,
+      "polygons": 1430,
+      "collections": [
+        "4: Muscular system",
+        "Left upper limb",
+        "Muscles",
+        "Muscles of upper limb",
+        "Rotator cuff muscles",
+        "Suprascapular nerve",
+        "Trunk"
+      ]
+    },
+    {
+      "name": "Teres minor muscle.l",
+      "data": "Teres minor muscle",
+      "vertices": 763,
+      "polygons": 1522,
+      "collections": [
+        "4: Muscular system",
+        "Axillary nerve",
+        "Left upper limb",
+        "Muscles",
+        "Muscles of upper limb",
+        "Rotator cuff muscles"
+      ]
+    },
+    {
+      "name": "Infraspinatus muscle.l",
+      "data": "Infraspinatus muscle",
+      "vertices": 1585,
+      "polygons": 3166,
+      "collections": [
+        "4: Muscular system",
+        "Left upper limb",
+        "Muscles",
+        "Muscles of upper limb",
+        "Rotator cuff muscles",
+        "Suprascapular nerve",
+        "Trunk"
+      ]
+    },
+    {
+      "name": "Teres major muscle.r",
+      "data": "Teres major muscle",
+      "vertices": 577,
+      "polygons": 1154,
+      "collections": [
+        "4: Muscular system",
+        "Muscles",
+        "Muscles of upper limb",
+        "Right upper limb",
+        "Trunk"
+      ]
+    },
+    {
+      "name": "Teres major muscle.l",
+      "data": "Teres major muscle",
+      "vertices": 577,
+      "polygons": 1154,
+      "collections": [
+        "4: Muscular system",
+        "Muscles",
+        "Trunk"
+      ]
+    },
+    {
+      "name": "Long head of biceps brachii.r",
+      "data": "Long head of biceps brachii",
+      "vertices": 1611,
+      "polygons": 3218,
+      "collections": [
+        "4: Muscular system",
+        "Anterior compartment of arm",
+        "Muscles",
+        "Muscles of upper limb",
+        "Musculocutaneous nerve",
+        "Right upper limb",
+        "Superficial muscles"
+      ]
+    },
+    {
+      "name": "Short head of biceps brachii.r",
+      "data": "Short head of biceps brachii",
+      "vertices": 1344,
+      "polygons": 2696,
+      "collections": [
+        "4: Muscular system",
+        "Anterior compartment of arm",
+        "Muscles",
+        "Muscles of upper limb",
+        "Musculocutaneous nerve",
+        "Right upper limb",
+        "Superficial muscles"
+      ]
+    },
+    {
+      "name": "Long head of biceps brachii.l",
+      "data": "Long head of biceps brachii",
+      "vertices": 1611,
+      "polygons": 3218,
+      "collections": [
+        "4: Muscular system",
+        "Anterior compartment of arm",
+        "Left upper limb",
+        "Muscles",
+        "Muscles of upper limb",
+        "Musculocutaneous nerve",
+        "Superficial muscles"
+      ]
+    },
+    {
+      "name": "Short head of biceps brachii.l",
+      "data": "Short head of biceps brachii",
+      "vertices": 1344,
+      "polygons": 2696,
+      "collections": [
+        "4: Muscular system",
+        "Anterior compartment of arm",
+        "Left upper limb",
+        "Muscles",
+        "Muscles of upper limb",
+        "Musculocutaneous nerve",
+        "Superficial muscles"
+      ]
+    },
+    {
+      "name": "Medial head of triceps brachii.r",
+      "data": "Medial head of triceps brachii",
+      "vertices": 1345,
+      "polygons": 2686,
+      "collections": [
+        "4: Muscular system",
+        "Muscles",
+        "Muscles of upper limb",
+        "Posterior compartment of arm",
+        "Radial nerve",
+        "Right upper limb"
+      ]
+    },
+    {
+      "name": "Lateral head of triceps brachii.r",
+      "data": "Lateral head of triceps brachii",
+      "vertices": 1816,
+      "polygons": 3628,
+      "collections": [
+        "4: Muscular system",
+        "Muscles",
+        "Muscles of upper limb",
+        "Posterior compartment of arm",
+        "Radial nerve",
+        "Right upper limb",
+        "Superficial muscles"
+      ]
+    },
+    {
+      "name": "Long head of triceps brachii.r",
+      "data": "Long head of triceps brachii",
+      "vertices": 1977,
+      "polygons": 3950,
+      "collections": [
+        "4: Muscular system",
+        "Muscles",
+        "Muscles of upper limb",
+        "Posterior compartment of arm",
+        "Radial nerve",
+        "Right upper limb",
+        "Superficial muscles"
+      ]
+    },
+    {
+      "name": "Medial head of triceps brachii.l",
+      "data": "Medial head of triceps brachii",
+      "vertices": 1345,
+      "polygons": 2686,
+      "collections": [
+        "4: Muscular system",
+        "Left upper limb",
+        "Muscles",
+        "Muscles of upper limb",
+        "Posterior compartment of arm",
+        "Radial nerve"
+      ]
+    },
+    {
+      "name": "Lateral head of triceps brachii.l",
+      "data": "Lateral head of triceps brachii",
+      "vertices": 1816,
+      "polygons": 3628,
+      "collections": [
+        "4: Muscular system",
+        "Left upper limb",
+        "Muscles",
+        "Muscles of upper limb",
+        "Posterior compartment of arm",
+        "Radial nerve",
+        "Superficial muscles"
+      ]
+    },
+    {
+      "name": "Long head of triceps brachii.l",
+      "data": "Long head of triceps brachii",
+      "vertices": 1977,
+      "polygons": 3950,
+      "collections": [
+        "4: Muscular system",
+        "Left upper limb",
+        "Muscles",
+        "Muscles of upper limb",
+        "Posterior compartment of arm",
+        "Radial nerve",
+        "Superficial muscles"
+      ]
+    },
+    {
+      "name": "Superficial head of pronator teres.r",
+      "data": "Superficial head of pronator teres",
+      "vertices": 1273,
+      "polygons": 2546,
+      "collections": [
+        "4: Muscular system",
+        "Anterior compartment of forearm",
+        "Median nerve",
+        "Muscles",
+        "Muscles of upper limb",
+        "Right upper limb"
+      ]
+    },
+    {
+      "name": "Deep head of pronator teres.r",
+      "data": "Deep head of pronator teres",
+      "vertices": 559,
+      "polygons": 1114,
+      "collections": [
+        "4: Muscular system",
+        "Anterior compartment of forearm",
+        "Median nerve",
+        "Muscles",
+        "Muscles of upper limb",
+        "Right upper limb"
+      ]
+    },
+    {
+      "name": "Superficial head of pronator teres.l",
+      "data": "Superficial head of pronator teres",
+      "vertices": 1273,
+      "polygons": 2546,
+      "collections": [
+        "4: Muscular system",
+        "Anterior compartment of forearm",
+        "Left upper limb",
+        "Median nerve",
+        "Muscles",
+        "Muscles of upper limb"
+      ]
+    },
+    {
+      "name": "Deep head of pronator teres.l",
+      "data": "Deep head of pronator teres",
+      "vertices": 559,
+      "polygons": 1114,
+      "collections": [
+        "4: Muscular system",
+        "Anterior compartment of forearm",
+        "Left upper limb",
+        "Median nerve",
+        "Muscles",
+        "Muscles of upper limb"
+      ]
+    },
+    {
+      "name": "Brachioradialis muscle.r",
+      "data": "Brachioradialis muscle",
+      "vertices": 3658,
+      "polygons": 7312,
+      "collections": [
+        "4: Muscular system",
+        "Muscles",
+        "Muscles of upper limb",
+        "Posterior compartment of forearm",
+        "Radial nerve",
+        "Right upper limb",
+        "Superficial muscles"
+      ]
+    },
+    {
+      "name": "Brachioradialis muscle.l",
+      "data": "Brachioradialis muscle",
+      "vertices": 3658,
+      "polygons": 7312,
+      "collections": [
+        "4: Muscular system",
+        "Left upper limb",
+        "Muscles",
+        "Muscles of upper limb",
+        "Posterior compartment of forearm",
+        "Radial nerve",
+        "Superficial muscles"
+      ]
+    },
+    {
+      "name": "Oblique head of adductor pollicis.r",
+      "data": "Oblique head of adductor pollicis",
+      "vertices": 227,
+      "polygons": 450,
+      "collections": [
+        "4: Muscular system",
+        "Median nerve",
+        "Muscles",
+        "Muscles of hand",
+        "Muscles of upper limb",
+        "Right upper limb"
+      ]
+    },
+    {
+      "name": "Oblique head of adductor pollicis.l",
+      "data": "Oblique head of adductor pollicis",
+      "vertices": 227,
+      "polygons": 450,
+      "collections": [
+        "4: Muscular system",
+        "Left upper limb",
+        "Median nerve",
+        "Muscles",
+        "Muscles of hand",
+        "Muscles of upper limb"
+      ]
+    },
+    {
+      "name": "Medial intermuscular septum of arm.r",
+      "data": "Medial intermuscular septum of arm",
+      "vertices": 190,
+      "polygons": 156,
+      "collections": [
+        "4: Muscular system",
+        "Fascia",
+        "Right upper limb"
+      ]
+    },
+    {
+      "name": "Lateral intermuscular septum of arm.r",
+      "data": "Lateral intermuscular septum of arm",
+      "vertices": 102,
+      "polygons": 80,
+      "collections": [
+        "4: Muscular system",
+        "Fascia",
+        "Right upper limb"
+      ]
+    },
+    {
+      "name": "Deltoid fascia.r",
+      "data": "Deltoid fascia",
+      "vertices": 1848,
+      "polygons": 1821,
+      "collections": [
+        "4: Muscular system",
+        "Fascia",
+        "Right upper limb",
+        "Superficial muscles"
+      ]
+    },
+    {
+      "name": "Brachial fascia.r",
+      "data": "Brachial fascia",
+      "vertices": 1575,
+      "polygons": 1532,
+      "collections": [
+        "4: Muscular system",
+        "Fascia",
+        "Right upper limb",
+        "Superficial muscles"
+      ]
+    },
+    {
+      "name": "Antebrachial fascia.r",
+      "data": "Antebrachial fascia",
+      "vertices": 2270,
+      "polygons": 2253,
+      "collections": [
+        "4: Muscular system",
+        "Fascia",
+        "Right upper limb",
+        "Superficial muscles"
+      ]
+    },
+    {
+      "name": "Extensor retinaculum of wrist.r",
+      "data": "Extensor retinaculum of wrist",
+      "vertices": 93,
+      "polygons": 78,
+      "collections": [
+        "4: Muscular system",
+        "Fascia of upper limb",
+        "Muscles",
+        "Right upper limb"
+      ]
+    },
+    {
+      "name": "Flexor retinaculum of wrist.r",
+      "data": "Flexor retinaculum of wrist",
+      "vertices": 132,
+      "polygons": 113,
+      "collections": [
+        "4: Muscular system",
+        "Fascia of upper limb",
+        "Muscles",
+        "Right upper limb"
+      ]
+    },
+    {
+      "name": "Dorsal fascia of hand.r",
+      "data": "Dorsal fascia of hand",
+      "vertices": 819,
+      "polygons": 746,
+      "collections": [
+        "4: Muscular system",
+        "Fascia",
+        "Right upper limb"
+      ]
+    },
+    {
+      "name": "Superficial transverse metacarpal ligament.r",
+      "data": "Superficial transverse metacarpal ligament",
+      "vertices": 49,
+      "polygons": 33,
+      "collections": [
+        "4: Muscular system",
+        "Fascia of upper limb",
+        "Muscles",
+        "Right upper limb"
+      ]
+    },
+    {
+      "name": "Palmar aponeurosis.r",
+      "data": "Palmar aponeurosis",
+      "vertices": 749,
+      "polygons": 663,
+      "collections": [
+        "4: Muscular system",
+        "Fascia",
+        "Right upper limb"
+      ]
+    },
+    {
+      "name": "Medial intermuscular septum of arm.l",
+      "data": "Medial intermuscular septum of arm",
+      "vertices": 190,
+      "polygons": 156,
+      "collections": [
+        "4: Muscular system",
+        "Fascia",
+        "Left upper limb"
+      ]
+    },
+    {
+      "name": "Lateral intermuscular septum of arm.l",
+      "data": "Lateral intermuscular septum of arm",
+      "vertices": 102,
+      "polygons": 80,
+      "collections": [
+        "4: Muscular system",
+        "Fascia",
+        "Left upper limb"
+      ]
+    },
+    {
+      "name": "Deltoid fascia.l",
+      "data": "Deltoid fascia",
+      "vertices": 1848,
+      "polygons": 1821,
+      "collections": [
+        "4: Muscular system",
+        "Fascia",
+        "Left upper limb",
+        "Superficial muscles"
+      ]
+    },
+    {
+      "name": "Brachial fascia.l",
+      "data": "Brachial fascia",
+      "vertices": 1575,
+      "polygons": 1532,
+      "collections": [
+        "4: Muscular system",
+        "Fascia",
+        "Left upper limb",
+        "Superficial muscles"
+      ]
+    },
+    {
+      "name": "Antebrachial fascia.l",
+      "data": "Antebrachial fascia",
+      "vertices": 2270,
+      "polygons": 2253,
+      "collections": [
+        "4: Muscular system",
+        "Fascia",
+        "Left upper limb",
+        "Superficial muscles"
+      ]
+    },
+    {
+      "name": "Extensor retinaculum of wrist.l",
+      "data": "Extensor retinaculum of wrist",
+      "vertices": 93,
+      "polygons": 78,
+      "collections": [
+        "4: Muscular system",
+        "Fascia of upper limb",
+        "Left upper limb",
+        "Muscles"
+      ]
+    },
+    {
+      "name": "Flexor retinaculum of wrist.l",
+      "data": "Flexor retinaculum of wrist",
+      "vertices": 132,
+      "polygons": 113,
+      "collections": [
+        "4: Muscular system",
+        "Fascia of upper limb",
+        "Left upper limb",
+        "Muscles"
+      ]
+    },
+    {
+      "name": "Dorsal fascia of hand.l",
+      "data": "Dorsal fascia of hand",
+      "vertices": 819,
+      "polygons": 746,
+      "collections": [
+        "4: Muscular system",
+        "Fascia",
+        "Left upper limb"
+      ]
+    },
+    {
+      "name": "Superficial transverse metacarpal ligament.l",
+      "data": "Superficial transverse metacarpal ligament",
+      "vertices": 49,
+      "polygons": 33,
+      "collections": [
+        "4: Muscular system",
+        "Fascia of upper limb",
+        "Left upper limb",
+        "Muscles"
+      ]
+    },
+    {
+      "name": "Palmar aponeurosis.l",
+      "data": "Palmar aponeurosis",
+      "vertices": 749,
+      "polygons": 663,
+      "collections": [
+        "4: Muscular system",
+        "Fascia",
+        "Left upper limb"
+      ]
+    },
+    {
+      "name": "Iliacus muscle.r",
+      "data": "Iliacus muscle",
+      "vertices": 2179,
+      "polygons": 4354,
+      "collections": [
+        "4: Muscular system",
+        "Femoral nerve",
+        "Muscles",
+        "Muscles of lower limb",
+        "Right lower limb"
+      ]
+    },
+    {
+      "name": "Iliacus muscle.l",
+      "data": "Iliacus muscle",
+      "vertices": 2179,
+      "polygons": 4354,
+      "collections": [
+        "4: Muscular system",
+        "Femoral nerve",
+        "Left lower limb",
+        "Muscles",
+        "Muscles of lower limb"
+      ]
+    },
+    {
+      "name": "Gluteus medius muscle.r",
+      "data": "Gluteus medius muscle",
+      "vertices": 2590,
+      "polygons": 5176,
+      "collections": [
+        "4: Muscular system",
+        "Muscles",
+        "Muscles of lower limb",
+        "Right lower limb",
+        "Superficial gluteal muscles"
+      ]
+    },
+    {
+      "name": "Gluteus maximus muscle.r",
+      "data": "Gluteus maximus muscle",
+      "vertices": 1663,
+      "polygons": 3326,
+      "collections": [
+        "4: Muscular system",
+        "Muscles",
+        "Muscles of lower limb",
+        "Right lower limb",
+        "Superficial gluteal muscles",
+        "Superficial muscles"
+      ]
+    },
+    {
+      "name": "Gluteus minimus muscle.r",
+      "data": "Gluteus minimus muscle",
+      "vertices": 3127,
+      "polygons": 6250,
+      "collections": [
+        "4: Muscular system",
+        "Muscles",
+        "Muscles of lower limb",
+        "Right lower limb",
+        "Superficial gluteal muscles"
+      ]
+    },
+    {
+      "name": "Tensor fasciae latae.r",
+      "data": "Tensor fasciae latae",
+      "vertices": 933,
+      "polygons": 1862,
+      "collections": [
+        "4: Muscular system",
+        "Muscles",
+        "Muscles of lower limb",
+        "Right lower limb",
+        "Superficial gluteal muscles"
+      ]
+    },
+    {
+      "name": "Gluteus medius muscle.l",
+      "data": "Gluteus medius muscle",
+      "vertices": 2590,
+      "polygons": 5176,
+      "collections": [
+        "4: Muscular system",
+        "Left lower limb",
+        "Muscles",
+        "Muscles of lower limb",
+        "Superficial gluteal muscles"
+      ]
+    },
+    {
+      "name": "Gluteus maximus muscle.l",
+      "data": "Gluteus maximus muscle",
+      "vertices": 1663,
+      "polygons": 3326,
+      "collections": [
+        "4: Muscular system",
+        "Left lower limb",
+        "Muscles",
+        "Muscles of lower limb",
+        "Superficial gluteal muscles",
+        "Superficial muscles"
+      ]
+    },
+    {
+      "name": "Gluteus minimus muscle.l",
+      "data": "Gluteus minimus muscle",
+      "vertices": 3127,
+      "polygons": 6250,
+      "collections": [
+        "4: Muscular system",
+        "Left lower limb",
+        "Muscles",
+        "Muscles of lower limb",
+        "Superficial gluteal muscles"
+      ]
+    },
+    {
+      "name": "Tensor fasciae latae.l",
+      "data": "Tensor fasciae latae",
+      "vertices": 933,
+      "polygons": 1862,
+      "collections": [
+        "4: Muscular system",
+        "Left lower limb",
+        "Muscles",
+        "Muscles of lower limb",
+        "Superficial gluteal muscles"
+      ]
+    },
+    {
+      "name": "Piriformis muscle.r",
+      "data": "Piriformis muscle",
+      "vertices": 752,
+      "polygons": 1500,
+      "collections": [
+        "4: Muscular system",
+        "Deep gluteal muscles",
+        "Muscles",
+        "Muscles of lower limb",
+        "Right lower limb"
+      ]
+    },
+    {
+      "name": "Quadratus femoris muscle.r",
+      "data": "Quadratus femoris muscle",
+      "vertices": 825,
+      "polygons": 1646,
+      "collections": [
+        "4: Muscular system",
+        "Deep gluteal muscles",
+        "Muscles",
+        "Muscles of lower limb",
+        "Right lower limb"
+      ]
+    },
+    {
+      "name": "Inferior gemellus muscle.r",
+      "data": "Inferior gemellus muscle",
+      "vertices": 490,
+      "polygons": 976,
+      "collections": [
+        "4: Muscular system",
+        "Deep gluteal muscles",
+        "Muscles",
+        "Muscles of lower limb",
+        "Right lower limb"
+      ]
+    },
+    {
+      "name": "Obturator internus.r",
+      "data": "Obturator internus",
+      "vertices": 1882,
+      "polygons": 3760,
+      "collections": [
+        "4: Muscular system",
+        "Deep gluteal muscles",
+        "Muscles",
+        "Muscles of lower limb",
+        "Obturator nerve",
+        "Right lower limb"
+      ]
+    },
+    {
+      "name": "Superior gemellus muscle.r",
+      "data": "Superior gemellus muscle",
+      "vertices": 204,
+      "polygons": 404,
+      "collections": [
+        "4: Muscular system",
+        "Deep gluteal muscles",
+        "Muscles",
+        "Muscles of lower limb",
+        "Right lower limb"
+      ]
+    },
+    {
+      "name": "Piriformis muscle.l",
+      "data": "Piriformis muscle",
+      "vertices": 752,
+      "polygons": 1500,
+      "collections": [
+        "4: Muscular system",
+        "Deep gluteal muscles",
+        "Left lower limb",
+        "Muscles",
+        "Muscles of lower limb"
+      ]
+    },
+    {
+      "name": "Quadratus femoris muscle.l",
+      "data": "Quadratus femoris muscle",
+      "vertices": 825,
+      "polygons": 1646,
+      "collections": [
+        "4: Muscular system",
+        "Deep gluteal muscles",
+        "Left lower limb",
+        "Muscles",
+        "Muscles of lower limb"
+      ]
+    },
+    {
+      "name": "Inferior gemellus muscle.l",
+      "data": "Inferior gemellus muscle",
+      "vertices": 490,
+      "polygons": 976,
+      "collections": [
+        "4: Muscular system",
+        "Deep gluteal muscles",
+        "Left lower limb",
+        "Muscles",
+        "Muscles of lower limb"
+      ]
+    },
+    {
+      "name": "Obturator internus.l",
+      "data": "Obturator internus",
+      "vertices": 1882,
+      "polygons": 3760,
+      "collections": [
+        "4: Muscular system",
+        "Deep gluteal muscles",
+        "Left lower limb",
+        "Muscles",
+        "Muscles of lower limb",
+        "Obturator nerve"
+      ]
+    },
+    {
+      "name": "Superior gemellus muscle.l",
+      "data": "Superior gemellus muscle",
+      "vertices": 204,
+      "polygons": 404,
+      "collections": [
+        "4: Muscular system",
+        "Deep gluteal muscles",
+        "Left lower limb",
+        "Muscles",
+        "Muscles of lower limb"
+      ]
+    },
+    {
+      "name": "Rectus femoris muscle.r",
+      "data": "Rectus femoris muscle",
+      "vertices": 4136,
+      "polygons": 8276,
+      "collections": [
+        "4: Muscular system",
+        "Anterior compartment of thigh",
+        "Femoral nerve",
+        "Muscles",
+        "Muscles of lower limb",
+        "Right lower limb",
+        "Superficial muscles"
+      ]
+    },
+    {
+      "name": "Vastus lateralis muscle.r",
+      "data": "Vastus lateralis muscle",
+      "vertices": 4678,
+      "polygons": 9356,
+      "collections": [
+        "4: Muscular system",
+        "Anterior compartment of thigh",
+        "Femoral nerve",
+        "Muscles",
+        "Muscles of lower limb",
+        "Right lower limb",
+        "Superficial muscles"
+      ]
+    },
+    {
+      "name": "Vastus medialis muscle.r",
+      "data": "Vastus medialis muscle",
+      "vertices": 3232,
+      "polygons": 6460,
+      "collections": [
+        "4: Muscular system",
+        "Anterior compartment of thigh",
+        "Femoral nerve",
+        "Muscles",
+        "Muscles of lower limb",
+        "Right lower limb",
+        "Superficial muscles"
+      ]
+    },
+    {
+      "name": "Vastus intermedius muscle.r",
+      "data": "Vastus intermedius muscle",
+      "vertices": 3076,
+      "polygons": 6164,
+      "collections": [
+        "4: Muscular system",
+        "Anterior compartment of thigh",
+        "Femoral nerve",
+        "Muscles",
+        "Muscles of lower limb",
+        "Right lower limb"
+      ]
+    },
+    {
+      "name": "Rectus femoris muscle.l",
+      "data": "Rectus femoris muscle",
+      "vertices": 4136,
+      "polygons": 8276,
+      "collections": [
+        "4: Muscular system",
+        "Anterior compartment of thigh",
+        "Femoral nerve",
+        "Left lower limb",
+        "Muscles",
+        "Muscles of lower limb",
+        "Superficial muscles"
+      ]
+    },
+    {
+      "name": "Vastus lateralis muscle.l",
+      "data": "Vastus lateralis muscle",
+      "vertices": 4678,
+      "polygons": 9356,
+      "collections": [
+        "4: Muscular system",
+        "Anterior compartment of thigh",
+        "Femoral nerve",
+        "Left lower limb",
+        "Muscles",
+        "Muscles of lower limb",
+        "Superficial muscles"
+      ]
+    },
+    {
+      "name": "Vastus medialis muscle.l",
+      "data": "Vastus medialis muscle",
+      "vertices": 3232,
+      "polygons": 6460,
+      "collections": [
+        "4: Muscular system",
+        "Anterior compartment of thigh",
+        "Femoral nerve",
+        "Left lower limb",
+        "Muscles",
+        "Muscles of lower limb",
+        "Superficial muscles"
+      ]
+    },
+    {
+      "name": "Vastus intermedius muscle.l",
+      "data": "Vastus intermedius muscle",
+      "vertices": 3076,
+      "polygons": 6164,
+      "collections": [
+        "4: Muscular system",
+        "Anterior compartment of thigh",
+        "Femoral nerve",
+        "Left lower limb",
+        "Muscles",
+        "Muscles of lower limb"
+      ]
+    },
+    {
+      "name": "Obturator externus.l",
+      "data": "Obturator externus",
+      "vertices": 582,
+      "polygons": 1156,
+      "collections": [
+        "4: Muscular system",
+        "Deep gluteal muscles",
+        "Left lower limb",
+        "Muscles",
+        "Muscles of lower limb"
+      ]
+    },
+    {
+      "name": "Long head of biceps femoris.r",
+      "data": "Long head of biceps femoris",
+      "vertices": 3623,
+      "polygons": 7258,
+      "collections": [
+        "4: Muscular system",
+        "Common fibular nerve",
+        "Muscles",
+        "Muscles of lower limb",
+        "Posterior compartment of thigh",
+        "Right lower limb",
+        "Sciatic nerve",
+        "Superficial muscles",
+        "Tibial nerve"
+      ]
+    },
+    {
+      "name": "Short head of biceps femoris.r",
+      "data": "Short head of biceps femoris",
+      "vertices": 1238,
+      "polygons": 2476,
+      "collections": [
+        "4: Muscular system",
+        "Common fibular nerve",
+        "Muscles",
+        "Muscles of lower limb",
+        "Posterior compartment of thigh",
+        "Right lower limb",
+        "Sciatic nerve",
+        "Tibial nerve"
+      ]
+    },
+    {
+      "name": "Long head of biceps femoris.l",
+      "data": "Long head of biceps femoris",
+      "vertices": 3623,
+      "polygons": 7258,
+      "collections": [
+        "4: Muscular system",
+        "Common fibular nerve",
+        "Left lower limb",
+        "Muscles",
+        "Muscles of lower limb",
+        "Posterior compartment of thigh",
+        "Sciatic nerve",
+        "Superficial muscles",
+        "Tibial nerve"
+      ]
+    },
+    {
+      "name": "Short head of biceps femoris.l",
+      "data": "Short head of biceps femoris",
+      "vertices": 1238,
+      "polygons": 2476,
+      "collections": [
+        "4: Muscular system",
+        "Common fibular nerve",
+        "Left lower limb",
+        "Muscles",
+        "Muscles of lower limb",
+        "Posterior compartment of thigh",
+        "Sciatic nerve",
+        "Tibial nerve"
+      ]
+    },
+    {
+      "name": "Tibialis anterior muscle.r",
+      "data": "Tibialis anterior muscle",
+      "vertices": 1761,
+      "polygons": 3526,
+      "collections": [
+        "4: Muscular system",
+        "Anterior compartment of leg",
+        "Deep fibular nerve",
+        "Muscles",
+        "Muscles of lower limb",
+        "Right lower limb",
+        "Sciatic nerve",
+        "Superficial muscles"
+      ]
+    },
+    {
+      "name": "Tibialis anterior muscle.l",
+      "data": "Tibialis anterior muscle",
+      "vertices": 1761,
+      "polygons": 3526,
+      "collections": [
+        "4: Muscular system",
+        "Anterior compartment of leg",
+        "Deep fibular nerve",
+        "Left lower limb",
+        "Muscles",
+        "Muscles of lower limb",
+        "Sciatic nerve",
+        "Superficial muscles"
+      ]
+    },
+    {
+      "name": "Lateral head of gastrocnemius.r",
+      "data": "Lateral head of gastrocnemius",
+      "vertices": 2454,
+      "polygons": 4908,
+      "collections": [
+        "4: Muscular system",
+        "Muscles",
+        "Muscles of lower limb",
+        "Posterior compartment of leg",
+        "Right lower limb",
+        "Sciatic nerve",
+        "Superficial muscles",
+        "Tibial nerve"
+      ]
+    },
+    {
+      "name": "Medial head of gastrocnemius.r",
+      "data": "Medial head of gastrocnemius",
+      "vertices": 3233,
+      "polygons": 6462,
+      "collections": [
+        "4: Muscular system",
+        "Muscles",
+        "Muscles of lower limb",
+        "Posterior compartment of leg",
+        "Right lower limb",
+        "Sciatic nerve",
+        "Superficial muscles",
+        "Tibial nerve"
+      ]
+    },
+    {
+      "name": "Lateral head of gastrocnemius.l",
+      "data": "Lateral head of gastrocnemius",
+      "vertices": 2454,
+      "polygons": 4908,
+      "collections": [
+        "4: Muscular system",
+        "Left lower limb",
+        "Muscles",
+        "Muscles of lower limb",
+        "Posterior compartment of leg",
+        "Sciatic nerve",
+        "Superficial muscles",
+        "Tibial nerve"
+      ]
+    },
+    {
+      "name": "Medial head of gastrocnemius.l",
+      "data": "Medial head of gastrocnemius",
+      "vertices": 3233,
+      "polygons": 6462,
+      "collections": [
+        "4: Muscular system",
+        "Left lower limb",
+        "Muscles",
+        "Muscles of lower limb",
+        "Posterior compartment of leg",
+        "Sciatic nerve",
+        "Superficial muscles",
+        "Tibial nerve"
+      ]
+    },
+    {
+      "name": "Soleus muscle.r",
+      "data": "Soleus muscle",
+      "vertices": 3379,
+      "polygons": 6774,
+      "collections": [
+        "4: Muscular system",
+        "Muscles",
+        "Muscles of lower limb",
+        "Posterior compartment of leg",
+        "Right lower limb",
+        "Sciatic nerve",
+        "Tibial nerve"
+      ]
+    },
+    {
+      "name": "Soleus muscle.l",
+      "data": "Soleus muscle",
+      "vertices": 3379,
+      "polygons": 6774,
+      "collections": [
+        "4: Muscular system",
+        "Left lower limb",
+        "Muscles",
+        "Muscles of lower limb",
+        "Posterior compartment of leg",
+        "Sciatic nerve",
+        "Tibial nerve"
+      ]
+    },
+    {
+      "name": "Tibialis posterior muscle.r",
+      "data": "Tibialis posterior muscle",
+      "vertices": 2741,
+      "polygons": 5526,
+      "collections": [
+        "4: Muscular system",
+        "Muscles",
+        "Muscles of lower limb",
+        "Posterior compartment of leg",
+        "Right lower limb",
+        "Sciatic nerve",
+        "Tibial nerve"
+      ]
+    },
+    {
+      "name": "Tibialis posterior muscle.l",
+      "data": "Tibialis posterior muscle",
+      "vertices": 2741,
+      "polygons": 5526,
+      "collections": [
+        "4: Muscular system",
+        "Left lower limb",
+        "Muscles",
+        "Muscles of lower limb",
+        "Posterior compartment of leg",
+        "Sciatic nerve",
+        "Tibial nerve"
+      ]
+    },
+    {
+      "name": "Oblique head of adductor hallucis.r",
+      "data": "Oblique head of adductor hallucis",
+      "vertices": 454,
+      "polygons": 904,
+      "collections": [
+        "4: Muscular system",
+        "Lateral plantar nerve",
+        "Muscles",
+        "Muscles of foot",
+        "Muscles of lower limb",
+        "Right lower limb",
+        "Sciatic nerve",
+        "Ulnar nerve"
+      ]
+    },
+    {
+      "name": "Oblique head of adductor hallucis.l",
+      "data": "Oblique head of adductor hallucis",
+      "vertices": 454,
+      "polygons": 904,
+      "collections": [
+        "4: Muscular system",
+        "Lateral plantar nerve",
+        "Left lower limb",
+        "Muscles",
+        "Muscles of foot",
+        "Muscles of lower limb",
+        "Sciatic nerve",
+        "Ulnar nerve"
+      ]
+    },
+    {
+      "name": "Fascia lata.r",
+      "data": "Fascia lata",
+      "vertices": 6682,
+      "polygons": 6530,
+      "collections": [
+        "4: Muscular system",
+        "Fascia",
+        "Right lower limb",
+        "Superficial muscles"
+      ]
+    },
+    {
+      "name": "Fascia lata.l",
+      "data": "Fascia lata",
+      "vertices": 6682,
+      "polygons": 6530,
+      "collections": [
+        "4: Muscular system",
+        "Fascia",
+        "Left lower limb",
+        "Superficial muscles"
+      ]
+    },
+    {
+      "name": "Medial femoral intermuscular septum.r",
+      "data": "Medial femoral intermuscular septum",
+      "vertices": 4038,
+      "polygons": 3861,
+      "collections": [
+        "4: Muscular system",
+        "Fascia",
+        "Right lower limb"
+      ]
+    },
+    {
+      "name": "Lateral femoral intermuscular septum.r",
+      "data": "Lateral femoral intermuscular septum",
+      "vertices": 350,
+      "polygons": 294,
+      "collections": [
+        "4: Muscular system",
+        "Fascia",
+        "Right lower limb"
+      ]
+    },
+    {
+      "name": "Popliteal fascia.r",
+      "data": "Popliteal fascia",
+      "vertices": 278,
+      "polygons": 246,
+      "collections": [
+        "4: Muscular system",
+        "Fascia",
+        "Right lower limb",
+        "Superficial muscles"
+      ]
+    },
+    {
+      "name": "Crural fascia.r",
+      "data": "Crural fascia",
+      "vertices": 5607,
+      "polygons": 5523,
+      "collections": [
+        "4: Muscular system",
+        "Fascia",
+        "Right lower limb",
+        "Superficial muscles"
+      ]
+    },
+    {
+      "name": "Anterior intermuscular septum of leg.r",
+      "data": "Anterior intermuscular septum of leg",
+      "vertices": 147,
+      "polygons": 208,
+      "collections": [
+        "4: Muscular system",
+        "Fascia",
+        "Right lower limb"
+      ]
+    },
+    {
+      "name": "Posterior intermuscular septum of leg.r",
+      "data": "Posterior intermuscular septum of leg",
+      "vertices": 179,
+      "polygons": 265,
+      "collections": [
+        "4: Muscular system",
+        "Fascia",
+        "Right lower limb"
+      ]
+    },
+    {
+      "name": "Transverse intermuscular septum of leg.r",
+      "data": "Transverse intermuscular septum of leg",
+      "vertices": 301,
+      "polygons": 492,
+      "collections": [
+        "4: Muscular system",
+        "Fascia",
+        "Right lower limb"
+      ]
+    },
+    {
+      "name": "Iliopectineal arch.r",
+      "data": "Iliopectineal arch",
+      "vertices": 23,
+      "polygons": 13,
+      "collections": [
+        "4: Muscular system",
+        "Fascia",
+        "Right lower limb"
+      ]
+    },
+    {
+      "name": "Medial femoral intermuscular septum.l",
+      "data": "Medial femoral intermuscular septum",
+      "vertices": 4038,
+      "polygons": 3861,
+      "collections": [
+        "4: Muscular system",
+        "Fascia",
+        "Left lower limb"
+      ]
+    },
+    {
+      "name": "Lateral femoral intermuscular septum.l",
+      "data": "Lateral femoral intermuscular septum",
+      "vertices": 350,
+      "polygons": 294,
+      "collections": [
+        "4: Muscular system",
+        "Fascia",
+        "Left lower limb"
+      ]
+    },
+    {
+      "name": "Popliteal fascia.l",
+      "data": "Popliteal fascia",
+      "vertices": 278,
+      "polygons": 246,
+      "collections": [
+        "4: Muscular system",
+        "Fascia",
+        "Left lower limb",
+        "Superficial muscles"
+      ]
+    },
+    {
+      "name": "Crural fascia.l",
+      "data": "Crural fascia",
+      "vertices": 5607,
+      "polygons": 5523,
+      "collections": [
+        "4: Muscular system",
+        "Fascia",
+        "Left lower limb",
+        "Superficial muscles"
+      ]
+    },
+    {
+      "name": "Anterior intermuscular septum of leg.l",
+      "data": "Anterior intermuscular septum of leg",
+      "vertices": 147,
+      "polygons": 208,
+      "collections": [
+        "4: Muscular system",
+        "Fascia",
+        "Left lower limb"
+      ]
+    },
+    {
+      "name": "Posterior intermuscular septum of leg.l",
+      "data": "Posterior intermuscular septum of leg",
+      "vertices": 179,
+      "polygons": 265,
+      "collections": [
+        "4: Muscular system",
+        "Fascia",
+        "Left lower limb"
+      ]
+    },
+    {
+      "name": "Transverse intermuscular septum of leg.l",
+      "data": "Transverse intermuscular septum of leg",
+      "vertices": 301,
+      "polygons": 492,
+      "collections": [
+        "4: Muscular system",
+        "Fascia",
+        "Left lower limb"
+      ]
+    },
+    {
+      "name": "Iliopectineal arch.l",
+      "data": "Iliopectineal arch",
+      "vertices": 23,
+      "polygons": 13,
+      "collections": [
+        "4: Muscular system",
+        "Fascia",
+        "Trunk"
+      ]
+    },
+    {
+      "name": "Clavipectoral fascia.r",
+      "data": "Clavipectoral fascia",
+      "vertices": 677,
+      "polygons": 656,
+      "collections": [
+        "4: Muscular system",
+        "Fascia",
+        "Trunk"
+      ]
+    },
+    {
+      "name": "Clavipectoral fascia.l",
+      "data": "Clavipectoral fascia",
+      "vertices": 677,
+      "polygons": 656,
+      "collections": [
+        "4: Muscular system",
+        "Fascia",
+        "Trunk"
+      ]
+    },
+    {
+      "name": "Iliopsoas fascia.r",
+      "data": "Iliopsoas fascia",
+      "vertices": 874,
+      "polygons": 830,
+      "collections": [
+        "4: Muscular system",
+        "Abdominal part of muscular system",
+        "Fascia",
+        "Trunk"
+      ]
+    },
+    {
+      "name": "Iliopsoas fascia.l",
+      "data": "Iliopsoas fascia",
+      "vertices": 874,
+      "polygons": 830,
+      "collections": [
+        "4: Muscular system",
+        "Abdominal part of muscular system",
+        "Fascia",
+        "Trunk"
+      ]
+    },
+    {
+      "name": "Transversalis fascia",
+      "data": "Transversalis fascia",
+      "vertices": 2231,
+      "polygons": 2175,
+      "collections": [
+        "4: Muscular system",
+        "Abdominal part of muscular system",
+        "Fascia",
+        "Trunk"
+      ]
+    },
+    {
+      "name": "Diaphragmatic fascia",
+      "data": "Diaphragmatic fascia",
+      "vertices": 2428,
+      "polygons": 2391,
+      "collections": [
+        "4: Muscular system",
+        "Abdominal part of muscular system",
+        "Fascia",
+        "Trunk"
+      ]
+    }
+  ]
+}

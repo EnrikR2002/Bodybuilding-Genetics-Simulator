@@ -1,0 +1,9 @@
+[
+  { "label": "pose-tune-a", "pose": "frontDouble", "over": { "arm": { "hand": [0.16, 0.18, 0.03], "pole": [1.1, -0.02, -0.04], "roll": -0.7, "curl": 2.2 } }, "view": "front", "zoom": 0.72 },
+  { "label": "pose-tune-b", "pose": "frontDouble", "over": { "arm": { "hand": [0.22, 0.12, 0.03], "pole": [1.1, -0.02, -0.04], "roll": -0.4, "wristY": 0.2, "curl": 2.2 } }, "view": "front", "zoom": 0.72 },
+  { "label": "pose-tune-c", "pose": "frontDouble", "over": { "arm": { "hand": [0.18, 0.20, -0.08], "pole": [1.1, -0.02, -0.04], "roll": -0.9, "wristY": 0.4, "curl": 2.2 } }, "view": "front", "zoom": 0.72 },
+  { "label": "pose-tune-fist-front", "pose": "frontDouble", "over": { "arm": { "hand": [0.16, 0.18, 0.03], "pole": [1.1, -0.02, -0.04], "roll": -0.7, "curl": 2.75 } }, "view": "front", "zoom": 0.72 },
+  { "label": "pose-tune-fist-back", "pose": "backDouble", "over": { "arm": { "hand": [0.16, 0.18, 0.03], "pole": [1.1, -0.02, -0.04], "roll": -0.7, "curl": 2.75 } }, "view": "back", "zoom": 0.72 },
+  { "label": "pose-tune-wrist-front", "pose": "frontDouble", "over": { "arm": { "hand": [0.16, 0.18, 0.03], "pole": [1.1, -0.02, -0.04], "roll": -0.7, "wristY": 0.5, "curl": 2.2 } }, "view": "front", "zoom": 0.72 },
+  { "label": "pose-tune-wrist-back", "pose": "backDouble", "over": { "arm": { "hand": [0.16, 0.18, 0.03], "pole": [1.1, -0.02, -0.04], "roll": -0.7, "wristY": 0.5, "curl": 2.2 } }, "view": "back", "zoom": 0.72 }
+]

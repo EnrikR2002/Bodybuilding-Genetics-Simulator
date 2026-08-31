@@ -171,9 +171,18 @@ export class RegionField {
     const peakiness = g('bicepPeak');
     const pecGap = g('pecGap');
     const stagger = g('abStagger');
+    const authored = ctx.authored || {};
+    const studio = this.figure.header.source === 'studio';
+    const sourceBulk = studio ? 0.74 : 1;
 
     for (const R of this.regions) {
-      const bulk = BULK[R.base] || 0;
+      let bulk = (BULK[R.base] || 0) * sourceBulk;
+      if (studio && (R.base === 'forearm_flex' || R.base === 'forearm_ext')) bulk *= 0.56;
+      /* The generated lat sheet is deliberately conservative once a real
+         insertion pair owns its silhouette and inferior border. Stacking the
+         old full-strength field underneath creates one inflated back balloon
+         and buries both tendon intervals. */
+      if (R.base === 'lat' && authored.latInsertion) bulk *= 0.70;
       const amt = (drive[DRIVER[R.base]] ?? ctx.relief) * bulk;
       if (amt <= 0.0005 && !R.ins) continue;
 
@@ -184,10 +193,17 @@ export class RegionField {
       let cur = null, neutral = null;
       if (R.ins) {
         const range = INS_RANGE[R.ins];
-        const s = insSlider[R.ins];
+        const sliderKey = R.ins === 'bicep' ? 'bicepInsertion'
+          : R.ins === 'lat' ? 'latInsertion'
+          : R.ins === 'calf' ? 'calfInsertion' : 'trapHeight';
+        /* A compatible endpoint pair owns the anatomical termination. Keep
+           only the neutral region volume underneath it; do not stack a
+           generated insertion shift on top of the sculpt. */
+        const s = authored[sliderKey] ? 0.5 : insSlider[R.ins];
         let run = lerp(range.run[0], range.run[1], s);
         let peak = lerp(range.peak[0], range.peak[1], s);
-        if (R.base.startsWith('biceps')) run *= lerp(1.22, 0.74, peakiness);
+        if (R.base.startsWith('biceps') && !authored.bicepPeak)
+          run *= lerp(1.22, 0.74, peakiness);
         cur = { peak, run, end: lerp(range.end[0], range.end[1], s) };
         neutral = {
           peak: lerp(range.peak[0], range.peak[1], 0.5),
@@ -197,13 +213,14 @@ export class RegionField {
       }
 
       /* a peaked biceps is a taller, shorter belly; a flat one is longer */
-      const peakGain = R.base.startsWith('biceps') ? (peakiness - 0.5) * 0.9 : 0;
+      const peakGain = R.base.startsWith('biceps') && !authored.bicepPeak
+        ? (peakiness - 0.5) * 0.9 : 0;
 
       /* pec attachment: a wide sternal gap means the inner edge pulls away
          from the midline and the outer edge picks the volume up */
       let gapGain = 0;
-      if (R.base === 'pec_inner') gapGain = -(pecGap - 0.35) * 1.55;
-      else if (R.base === 'pec_outer') gapGain = (pecGap - 0.35) * 0.75;
+      if (!authored.pecGap && R.base === 'pec_inner') gapGain = -(pecGap - 0.35) * 1.55;
+      else if (!authored.pecGap && R.base === 'pec_outer') gapGain = (pecGap - 0.35) * 0.75;
 
       const { idx, w, u, dir } = R;
       const n = idx.length;
@@ -230,7 +247,7 @@ export class RegionField {
 
         /* ab rows: only ever visible when lean, and the left and right rows
            rarely line up — that offset is the ab-insertion slider */
-        if (R.base === 'rectus_abs') {
+        if (R.base === 'rectus_abs' && !authored.abStagger) {
           const phase = R.side === 'L' ? (stagger - 0.5) * 0.34 : -(stagger - 0.5) * 0.34;
           const rows = Math.cos((m + phase) * Math.PI * 7.0);
           d += rows * 0.64 * drive.abs * smoothstep(0.04, 0.26, m) * (1 - smoothstep(0.74, 0.98, m));

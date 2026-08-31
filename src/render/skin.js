@@ -320,8 +320,8 @@ export function createSkin({ tone = 1, oil = 0.55 } = {}) {
           float mott = (nz2.x - 0.5) * 0.07;
           float cav = clamp(vCavity * 9.5, -1.0, 1.0);
           float valley = max(cav, 0.0);
-          float authoredValley = smoothstep(0.035, 0.30, vAnatomy);
-          float authoredRidge = smoothstep(0.025, 0.24, -vAnatomy);
+          float authoredValley = smoothstep(0.015, 0.17, vAnatomy);
+          float authoredRidge = smoothstep(0.018, 0.18, -vAnatomy);
 
           /* Skin is never one colour. Hands, face and feet run redder because
              the blood is closer to the surface; knuckles, elbows and knees run
@@ -340,7 +340,7 @@ export function createSkin({ tone = 1, oil = 0.55 } = {}) {
              Give those valleys the compressed-skin colour they would receive
              from stage light, and keep the intervening tendon/muscle planes
              fractionally paler. */
-          diffuseColor.rgb = mix(diffuseColor.rgb, uDeep, authoredValley * 0.30 * uCavity);
+          diffuseColor.rgb = mix(diffuseColor.rgb, uDeep, authoredValley * 0.42 * uCavity);
           diffuseColor.rgb *= 1.0 + authoredRidge * 0.045;
           diffuseColor.rgb *= 1.0 + mott - valley * 0.13 * uCavity + max(-cav, 0.0) * 0.04;
           /* a broad value drift so the body is not one flat tone from neck to
@@ -383,7 +383,7 @@ export function createSkin({ tone = 1, oil = 0.55 } = {}) {
           float cav = vCavity * 9.5;
           float valley = clamp(cav, 0.0, 1.0);
           float ridge = clamp(-cav, 0.0, 1.0);
-          float authoredValley = smoothstep(0.035, 0.30, vAnatomy);
+          float authoredValley = smoothstep(0.015, 0.17, vAnatomy);
           /* oil sits on the high points and skips the creases */
           roughnessFactor = clamp(roughnessFactor + micro + valley * 0.30 + authoredValley * 0.22
                                   - uOil * (0.10 + ridge * 0.34), 0.05, 1.0);

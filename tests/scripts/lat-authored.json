@@ -1,0 +1,36 @@
+[
+  {
+    "label": "lat-authored-high-spread",
+    "set": { "mass": 0.92, "legMass": 0.85, "backThickness": 0.9, "bodyFat": 0.03, "clavicle": 0.82, "hipWidth": 0.22, "latInsertion": 0.0 },
+    "pose": "rearLat",
+    "view": 180,
+    "el": 0.02,
+    "zoom": 0.48,
+    "target": [0, 121, 0],
+    "wait": 700
+  },
+  {
+    "label": "lat-authored-low-spread",
+    "set": { "mass": 0.92, "legMass": 0.85, "backThickness": 0.9, "bodyFat": 0.03, "clavicle": 0.82, "hipWidth": 0.22, "latInsertion": 1.0 },
+    "pose": "rearLat",
+    "view": 180,
+    "el": 0.02,
+    "zoom": 0.48,
+    "target": [0, 121, 0],
+    "wait": 700
+  },
+  {
+    "label": "lat-authored-high-double",
+    "set": { "latInsertion": 0.0 },
+    "pose": "backDouble",
+    "view": 180,
+    "wait": 650
+  },
+  {
+    "label": "lat-authored-low-double",
+    "set": { "latInsertion": 1.0 },
+    "pose": "backDouble",
+    "view": 180,
+    "wait": 650
+  }
+]

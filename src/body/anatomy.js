@@ -23,6 +23,7 @@ export class AnatomyCorrectives {
     this.adjOff = regionField.adjOff;
     this.adjIdx = regionField.adjIdx;
     this.basePos = figure.basePos;
+    this.sourceGain = figure.header.source === 'studio' ? 2.05 : 1;
     this.byKey = regionField.byKey;
     this.cache = new Map();
     this.maps = {
@@ -263,13 +264,19 @@ export class AnatomyCorrectives {
     this._both(this._cross, 'trunk', 0.11, 'serratus.$', [0.16, 0.43, 0.70], 0.042, 0.65);
 
     /* Spinal furrow and planes around the scapula/teres/lat stack. */
-    this._midline('back', 0.30, ['erectors.L', 'erectors.R', 'trap_mid.L', 'trap_mid.R'], 0.115, -0.1, 1.1);
-    this._both(this._groupBoundary, 'back', 0.16,
+    this._midline('back', 0.44, ['erectors.L', 'erectors.R', 'trap_mid.L', 'trap_mid.R'], 0.105, -0.1, 1.1);
+    this._both(this._groupBoundary, 'back', 0.30,
       ['trap_mid.$', 'rhomboids.$', 'teres.$', 'lat.$', 'erectors.$']);
-    this._both(this._boundary, 'back', 0.13, 'trap_mid.$', 'rhomboids.$');
-    this._both(this._boundary, 'back', 0.17, 'rhomboids.$', 'teres.$');
-    this._both(this._boundary, 'back', 0.19, 'teres.$', 'lat.$');
-    this._both(this._boundary, 'back', 0.15, 'lat.$', 'erectors.$');
+    this._both(this._boundary, 'back', 0.24, 'trap_mid.$', 'rhomboids.$');
+    this._both(this._boundary, 'back', 0.31, 'rhomboids.$', 'teres.$');
+    this._both(this._boundary, 'back', 0.38, 'teres.$', 'lat.$');
+    this._both(this._boundary, 'back', 0.32, 'lat.$', 'erectors.$');
+    /* Broad positive planes between the seams keep the back from reading as
+       one inflated shell.  The lats remain sheets, the erectors become paired
+       columns, and the mid traps retain a distinct diamond over both. */
+    this._both(this._blocks, 'back', 0.17, 'lat.$', [0.38], 0.24);
+    this._both(this._blocks, 'back', 0.14, 'erectors.$', [0.42], 0.28);
+    this._both(this._blocks, 'back', 0.12, 'trap_mid.$', [0.52], 0.25);
 
     /* Rectus column, lateral sweep, medial teardrop and quad tendon. */
     this._both(this._groupBoundary, 'legs', 0.22,
@@ -307,6 +314,7 @@ export class AnatomyCorrectives {
     for (let v = 0; v < this.n; v++) {
       let cm = 0;
       for (const [name, map] of Object.entries(this.maps)) cm += map[v] * drives[name];
+      cm *= this.sourceGain;
       current[v] = cm;
       if (Math.abs(cm) < 0.002) continue;
       /* A quarter of the sculpt changes the cage and therefore the physical

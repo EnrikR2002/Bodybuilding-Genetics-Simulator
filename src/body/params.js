@@ -15,8 +15,25 @@ const LR = ['l', 'r'];
 const clamp = (v, a, b) => (v < a ? a : v > b ? b : v);
 const bi = v => (clamp(v, 0, 1) - 0.5) * 2;               /* 0..1 -> -1..1 */
 
+/* Prefer a real endpoint sculpt whenever both halves of the artist contract
+   are installed.  Requiring the pair prevents one end of a slider from using
+   authored anatomy while the other silently falls back to a generated bulge. */
+function addAuthoredTrait(M, key, value) {
+  const low = `correctives/${key}-0`;
+  const high = `correctives/${key}-1`;
+  if (!M.has?.(low) || !M.has?.(high)) return false;
+  const signed = bi(value);
+  if (signed < 0) M.add(low, -signed);
+  else if (signed > 0) M.add(high, signed);
+  return true;
+}
+
 export function applyParams(M, p) {
   const g = k => (p[k] === undefined ? 0.5 : clamp(p[k], 0, 1));
+  const authored = {};
+  for (const key of ['bicepInsertion', 'bicepPeak', 'latInsertion', 'pecGap',
+                     'abStagger', 'calfInsertion', 'trapHeight'])
+    authored[key] = addAuthoredTrait(M, key, g(key));
 
   /* ---- body composition: the nine-way muscle x weight sculpt blend ----- */
   /* MakeHuman's max-muscle-max-weight sculpt is a strongman: a barrel with no
@@ -126,6 +143,16 @@ export function applyParams(M, p) {
 
   /* ---- body fat ---- */
   const fat = g('bodyFat');
+  /* A topology-compatible relief authored from the separated Z-Anatomy back
+     muscles. It describes actual atlas borders rather than guessing a row of
+     generic ellipsoids. Fat softens those borders; muscularity and back
+     development make the underlying planes readable. */
+  if (M.has?.('correctives/anatomy-back')) {
+    const atlasBack = clamp(1.08 - fat * 2.8, 0, 1)
+                    * clamp(0.20 + mass * 0.90, 0, 1)
+                    * clamp(0.40 + back * 0.70, 0, 1);
+    M.add('correctives/anatomy-back', atlasBack);
+  }
   const fatS = (fat - 0.18) * 1.35;
   for (const s of LR) {
     addPair(M, `armslegs/${s}-upperarm-fat`, fatS, 0.85);
@@ -162,8 +189,12 @@ export function applyParams(M, p) {
   const vacuum = clamp(p.vacuum || 0, 0, 1);
   const flex = clamp(p.flex === undefined ? 0.3 : p.flex, 0, 1);
 
-  M.add('torso/torso-muscle-dorsi-incr', flare * (0.35 + back * 0.45));
-  M.add('measure/measure-underbust-circ-incr', flare * 0.30);
+  /* The stock dorsi target expands the whole lower back. It is useful as a
+     fallback flare, but would refill the exposed lumbar interval sculpted for
+     a high insertion. Authored endpoints keep a restrained contraction dose. */
+  const genericFlare = authored.latInsertion ? 0.24 : 1;
+  M.add('torso/torso-muscle-dorsi-incr', flare * (0.35 + back * 0.45) * genericFlare);
+  M.add('measure/measure-underbust-circ-incr', flare * 0.30 * (authored.latInsertion ? 0.45 : 1));
   M.add('torso/torso-muscle-pectoral-incr', chestUp * (0.12 + mass * 0.16));
   M.add('measure/measure-bust-circ-incr', chestUp * 0.22);
   M.add('measure/measure-frontchest-dist-incr', chestUp * 0.14);
@@ -187,6 +218,7 @@ export function applyParams(M, p) {
   /* what regions.js still needs to know */
   return {
     mass, legMass, back, fat, flex, flare, chestUp, vacuum, lean,
+    authored,
     /* how far to blend toward the smoothed mesh: definition disappearing */
     soften: clamp((fat - 0.12) * 1.55, 0, 1) * 0.55 * (1 - flex * 0.25),
     /* and how far to blend away from it: definition arriving. Lean and full

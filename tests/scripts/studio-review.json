@@ -1,0 +1,26 @@
+[
+  {
+    "label": "studio-review-front",
+    "view": "front",
+    "pose": "relaxed",
+    "set": { "mass": 0.72, "legMass": 0.68, "backThickness": 0.72, "bodyFat": 0.08 },
+    "zoom": 1.08
+  },
+  {
+    "label": "studio-review-back",
+    "view": "back",
+    "pose": "relaxed",
+    "zoom": 1.08
+  },
+  {
+    "label": "studio-regions-front",
+    "view": "front",
+    "regions": true,
+    "zoom": 1.08
+  },
+  {
+    "label": "studio-regions-back",
+    "view": "back",
+    "zoom": 1.08
+  }
+]

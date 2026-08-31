@@ -26,7 +26,7 @@ export const POSES = [
     note: 'Every insertion is on trial here: biceps length, lat width, quad sweep, all at once.',
     /* the pole is almost pure sideways, which is what puts the upper arm
        level with the shoulder instead of angled up at the head */
-    arm: { hand: [0.10, 0.37, 0.02], pole: [1.10, -0.02, -0.04], roll: -1.25, curl: 1.55 },
+    arm: { hand: [0.16, 0.18, 0.03], pole: [1.10, -0.02, -0.04], roll: -0.70, curl: 2.20 },
     legL: { foot: [0.18, -0.968, 0.06], pole: [0.30, 0.05, 1.0], toeOut: 0.28 },
     legR: { foot: [0.15, -0.988, -0.02], pole: [0.28, 0.05, 1.0], toeOut: 0.22 },
     joints: { spine01: [-0.03, 0, 0] },
@@ -47,7 +47,7 @@ export const POSES = [
     grip: [-0.28, -0.52, 0.24],
     armL: { pole: [0.72, -0.42, 0.74], roll: 0.62, wristY: 0.34, curl: 0.86 },
     armR: { pole: [1.00, -0.36, 0.18], roll: 0.42, wristY: -0.24, curl: 0.86 },
-    legL: { foot: [0.16, -0.96, -0.16], pole: [0.20, 0.05, 1.0], ankle: 0.42, toeOut: 0.30 },
+    legL: { foot: [0.16, -0.985, -0.12], pole: [0.20, 0.05, 1.0], ankle: 0.12, toeOut: 0.30 },
     legR: { foot: [0.12, -0.99, 0.10], pole: [0.24, 0.05, 1.0] },
   },
   {
@@ -58,7 +58,7 @@ export const POSES = [
     grip: [-0.25, -0.69, -0.10],
     armL: { pole: [0.80, -0.24, -0.72], roll: 0.72, wristY: 0.18, curl: 0.62 },
     armR: { pole: [0.84, -0.32, -0.50], roll: 0.62, wristY: -0.18, curl: 0.62 },
-    legL: { foot: [0.16, -0.955, -0.20], pole: [0.20, 0.05, 1.0], ankle: 0.48, toeOut: 0.30 },
+    legL: { foot: [0.16, -0.985, -0.14], pole: [0.20, 0.05, 1.0], ankle: 0.14, toeOut: 0.30 },
     legR: { foot: [0.12, -0.99, 0.10], pole: [0.24, 0.05, 1.0] },
   },
   {
@@ -66,7 +66,7 @@ export const POSES = [
     geo: { latFlare: 0.70, chestUp: 0.2, vacuum: 0.2, flex: 1 },
     note: 'Lat insertion is unmissable from behind — high insertions leave a gap above the waist.',
     joints: { root: [0, Math.PI, 0], spine01: [-0.03, 0, 0] },
-    arm: { hand: [0.10, 0.37, 0.02], pole: [1.10, -0.02, -0.04], roll: -1.25, curl: 1.55 },
+    arm: { hand: [0.16, 0.18, 0.03], pole: [1.10, -0.02, -0.04], roll: -0.70, curl: 2.20 },
     legL: { foot: [0.20, -0.975, 0.02], pole: [0.30, 0.05, 1.0], toeOut: 0.26 },
     legR: { foot: [0.20, -0.955, -0.18], pole: [0.30, 0.05, 1.0], ankle: 0.40, toeOut: 0.26 },
   },
