@@ -26,7 +26,7 @@ export const POSES = [
     note: 'Every insertion is on trial here: biceps length, lat width, quad sweep, all at once.',
     /* the pole is almost pure sideways, which is what puts the upper arm
        level with the shoulder instead of angled up at the head */
-    arm: { hand: [0.16, 0.18, 0.03], pole: [1.10, -0.02, -0.04], roll: -0.70, curl: 2.20 },
+    arm: { hand: [0.24, 0.46, 0.06], pole: [1.10, -0.02, -0.04], roll: -0.70, curl: 1.45, girdle: 0.14 },
     legL: { foot: [0.18, -0.968, 0.06], pole: [0.30, 0.05, 1.0], toeOut: 0.28 },
     legR: { foot: [0.15, -0.988, -0.02], pole: [0.28, 0.05, 1.0], toeOut: 0.22 },
     joints: { spine01: [-0.03, 0, 0] },
@@ -66,7 +66,7 @@ export const POSES = [
     geo: { latFlare: 0.70, chestUp: 0.2, vacuum: 0.2, flex: 1 },
     note: 'Lat insertion is unmissable from behind — high insertions leave a gap above the waist.',
     joints: { root: [0, Math.PI, 0], spine01: [-0.03, 0, 0] },
-    arm: { hand: [0.16, 0.18, 0.03], pole: [1.10, -0.02, -0.04], roll: -0.70, curl: 2.20 },
+    arm: { hand: [0.24, 0.46, 0.06], pole: [1.10, -0.02, -0.04], roll: -0.70, curl: 1.45, girdle: 0.14 },
     legL: { foot: [0.20, -0.975, 0.02], pole: [0.30, 0.05, 1.0], toeOut: 0.26 },
     legR: { foot: [0.20, -0.955, -0.18], pole: [0.30, 0.05, 1.0], ankle: 0.40, toeOut: 0.26 },
   },

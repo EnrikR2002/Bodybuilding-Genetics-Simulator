@@ -307,6 +307,41 @@ function topK(arr, k = MAX_BONES_PER_VERT) {
   for (const p of out) p[1] /= s;
   return out;
 }
+// The inner clavicle and neck remain supported by the thorax when the arms
+// rise. Carrying this patch entirely on the clavicle raised a rectangular
+// flap behind each side of the neck in a double-biceps pose.
+const thorax=boneIndex.spine01;
+for(let v=0;v<nAll;v++) {
+  const x=Math.abs(basePos[v*3]),y=basePos[v*3+1];
+  if(y<5.0||y>7.5||x>1.8)continue;
+  const t=Math.max(0,Math.min(1,(x-0.72)/1.08));
+  const retain=t*t*(3-2*t);
+  let transfer=0;
+  for(const pair of wList[v]) if(order[pair[0]].startsWith('clavicle.')) {
+    transfer+=pair[1]*(1-retain);pair[1]*=retain;
+  }
+  if(transfer>0) {
+    const hit=wList[v].find(p=>p[0]===thorax);
+    if(hit)hit[1]+=transfer;else wList[v].push([thorax,transfer]);
+  }
+}
+// Ease the shoulder and elbow weight transitions on connected surface edges.
+// A spatial nearest-neighbour blur would incorrectly weld arms to the ribs.
+const weightAdj=Array.from({length:nAll},()=>new Set());
+for(let i=0;i<quads.length;i+=4)for(let k=0;k<4;k++) {
+  const a=quads[i+k],b=quads[i+(k+1)%4];weightAdj[a].add(b);weightAdj[b].add(a);
+}
+for(let pass=0;pass<3;pass++) {
+  const previous=wList.map(a=>a.map(p=>p.slice()));
+  for(let v=0;v<nAll;v++) {
+    const y=basePos[v*3+1];
+    if(y<2.8||y>7.2||!weightAdj[v].size)continue;
+    const weights=new Map(previous[v].map(([b,w])=>[b,w*0.65]));
+    for(const n of weightAdj[v])for(const [b,w] of previous[n])
+      weights.set(b,(weights.get(b)||0)+w*0.35/weightAdj[v].size);
+    wList[v]=topK([...weights]);
+  }
+}
 /* cage weights as dense 4-wide arrays */
 const cageSI = new Uint16Array(nAll * 4), cageSW = new Float32Array(nAll * 4);
 for (let v = 0; v < nAll; v++) {

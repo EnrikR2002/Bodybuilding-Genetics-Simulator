@@ -236,8 +236,28 @@ export class PoseRig {
     /* first segment: point it, then take the parent's rotation back out so
        what lands on the bone is a local rotation */
     const world1 = new Quaternion().setFromUnitVectors(L.restDir1, this.solve.dir1);
-    s.byName[L.root].quaternion.copy(_q1.copy(pq).invert().multiply(world1));
-    if (s.byName[L.rootTwist]) s.byName[L.rootTwist].quaternion.identity();
+    const humeralTwist = new Quaternion();
+    if (key.startsWith('arm')) {
+      // The anterior humerus must face the elbow's flexion plane. A shortest
+      // arc alone aims the bone but leaves the biceps facing the camera even
+      // when the forearm is raised, hiding its peak and twisting the elbow.
+      const front = new Vector3(0, 0, 1).addScaledVector(L.restDir1, -L.restDir1.z).normalize();
+      const from = front.clone().applyQuaternion(world1);
+      const to = this.solve.dir2.clone().addScaledVector(this.solve.dir1,
+        -this.solve.dir2.dot(this.solve.dir1));
+      const bend = to.length();
+      if (bend > 0.001) {
+        to.normalize();
+        const angle = Math.atan2(this.solve.dir1.dot(from.clone().cross(to)), from.dot(to));
+        const weight = clamp((bend - 0.12) / 0.40, 0, 1);
+        humeralTwist.setFromAxisAngle(L.restDir1, clamp(angle, -1.45, 1.45) * weight);
+      }
+    }
+    const proximalTwist = new Quaternion().slerp(humeralTwist, 0.80);
+    s.byName[L.root].quaternion.copy(pq.clone().invert().multiply(world1).multiply(proximalTwist));
+    if (s.byName[L.rootTwist])
+      s.byName[L.rootTwist].quaternion.copy(new Quaternion().slerp(humeralTwist, 0.20));
+    world1.multiply(humeralTwist);
 
     /* second segment: the part that changes direction goes on the joint, the
        part that only rolls is shared with the twist bone so the skin winds

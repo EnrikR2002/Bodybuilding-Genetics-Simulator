@@ -149,6 +149,10 @@ input[type=range]:focus-visible{outline:2px solid var(--ox);outline-offset:2px}
 .viewbtns .btn:last-child{border-right-width:1px}
 .posestrip{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;margin-top:8px;scrollbar-width:thin}
 .posestrip .btn{white-space:nowrap;flex:0 0 auto;padding:5px 8px;font-size:10px}
+.studybar{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:8px}
+.studybar .btn{font-size:10px;padding:5px 8px}
+.studybar .btn[aria-pressed=true]{background:var(--ox);color:var(--plate)}
+.studybar span{font:10px var(--mono);color:var(--ink2)}
 
 /* loading */
 .loading{
@@ -215,7 +219,7 @@ input[type=range]:focus-visible{outline:2px solid var(--ox);outline-offset:2px}
     </section>
     <section class="sec">
       <div class="sechead"><h2>Insertions</h2><span class="tag given">Given</span></div>
-      <p class="secnote">Where each muscle attaches to bone — the shape it makes when it grows.</p>
+      <p class="secnote">Muscle belly length, tendon intervals and attachment shape. Belly length is different from the biceps' anatomical short and long heads.</p>
       <div id="grpIns"></div>
     </section>
     <section class="sec earned">
@@ -227,6 +231,12 @@ input[type=range]:focus-visible{outline:2px solid var(--ox);outline-offset:2px}
 
   <!-- ============ CENTER: stage ============ -->
   <div class="stagewrap">
+    <div class="studybar" aria-label="Biceps belly comparison">
+      <button class="btn" data-belly="0" aria-pressed="false">Short belly</button>
+      <button class="btn" data-belly="1" aria-pressed="false">Long belly</button>
+      <button class="btn" id="compareBiceps">Compare biceps</button>
+      <span id="studyStatus" aria-live="polite">Study belly length at the same frame and condition</span>
+    </div>
     <div class="stage" id="stage">
       <canvas id="cv"></canvas>
       <div class="ruler" id="ruler"></div>
@@ -241,6 +251,15 @@ input[type=range]:focus-visible{outline:2px solid var(--ox);outline-offset:2px}
       <button class="btn" id="btnCallouts">Callouts</button>
       <button class="btn" id="btnSpin">Turntable</button>
       <button class="btn" id="btnPin">Pin comparison</button>
+      <select class="btn" id="surfaceMode" aria-label="Surface display">
+        <option value="skin">Skin</option>
+        <option value="clay">Neutral clay</option>
+        <option value="anatomy">Atlas reference</option>
+      </select>
+      <select class="btn" id="skinTone" aria-label="Skin tone">
+        <option value="0">Light</option><option value="1" selected>Tan</option>
+        <option value="2">Bronze</option><option value="3">Deep</option>
+      </select>
       <div class="viewbtns">
         <button class="btn" data-az="0">Front</button>
         <button class="btn" data-az="-90">Side</button>

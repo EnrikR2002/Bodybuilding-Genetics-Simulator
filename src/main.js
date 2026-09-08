@@ -9,16 +9,19 @@
    Everything then goes through one round of Catmull-Clark subdivision on its
    way to the screen.
    --------------------------------------------------------------------------- */
-import { Vector3, Quaternion, BufferAttribute, MeshBasicMaterial, Color } from 'three';
+import { Vector3, Quaternion, BufferAttribute, MeshBasicMaterial, MeshStandardMaterial, Color } from 'three';
 import { loadFigure } from './body/figure.js';
 import { loadBundle } from './body/binary.js';
 import { Stage } from './render/stage.js';
-import { createSkin, createGhost, SKIN_TONES } from './render/skin.js';
+import { createSkin, SKIN_TONES } from './render/skin.js';
 import { PoseRig } from './pose/ik.js';
 import { Tape } from './body/measure.js';
 import { POSES } from './data/poses.js';
 import { SLIDERS, DEFAULT, PRESETS, judge } from './data/sliders.js';
-import { CALLOUTS, placeAnchors } from './ui/callouts.js';
+import { CALLOUTS, placeAnchors, updateAnchors } from './ui/callouts.js';
+import { installVolumeSkinning } from './render/skinning.js';
+
+installVolumeSkinning();
 
 const clamp = (v, a, b) => (v < a ? a : v > b ? b : v);
 const lerp = (a, b, t) => a + (b - a) * t;
@@ -39,10 +42,12 @@ let geoTarget = { ...geo };
 let geoBuilt = { latFlare: -9, chestUp: -9, vacuum: -9, flex: -9 };
 let currentPose = POSES[0];
 let showCallouts = false, spin = false, pinned = null;
-let shapeDirty = true, poseDirty = true;
+let shapeDirty = true;
 let measurements = null;
 let tone = 1;
 let debugMat = null;
+let surfaceMode = 'skin';
+const clay = new MeshStandardMaterial({ color: 0xb1aaa0, roughness: 0.78 });
 
 const QUALITY = Math.min(innerWidth, innerHeight) < 760 ? 0 : 1;
 const stage = new Stage(canvas, { hdri: '/env/studio.hdr', quality: QUALITY });
@@ -78,8 +83,15 @@ function params() { return { ...S, ...geo }; }
 let measureKey = '';
 const _head = new Vector3(), _headTail = new Vector3();
 function applyShape(remeasure = true) {
+  const previous = figure.skeleton.bones.map(b => b.quaternion.clone());
   figure.update(params());
   rig.refresh();
+  rig.apply(currentPose);
+  poseTargets.clear();
+  figure.skeleton.bones.forEach((b,i) => {
+    poseTargets.set(b,b.quaternion.clone());
+    b.quaternion.copy(previous[i]);
+  });
   /* the shader places the hairline relative to the skull, so it needs to know
      where the skull ended up */
   figure.skeleton.restHead('head', _head);
@@ -127,6 +139,10 @@ function applyPose(p, instant) {
     for (const [b, q] of poseTargets) b.quaternion.copy(liveQuat.get(b) || q);
   }
   shapeDirty = true;
+  if (pinned) {
+    pinned.update({ ...pinned.snapshotParams, ...geoTarget });
+    pinned.pinnedRig.refresh().apply(p);
+  }
 }
 
 /* remember what the bones actually look like right now, so a pose change
@@ -216,7 +232,10 @@ function buildSliders() {
       `<div class="ends"><span>${sp.lo}</span><span>${sp.hi}</span></div>`;
     document.getElementById(sp.g).appendChild(wrap);
     const input = wrap.querySelector('input');
-    input.addEventListener('input', () => { S[sp.k] = parseFloat(input.value); shapeDirty = true; });
+    input.addEventListener('input', () => {
+      S[sp.k] = parseFloat(input.value); shapeDirty = true;
+      resetStudyStatus();
+    });
   }
 }
 
@@ -225,6 +244,14 @@ function syncInputs() {
     const i = document.getElementById('s_' + sp.k);
     if (i && Math.abs(parseFloat(i.value) - S[sp.k]) > 1e-4) i.value = S[sp.k];
   }
+}
+
+function resetStudyStatus() {
+  document.getElementById('studyStatus').textContent = pinned
+    ? 'Left: pinned physique · Right: current physique'
+    : 'Study belly length at the same frame and condition';
+  document.querySelectorAll('[data-belly]').forEach(b =>
+    b.setAttribute('aria-pressed', +b.dataset.belly === S.bicepInsertion));
 }
 
 function syncReadout() {
@@ -281,6 +308,25 @@ function buildPoseStrip() {
 const btnC = document.getElementById('btnCallouts');
 const btnS = document.getElementById('btnSpin');
 const btnP = document.getElementById('btnPin');
+const surfaceSelect = document.getElementById('surfaceMode');
+function setSurface(mode) {
+  surfaceMode = mode;
+  surfaceSelect.value = mode;
+  if (mode === 'anatomy') window.__app.debugRegions('anatomy');
+  else figure.mesh.material = mode === 'clay' ? clay : skin;
+  if (pinned) {
+    if (mode === 'anatomy') {
+      pinned.geometry.setAttribute('color',figure.geometry.attributes.color.clone());
+      pinned.mesh.material = debugMat;
+    } else pinned.mesh.material = mode === 'clay' ? clay : pinned.comparisonSkin;
+  }
+}
+surfaceSelect.addEventListener('change', () => setSurface(surfaceSelect.value));
+document.getElementById('skinTone').addEventListener('change', e => {
+  tone = +e.target.value;
+  skin.userData.setTone(tone);
+  pinned?.comparisonSkin.userData.setTone(tone);
+});
 btnC.addEventListener('click', () => {
   showCallouts = !showCallouts;
   btnC.classList.toggle('on', showCallouts);
@@ -289,35 +335,73 @@ btnC.addEventListener('click', () => {
 function setSpin(v) { spin = v; btnS.classList.toggle('on', spin); }
 btnS.addEventListener('click', () => setSpin(!spin));
 
-btnP.addEventListener('click', async () => {
+async function toggleComparison() {
+  if (btnP.disabled) return;
   if (pinned) {
     stage.scene.remove(pinned.root);
+    pinned.geometry.dispose();
+    pinned.eyeGeometry?.dispose();
+    pinned.eyes?.material.dispose();
+    pinned.comparisonSkin.userData.uniformRefs.uNoise.value.dispose();
+    pinned.comparisonSkin.dispose();
+    pinned.skeleton.skeleton.dispose();
     pinned = null;
     figure.root.position.x = 0;
     if (!userZoom) distT = baseDist();
     btnP.classList.remove('on');
     btnP.textContent = 'Pin comparison';
+    resetStudyStatus();
     return;
   }
   btnP.disabled = true;
-  const ghost = await loadFigure('/models/body.bin');
-  ghost.attachRegions(regionBundle);
-  ghost.mesh.material = createGhost();
-  if (ghost.eyes) ghost.eyes.material = createGhost();
-  ghost.bindSkeleton();
-  ghost.update(params());
-  const gRig = new PoseRig(ghost.skeleton);
-  gRig.refresh();
-  gRig.apply(currentPose);
-  ghost.pinnedRig = gRig;
-  ghost.root.position.x = -figure.height * 0.30;
-  figure.root.position.x = figure.height * 0.30;
-  stage.scene.add(ghost.root);
-  pinned = ghost;
-  distT = Math.max(distT, baseDist() * 1.42);
-  btnP.classList.add('on');
-  btnP.textContent = 'Clear comparison';
-  btnP.disabled = false;
+  try {
+    const ghost = await loadFigure('/models/body.bin');
+    ghost.attachRegions(regionBundle, anatomyBundle);
+    ghost.comparisonSkin = createSkin({ tone, oil: 0.48 });
+    ghost.mesh.material = surfaceMode === 'clay' ? clay : ghost.comparisonSkin;
+    ghost.bindSkeleton();
+    ghost.update(params());
+    ghost.snapshotParams = { ...S };
+    ghost.comparisonSkin.userData.setHead(_head);
+    ghost.comparisonSkin.userData.setVein(ghost.lastCtx.vein);
+    ghost.comparisonSkin.userData.setStriate(ghost.lastCtx.striate);
+    const gRig = new PoseRig(ghost.skeleton);
+    gRig.refresh();
+    gRig.apply(currentPose);
+    ghost.pinnedRig = gRig;
+    ghost.root.position.x = -figure.height * 0.30;
+    figure.root.position.x = figure.height * 0.30;
+    stage.scene.add(ghost.root);
+    pinned = ghost;
+    setSurface(surfaceMode);
+    distT = Math.max(distT, baseDist() * 1.42);
+    btnP.classList.add('on');
+    btnP.textContent = 'Clear comparison';
+  } finally { btnP.disabled = false; }
+}
+btnP.addEventListener('click', toggleComparison);
+
+function studyBiceps(value) {
+  S.bicepInsertion = value;
+  syncInputs();
+  window.__app.pose('frontDouble');
+  applyShape();
+  window.__app.view(-8,0.02,0.70,[0,figure.height*0.80,0]);
+  document.getElementById('studyStatus').textContent = value < 0.5
+    ? 'Short belly · more exposed tendon above the elbow'
+    : 'Long belly · fuller toward the elbow, shorter tendon interval';
+  document.querySelectorAll('[data-belly]').forEach(b => b.setAttribute('aria-pressed',+b.dataset.belly===value));
+  shapeDirty = true;
+}
+document.querySelectorAll('[data-belly]').forEach(b => b.addEventListener('click',()=>studyBiceps(+b.dataset.belly)));
+document.getElementById('compareBiceps').addEventListener('click', async () => {
+  if (btnP.disabled) return;
+  if (pinned) await toggleComparison();
+  studyBiceps(0);
+  await toggleComparison();
+  studyBiceps(1);
+  window.__app.view(0,0.02,1.08,[0,figure.height*0.60,0]);
+  document.getElementById('studyStatus').textContent = 'Left: short belly · Right: long belly · Same frame and condition';
 });
 
 /* ---- presets ---- */
@@ -327,12 +411,12 @@ for (const p of PRESETS) {
   b.className = 'btn';
   b.style.textAlign = 'center';
   b.textContent = p.n;
-  b.addEventListener('click', () => { Object.assign(S, p.v); shapeDirty = true; syncInputs(); });
+  b.addEventListener('click', () => { Object.assign(S, p.v); shapeDirty = true; syncInputs(); resetStudyStatus(); });
   presetsEl.appendChild(b);
 }
 document.getElementById('btnDice').addEventListener('click', () => {
   for (const sp of SLIDERS) S[sp.k] = sp.k === 'bodyFat' ? Math.random() * 0.8 : Math.random();
-  shapeDirty = true; syncInputs();
+  shapeDirty = true; syncInputs(); resetStudyStatus();
 });
 
 /* ---- mobile tabs ---- */
@@ -391,6 +475,7 @@ function clearOverlay() {
 const _cv = new Vector3();
 function updateCallouts() {
   if (!showCallouts) return;
+  updateAnchors(anchors, figure);
   const W = stageEl.clientWidth, H = stageEl.clientHeight;
   const items = [];
   for (const c of CALLOUTS) {
@@ -464,12 +549,6 @@ function tick(now) {
 
   if (shapeDirty) { applyShape(); geoBuilt = { ...geo }; shapeDirty = false; }
   runMeasure(now, false);
-  if (pinned) {
-    for (const b of figure.skeleton.bones) {
-      const g = pinned.skeleton.byName[b.name];
-      if (g) g.quaternion.copy(b.quaternion);
-    }
-  }
 
   if (spin) azT -= dt * 0.30;
   az = lerp(az, azT, k); el = lerp(el, elT, k); dist = lerp(dist, distT, k);
@@ -511,6 +590,9 @@ setTimeout(() => loadingEl.remove(), 700);
 
 /* handles for the screenshot harness */
 window.__app = {
+  surface: setSurface,
+  studyBiceps,
+  comparison: () => pinned,
   set(o) { Object.assign(S, DEFAULT, o); shapeDirty = true; syncInputs(); },
   pose(id, over) {
     const p = POSES.find(x => x.id === id);
@@ -553,7 +635,7 @@ window.__app = {
     return { ...t, total: +Object.values(t).reduce((a, b) => a + b, 0).toFixed(2),
              tris: figure.header.nTris };
   },
-  pin() { btnP.click(); },
+  pin: toggleComparison,
   /* flat bright backdrop, used to tell a hole in the mesh from a very dark
      crevice: a hole goes the colour of the backdrop, a crevice stays dark */
   bg(on) {

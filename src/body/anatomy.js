@@ -95,6 +95,7 @@ export class AnatomyCorrectives {
     const drive = new Uint8Array(H.nSub);
     for (let v = 0; v < H.nSub; v++) drive[v] = owner[v] < 0 ? 0 : byGroup[owner[v]];
     this.atlas = {
+      groups: H.groups,
       nSub: H.nSub,
       relief: bundle.block(H.relief),
       covered: bundle.block(H.covered),

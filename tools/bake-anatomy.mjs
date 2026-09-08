@@ -295,6 +295,16 @@ const claim = key => (perChain[key] ||= {
   mask: new Uint8Array(nSub),
 });
 
+// A ray may cross a neighbouring body part before it reaches its own. Those
+// hits are occluders, not anatomy for this chain (e.g. biceps on the rib cage).
+const CHAIN_GROUPS = {
+  torso: /^(pec_|lat$|trap_|rhomboids$|teres$|infraspinatus$|erectors$|serratus$|obliques$|rectus_abs$|glutes$|glute_med$|clavicle_b$|sternum_b$|iliac_b$|scapula_b$|ribs_b$)/,
+  upperarm: /^(deltoid_|biceps_|brachialis$|triceps_|olecranon_b$)/,
+  forearm: /^forearm_/,
+  thigh: /^(rectus_fem$|vastus_|adductors$|sartorius$|ham_|glutes$|glute_med$|it_band$|patella_b$)/,
+  shank: /^(gastroc_|soleus$|tibialis$|peroneals$|tibia_b$|patella_b$)/,
+};
+
 for (let i = 0; i < meta.count; i++) {
   const h = i * HS;
   if (hits[h] < 0) continue;
@@ -304,12 +314,21 @@ for (let i = 0; i < meta.count; i++) {
   const side = rays[r + 2] < 0.5 ? 'L' : 'R';
   const aff = rays[r + 3];
   const u = rays[r + 4];
+  const chainName = key.split('.')[0];
+  if (chainName === 'torso' && (u > 0.96 || u < -0.18)) continue;
+  const valid = [];
+  for (let k = 0; k < STACK; k++) {
+    const gid = hits[h + k * 6] | 0;
+    if (hits[h + k * 6] < 0) break;
+    if (CHAIN_GROUPS[chainName]?.test(GROUPS[gid])) valid.push(k);
+  }
+  if (!valid.length) continue;
   const th = rays[r + 5] * D2R;
   const scale = chainScale[key];
   const w = aff * aff;
 
   /* the outermost surface is the one the skin lies on */
-  const outer = hits[h + 1];
+  const outer = Math.max(...valid.map(k => hits[h + k * 6 + 1]));
   const C = claim(key);
   C.standoff[v] += outer * scale * w;
   C.along[v] += u * w;
@@ -321,7 +340,7 @@ for (let i = 0; i < meta.count; i++) {
 
   /* the name, and the surface that goes with it */
   let best = 0, bestScore = -1e9;
-  for (let k = 0; k < STACK; k++) {
+  for (const k of valid) {
     const g = hits[h + k * 6];
     if (g < 0) break;
     const score = hits[h + k * 6 + 1] + reach[g | 0];

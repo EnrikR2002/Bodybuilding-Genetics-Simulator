@@ -22,6 +22,8 @@ import { MorphSet } from './morph.js';
 import { BodySkeleton } from './skeleton.js';
 import { RegionField } from './regions.js';
 import { applyParams } from './params.js';
+import { applyVolumeBoneTransform } from '../render/skinning.js';
+import { MuscleForms } from './muscle-forms.js';
 
 export const CM = 10;              /* MakeHuman decimetres -> centimetres */
 /* Depth in centimetres of the crease the shader draws where one muscle hands
@@ -42,7 +44,7 @@ const ATLAS_CREASE = 0.30;
    navel; below that the muscle runs uninterrupted, which is why the lowest
    pair of blocks is always the long one.
    --------------------------------------------------------------------------- */
-const AB_ROWS = [0.17, 0.35, 0.53, 0.67];
+const AB_ROWS = [0.20, 0.40, 0.60];
 const AB_SEGMENT = 0.18;
 function abWall(t, midline) {
   /* nothing above the ribs or below the pubis */
@@ -54,7 +56,12 @@ function abWall(t, midline) {
   }
   /* the rows fade out where the muscle disappears under the ribs */
   const ends = Math.min(1, Math.max(0, t / 0.10)) * Math.min(1, Math.max(0, (1.02 - t) / 0.10));
-  return cut * ends;
+  // Convex rectus segments between the inscriptions, with a quieter, longer
+  // lower segment. Geometry carries the read in neutral clay as well as skin.
+  let belly = 0;
+  for (const c of [0.10, 0.30, 0.50, 0.75])
+    belly = Math.max(belly, Math.exp(-(((t-c)/0.09)**2))*0.85);
+  return (cut-belly*(1-midline))*ends;
 }
 
 export async function loadFigure(url, onProgress) {
@@ -80,6 +87,7 @@ export class Figure {
     /* working buffers, reused every update */
     this.cage = new Float32Array(this.nCage * 3);
     this.cageMorphed = new Float32Array(this.nCage * 3);
+    this.rigCage = new Float32Array(this.nCage * 3);
     this.subNormals = new Float32Array(this.nSubVerts * 3);
 
     this.morph = new MorphSet(bundle);
@@ -100,6 +108,7 @@ export class Figure {
     this.regions = null;             /* filled by attachRegions() */
     this.geometry = this._buildGeometry(bundle);
     this.mesh = new SkinnedMesh(this.geometry, null);
+    this.mesh.applyBoneTransform = applyVolumeBoneTransform;
     this.mesh.frustumCulled = false;
     this.mesh.castShadow = true;
     this.mesh.receiveShadow = true;
@@ -148,32 +157,48 @@ export class Figure {
        is the first thing anyone looks at, and a bright sphere behind a narrow
        eyelid reads as a corpse — which is exactly what a mirror-finish
        eyeball under a studio light does. */
-    const col = new Float32Array(n * 3);
-    const sclera = new Color(0x9c948a), iris = new Color(0x3d2b1c), pupil = new Color(0x070505);
-    let cx = 0, cy = 0, cz = 0;
-    for (const v of verts) { cx += this.basePos[v * 3]; cy += this.basePos[v * 3 + 1]; cz += this.basePos[v * 3 + 2]; }
-    cx /= n; cy /= n; cz /= n;
-    const tmp = new Color();
-    for (let i = 0; i < n; i++) {
-      const v = verts[i] * 3;
-      const dz = this.basePos[v + 2] - cz;
-      const r = Math.hypot(this.basePos[v] - cx, this.basePos[v + 1] - cy, dz) || 1;
-      const f = dz / r;
-      const inIris = Math.max(0, Math.min(1, (f - 0.10) / 0.34));
-      const inPupil = Math.max(0, Math.min(1, (f - 0.74) / 0.20));
-      tmp.copy(sclera).lerp(iris, inIris).lerp(pupil, inPupil);
-      col[i * 3] = tmp.r; col[i * 3 + 1] = tmp.g; col[i * 3 + 2] = tmp.b;
+    // Each eye has its own centre. Averaging both eyes placed the old iris
+    // calculation halfway between them and produced blank, metallic sockets.
+    const centres = [new Vector3(), new Vector3()], counts = [0, 0];
+    for (const v of verts) {
+      const side = this.basePos[v * 3] > 0 ? 1 : 0;
+      centres[side].add(new Vector3().fromArray(this.basePos, v * 3)); counts[side]++;
     }
-    g.setAttribute('color', new BufferAttribute(col, 3));
+    centres.forEach((c, i) => c.divideScalar(counts[i] || 1));
+    const eyeLocal = new Float32Array(n * 3);
+    for (let i = 0; i < n; i++) {
+      const v = verts[i], side = this.basePos[v * 3] > 0 ? 1 : 0;
+      const local = new Vector3().fromArray(this.basePos, v * 3).sub(centres[side]).normalize();
+      local.toArray(eyeLocal, i * 3);
+    }
+    g.setAttribute('aEyeLocal', new BufferAttribute(eyeLocal, 3));
 
     this.eyeGeometry = g;
     /* A real eye catches one small hard highlight. Give it a broad soft one —
        which is what a rough surface under a studio dome does — and it reads as
        a blank white marble behind the lid. */
     this.eyes = new SkinnedMesh(g, new MeshPhysicalMaterial({
-      vertexColors: true, roughness: 0.09, metalness: 0,
+      color: 0xc7bcb0, roughness: 0.22, metalness: 0,
       clearcoat: 0, envMapIntensity: 0.10,
     }));
+    this.eyes.material.onBeforeCompile = shader => {
+      shader.vertexShader = shader.vertexShader
+        .replace('#include <common>', '#include <common>\nattribute vec3 aEyeLocal; varying vec3 vEyeLocal;')
+        .replace('#include <begin_vertex>', '#include <begin_vertex>\nvEyeLocal = aEyeLocal;');
+      shader.fragmentShader = shader.fragmentShader
+        .replace('#include <common>', '#include <common>\nvarying vec3 vEyeLocal;')
+        .replace('#include <color_fragment>', `#include <color_fragment>
+          vec3 eye = normalize(vEyeLocal);
+          float r = length(eye.xy);
+          float iris = (1.0-smoothstep(0.57,0.64,r))*step(0.0,eye.z);
+          float pupil = 1.0-smoothstep(0.23,0.27,r);
+          float fibres = 0.5+0.5*sin(atan(eye.y,eye.x)*64.0+r*18.0);
+          vec3 irisColor = mix(vec3(0.045,0.027,0.014),vec3(0.14,0.084,0.035),fibres);
+          irisColor = mix(irisColor,vec3(0.003),pupil);
+          diffuseColor.rgb = mix(diffuseColor.rgb,irisColor,iris);
+        `);
+    };
+    this.eyes.applyBoneTransform = applyVolumeBoneTransform;
     this.eyes.frustumCulled = false;
     this.root.add(this.eyes);
   }
@@ -262,6 +287,7 @@ export class Figure {
     }
     this.geometry.setAttribute('aTone', new BufferAttribute(tv, 4));
     this.geometry.setAttribute('aFibre', new BufferAttribute(carry(H.fibreDir, 3), 3));
+    if (this.regions.anatomy.atlas) this.muscleForms = new MuscleForms(this, this.regions.anatomy.atlas);
     return this;
   }
 
@@ -340,9 +366,14 @@ export class Figure {
     const ctx = applyParams(this.morph, params);
     this.lastCtx = ctx;
     this.morph.apply(this.basePos, this.cageMorphed);
+    // Some twist-bone centres are averages of surface vertices. Derive bones
+    // before muscle reshaping so belly length cannot move the underlying rig.
+    this.rigCage.set(this.cageMorphed);
+    this._correctProportions(this.rigCage);
 
     /* 2 — insertion remap and fat softening, on the control cage */
     if (this.regions) this.regions.deform(this.cageMorphed, params, ctx);
+    this.muscleForms?.deform(this.cageMorphed, this, params, ctx);
     this._softenForFat(params, ctx);
     this._correctProportions();
 
@@ -351,7 +382,7 @@ export class Figure {
     for (let i = 0; i < c.length; i++) c[i] = this.cageMorphed[i] * CM;
 
     /* 4 — skeleton, from the same cage, same frame */
-    this.skeleton.rebuild(this.cageMorphed, CM);
+    this.skeleton.rebuild(this.rigCage, CM);
 
     /* 5 — subdivide and gather */
     const sub = this.subdiv.run(c);
@@ -375,23 +406,32 @@ export class Figure {
         /* The two rows rarely line up left to right, and how far out of step
            they sit is decided before anyone trains. Half a segment either way
            covers the range real people show. */
-        const shift = (this.regions.anatomy.rowStagger - 0.5) * AB_SEGMENT * 0.5;
+        const shift = this.regions.anatomy.rowStagger * AB_SEGMENT * 0.5;
         for (let v = 0; v < this.nSubVerts; v++) {
           if (!atlas.covered[v]) continue;
           const g = gain[atlas.drive[v]];
           if (g <= 0.001) continue;
-          let d = atlas.relief[v] * g;
-          let crease = atlas.border[v] * ATLAS_CREASE * g;
+          const relief = this.muscleForms?.relief || atlas.relief;
+          const borders = this.muscleForms?.border || atlas.border;
+          let d = relief[v] * g;
+          d += (this.muscleForms?.envelope[v] || 0) * g;
+          d -= borders[v] * 0.20 * g;
+          let crease = borders[v] * ATLAS_CREASE * g;
           if (atlas.owner[v] === atlas.rectus && rowGain > 0.001) {
-            const cut = abWall(atlas.along[v] + shift * atlas.side[v],
+            // The atlas torso is longer than the surface template. Register
+            // inscriptions below the pec fold, rather than across the nipple.
+            const restY=this.muscleForms?.rest[v*3+1];
+            const along=restY===undefined?atlas.along[v]:(4.15-restY)/3.45;
+            const cut = abWall(along + shift * atlas.side[v],
                                atlas.midline[v]) * rowGain;
             d -= cut;
-            crease += cut;
+            crease += Math.max(0,cut);
           }
           this.subDisplace[v] -= d;
           this.subAnatomy[v] += crease;
         }
       }
+      this.muscleForms?.smoothSurface(this.subDisplace);
       for (let v = 0; v < this.nSubVerts; v++) {
         /* AnatomyCorrectives stores centimetres. A groove deeper than about
            four millimetres reads as a cut in skin, so keep the render-scale
@@ -428,19 +468,23 @@ export class Figure {
     if (!this._mCage) {
       this._mCage = new Float32Array(this.nCage * 3);
       this._mOut = new Float32Array(this.nCage * 3);
+      this._mRigCage = new Float32Array(this.nCage * 3);
     }
     const neutral = { ...params, latFlare: 0, chestUp: 0, vacuum: 0, flex: 0.35 };
     this.morph.clear();
     const ctx = applyParams(this.morph, neutral);
     this.morph.apply(this.basePos, this._mCage);
+    this._mRigCage.set(this._mCage);
+    this._correctProportions(this._mRigCage);
     if (this.regions) this.regions.deform(this._mCage, neutral, ctx);
+    this.muscleForms?.deform(this._mCage, this, neutral, ctx);
     const t = ctx.soften, s = this.smoothOffset, c = this._mCage;
     if (t > 0.001) for (let i = 0; i < c.length; i++) c[i] += s[i] * t;
     this._correctProportions(c);
     const out = this._mOut;
     for (let i = 0; i < c.length; i++) out[i] = c[i] * CM;
     this._measureSkel = this._measureSkel || new BodySkeleton(this.bundle);
-    this._measureSkel.rebuild(c, CM);
+    this._measureSkel.rebuild(this._mRigCage, CM);
     return { cage: out, skeleton: this._measureSkel };
   }
 

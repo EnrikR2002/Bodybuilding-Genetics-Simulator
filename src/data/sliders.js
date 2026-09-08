@@ -24,10 +24,10 @@ export const SLIDERS = [
   { g: 'grpFrame', k: 'boneThickness', label: 'Joint thickness', lo: 'Fine', hi: 'Thick',
     unit: s => `${pick(s, ['fine', 'light', 'average', 'sturdy', 'thick'])} wrists & ankles` },
 
-  { g: 'grpIns', k: 'bicepInsertion', label: 'Biceps insertion', lo: 'High', hi: 'Low',
-    unit: s => s < 0.33 ? 'long tendon, big gap' : s < 0.66 ? 'a finger and a half' : 'belly runs to the elbow' },
+  { g: 'grpIns', k: 'bicepInsertion', label: 'Biceps belly length', lo: 'Short belly', hi: 'Long belly',
+    unit: s => s < 0.33 ? 'longer distal tendon interval' : s < 0.66 ? 'intermediate belly length' : 'fuller toward the elbow' },
   { g: 'grpIns', k: 'bicepPeak', label: 'Biceps shape', lo: 'Flat', hi: 'Peaked',
-    unit: s => s < 0.4 ? 'long and flat' : s < 0.7 ? 'moderate peak' : 'high peak, short belly' },
+    unit: s => s < 0.4 ? 'broad, flatter profile' : s < 0.7 ? 'moderate peak' : 'more central height' },
   { g: 'grpIns', k: 'latInsertion', label: 'Lat insertion', lo: 'High', hi: 'Low',
     unit: s => s < 0.35 ? 'sweep starts high' : s < 0.7 ? 'mid attachment' : 'sweep starts at the waist' },
   { g: 'grpIns', k: 'pecGap', label: 'Pec attachment', lo: 'Full inner', hi: 'Wide gap',
@@ -76,9 +76,9 @@ export function judge(S) {
   const cl = S.clavicle, hp = S.hipWidth;
 
   out.push(['Arms', bi < 0.35
-    ? 'A high biceps insertion leaves a visible gap between the muscle belly and the elbow. It peaks higher when flexed but the arm looks shorter and empties out near the joint. No amount of curling fills that gap.'
-    : bi < 0.7 ? 'An average biceps insertion — about a finger and a half of tendon showing at the elbow crease when flexed.'
-    : 'A low insertion means the belly runs almost to the elbow. The arm looks full and thick from every angle but tends to peak less.']);
+    ? 'A shorter biceps belly leaves a longer tendon interval above the elbow. Look at the distal taper and the empty space below the peak in a flexed pose. The bony attachment stays fixed.'
+    : bi < 0.7 ? 'Intermediate belly length. Adjust belly length and peak shape separately to compare termination with central fullness.'
+    : 'A longer biceps belly carries more fullness toward the elbow and leaves a shorter visible tendon interval. Peak shape remains independently adjustable.']);
 
   out.push(['Back', li < 0.35
     ? 'High lat insertions leave a gap between the lat and the top of the pelvis. Width has to come from the clavicles, because the sweep starts too high to reach the waist.'

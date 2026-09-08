@@ -4,6 +4,7 @@
   "version": "2.0.0",
   "type": "module",
   "scripts": {
+    "test": "node --test tests/anatomy.test.mjs",
     "assets": "node tools/fetch-assets.mjs",
     "bake": "node tools/bake-mesh.mjs && node tools/bake-regions.mjs && node tools/bake-anatomy.mjs",
     "anatomy:rays": "node tools/export-anatomy-rays.mjs",

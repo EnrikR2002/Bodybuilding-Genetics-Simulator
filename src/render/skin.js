@@ -82,7 +82,7 @@ export function createSkin({ tone = 1, oil = 0.55 } = {}) {
 
   const mat = new MeshPhysicalMaterial({
     color: new Color(t.base),
-    roughness: 0.78,
+    roughness: 0.62,
     metalness: 0.0,
     /* the thin oily film a competitor wears on stage — enough to catch the
        lights along a muscle, not enough to look like a wet mannequin */
@@ -107,7 +107,7 @@ export function createSkin({ tone = 1, oil = 0.55 } = {}) {
     uDeep: { value: new Color(t.deep) },
     uSSS: { value: 0.42 },
     uPore: { value: 0.16 },
-    uCavity: { value: 1.38 },
+    uCavity: { value: 0.65 },
     uTrunkColor: { value: new Color(0x191b22) },
     uHairColor: { value: new Color(0x241c17) },
     /* head centre in object space, in centimetres — refreshed whenever the
@@ -266,49 +266,22 @@ export function createSkin({ tone = 1, oil = 0.55 } = {}) {
         {
           vec3 op = vObjPos;
           vec3 on = normalize(vObjNrm);
-          /* step one texel, so the slope is measured at the texture's own
-             resolution instead of across five pores */
-          float e = 0.28;
-          vec4 n0 = triplanar(uNoise, op, on, uScale);
-          vec4 nx = triplanar(uNoise, op + vec3(e, 0.0, 0.0), on, uScale);
-          vec4 ny = triplanar(uNoise, op + vec3(0.0, e, 0.0), on, uScale);
-          vec4 nz = triplanar(uNoise, op + vec3(0.0, 0.0, e), on, uScale);
-          /* three octaves: pores, then flow, then large slack */
-          float h0 = n0.w * 0.55 + n0.z * 0.30 + n0.y * 0.15;
-          vec3 grad = vec3(
-            (nx.w * 0.55 + nx.z * 0.30 + nx.y * 0.15) - h0,
-            (ny.w * 0.55 + ny.z * 0.30 + ny.y * 0.15) - h0,
-            (nz.w * 0.55 + nz.z * 0.30 + nz.y * 0.15) - h0);
-          grad -= on * dot(grad, on);
-          float amp = uPore * (1.0 - vTrunk * 0.9) + max(vHair, vBrow) * 1.6;
-          normal = normalize(normal - grad * 1.35 * amp);
+          // Heights are in centimetres. Screen-space surface derivatives carry
+          // the bump through skinning and camera rotation in the same space as
+          // the lighting normal; object-space gradients cannot be added to it.
+          vec4 pores = triplanar(uNoise, op, on, 0.32);
+          float exposed = (1.0 - vTrunk) * (1.0 - max(vHair, vBrow));
+          float height = (pores.w - 0.5) * 0.002 * exposed;
+          height += (pores.z - 0.5) * 0.001 * exposed;
+          height += veinField(op, on) * vTone.w * uVein * 0.045 * exposed;
+          if (length(vFibre) > 0.001)
+            height += striation(op, on, normalize(vFibre)) * uStriate * 0.06 * exposed;
+          vec3 dpdx = dFdx(-vViewPosition), dpdy = dFdy(-vViewPosition);
+          vec3 rx = cross(dpdy, normal), ry = cross(normal, dpdx);
+          float det = dot(dpdx, rx);
+          vec3 slope = sign(det) * (dFdx(height) * rx + dFdy(height) * ry);
+          normal = normalize(abs(det) * normal - slope);
 
-          /* striations, fine and directional, on top of the pores */
-          /* the length of the fibre vector is how much muscle is here: no
-             muscle, no striation, which keeps it off the face and hands */
-          float sAmt = uStriate * length(vFibre) * (1.0 - vTrunk) * (1.0 - max(vHair, vBrow));
-          if (sAmt > 0.002) {
-            vec3 fib = normalize(vFibre);
-            float e3 = 0.9;
-            float s0 = striation(op, on, fib);
-            vec3 sg = vec3(striation(op + vec3(e3, 0.0, 0.0), on, fib) - s0,
-                           striation(op + vec3(0.0, e3, 0.0), on, fib) - s0,
-                           striation(op + vec3(0.0, 0.0, e3), on, fib) - s0);
-            sg -= on * dot(sg, on);
-            normal = normalize(normal - sg * 0.30 * sAmt);
-          }
-
-          /* veins stand proud of the skin, so they get their own bump */
-          float vAmt = vTone.w * uVein * (1.0 - vTrunk);
-          if (vAmt > 0.002) {
-            float e2 = 0.9;
-            float v0 = veinField(op, on);
-            vec3 vg = vec3(veinField(op + vec3(e2, 0.0, 0.0), on) - v0,
-                           veinField(op + vec3(0.0, e2, 0.0), on) - v0,
-                           veinField(op + vec3(0.0, 0.0, e2), on) - v0);
-            vg -= on * dot(vg, on);
-            normal = normalize(normal - vg * 0.85 * vAmt);
-          }
         }
       `)
       /* colour: mottling, cavity darkening, hair and the trunks */
@@ -318,7 +291,7 @@ export function createSkin({ tone = 1, oil = 0.55 } = {}) {
         {
           vec4 nz2 = triplanar(uNoise, vObjPos, normalize(vObjNrm), uScale * 0.34);
           float mott = (nz2.x - 0.5) * 0.07;
-          float cav = clamp(vCavity * 9.5, -1.0, 1.0);
+          float cav = clamp(vCavity * 3.0, -1.0, 1.0);
           float valley = max(cav, 0.0);
           float authoredValley = smoothstep(0.015, 0.17, vAnatomy);
           float authoredRidge = smoothstep(0.018, 0.18, -vAnatomy);
@@ -330,19 +303,19 @@ export function createSkin({ tone = 1, oil = 0.55 } = {}) {
           diffuseColor.rgb = mix(diffuseColor.rgb, uRed, clamp(vTone.x, 0.0, 1.0) * 0.38);
           diffuseColor.rgb *= 1.0 - vTone.y * 0.24;
           /* thin skin over bone runs cool: the shin, the collarbone, the brow */
-          float thin = smoothstep(-0.02, -0.14, vCavity * 9.5);
+          float thin = (1.0 - smoothstep(-0.14, -0.02, vCavity * 3.0));
           diffuseColor.rgb = mix(diffuseColor.rgb, diffuseColor.rgb * vec3(0.94, 0.96, 1.04), thin * 0.30);
           diffuseColor.rgb = mix(diffuseColor.rgb, diffuseColor.rgb * vec3(0.80, 0.83, 0.92), vTone.z * 0.55);
 
           /* blood pools where the skin folds; ridges read paler */
-          diffuseColor.rgb = mix(diffuseColor.rgb, uDeep, valley * 0.24 * uCavity);
+          diffuseColor.rgb = mix(diffuseColor.rgb, uDeep, valley * 0.10 * uCavity);
           /* Corrective hollows are authored data, not incidental mesh noise.
              Give those valleys the compressed-skin colour they would receive
              from stage light, and keep the intervening tendon/muscle planes
              fractionally paler. */
-          diffuseColor.rgb = mix(diffuseColor.rgb, uDeep, authoredValley * 0.42 * uCavity);
+          diffuseColor.rgb = mix(diffuseColor.rgb, uDeep, authoredValley * 0.07 * uCavity);
           diffuseColor.rgb *= 1.0 + authoredRidge * 0.045;
-          diffuseColor.rgb *= 1.0 + mott - valley * 0.13 * uCavity + max(-cav, 0.0) * 0.04;
+          diffuseColor.rgb *= 1.0 + mott - valley * 0.04 * uCavity + max(-cav, 0.0) * 0.04;
           /* a broad value drift so the body is not one flat tone from neck to
              ankle: shoulders and back catch the sun, the inner arm does not */
           vec4 lg = triplanar(uNoise, vObjPos, normalize(vObjNrm), uScale * 0.05);
@@ -379,14 +352,14 @@ export function createSkin({ tone = 1, oil = 0.55 } = {}) {
           /* two scales of break-up: sweat pooling across whole muscle bellies,
              and the fine grain of the skin itself. A single roughness value is
              what makes a render look like painted plastic. */
-          float micro = (rn.z - 0.5) * 0.30 + (rn.w - 0.5) * 0.18 + (rl.y - 0.5) * 0.24;
-          float cav = vCavity * 9.5;
+          float micro = (rn.z - 0.5) * 0.10 + (rn.w - 0.5) * 0.06 + (rl.y - 0.5) * 0.06;
+          float cav = vCavity * 3.0;
           float valley = clamp(cav, 0.0, 1.0);
           float ridge = clamp(-cav, 0.0, 1.0);
           float authoredValley = smoothstep(0.015, 0.17, vAnatomy);
           /* oil sits on the high points and skips the creases */
-          roughnessFactor = clamp(roughnessFactor + micro + valley * 0.30 + authoredValley * 0.22
-                                  - uOil * (0.10 + ridge * 0.34), 0.05, 1.0);
+          roughnessFactor = clamp(roughnessFactor + micro + valley * 0.09 + authoredValley * 0.07
+                                  - uOil * (0.10 + ridge * 0.13), 0.05, 1.0);
           roughnessFactor = mix(roughnessFactor, 0.94, vTrunk);
           /* hair is matte; leaving it glossy turns a crop into a wet helmet */
           roughnessFactor = mix(roughnessFactor, 0.88, max(vHair, vBrow));
@@ -412,7 +385,7 @@ export function createSkin({ tone = 1, oil = 0.55 } = {}) {
           /* warm the terminator: the band where light dies is red in skin,
              grey in plastic */
           float lum = dot(outgoingLight, vec3(0.2126, 0.7152, 0.0722));
-          float term = smoothstep(0.42, 0.04, lum) * (1.0 - max(vTrunk, vHair));
+          float term = (1.0 - smoothstep(0.04, 0.42, lum)) * (1.0 - max(vTrunk, vHair));
           outgoingLight = mix(outgoingLight,
                               outgoingLight * vec3(1.22, 0.90, 0.84), term * 0.42 * uSSS);
           outgoingLight *= mix(vec3(1.0), vec3(1.03, 0.985, 0.965), 0.7);
@@ -421,7 +394,7 @@ export function createSkin({ tone = 1, oil = 0.55 } = {}) {
       `);
   };
 
-  mat.customProgramCacheKey = () => 'insertion-skin-v1';
+  mat.customProgramCacheKey = () => 'insertion-skin-v2';
   mat.userData.setTone = (i) => {
     const s = SKIN_TONES[i] || SKIN_TONES[1];
     mat.color.set(s.base);

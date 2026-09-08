@@ -199,10 +199,11 @@ export class RegionField {
         /* A compatible endpoint pair owns the anatomical termination. Keep
            only the neutral region volume underneath it; do not stack a
            generated insertion shift on top of the sculpt. */
-        const s = authored[sliderKey] ? 0.5 : insSlider[R.ins];
+        const transported = this.figure.muscleForms && (R.ins === 'bicep' || R.ins === 'calf');
+        const s = authored[sliderKey] || transported ? 0.5 : insSlider[R.ins];
         let run = lerp(range.run[0], range.run[1], s);
         let peak = lerp(range.peak[0], range.peak[1], s);
-        if (R.base.startsWith('biceps') && !authored.bicepPeak)
+        if (R.base.startsWith('biceps') && !authored.bicepPeak && !transported)
           run *= lerp(1.22, 0.74, peakiness);
         cur = { peak, run, end: lerp(range.end[0], range.end[1], s) };
         neutral = {
@@ -213,7 +214,7 @@ export class RegionField {
       }
 
       /* a peaked biceps is a taller, shorter belly; a flat one is longer */
-      const peakGain = R.base.startsWith('biceps') && !authored.bicepPeak
+      const peakGain = R.base.startsWith('biceps') && !authored.bicepPeak && !this.figure.muscleForms
         ? (peakiness - 0.5) * 0.9 : 0;
 
       /* pec attachment: a wide sternal gap means the inner edge pulls away
@@ -225,7 +226,13 @@ export class RegionField {
       const { idx, w, u, dir } = R;
       const n = idx.length;
       for (let i = 0; i < n; i++) {
-        const wi = w[i];
+        let wi = w[i];
+        const atlas = this.anatomy.atlas;
+        // The atlas footprint now supplies the final development. Restrain
+        // overlapping bone regions so a lat, teres and trap cannot inflate
+        // the same patch of back three times.
+        if (atlas?.covered[idx[i]] && !R.bone && this.figure.muscleForms)
+          wi *= R.ins === 'bicep' || R.ins === 'calf' ? 0.8 : 0.32;
         let m = (u[i] - R.u0) / span;
         if (flip) m = 1 - m;
         m = clamp(m, -0.2, 1.2);
@@ -247,7 +254,7 @@ export class RegionField {
 
         /* ab rows: only ever visible when lean, and the left and right rows
            rarely line up — that offset is the ab-insertion slider */
-        if (R.base === 'rectus_abs' && !authored.abStagger) {
+        if (R.base === 'rectus_abs' && !authored.abStagger && !this.anatomy.atlas) {
           const phase = R.side === 'L' ? (stagger - 0.5) * 0.34 : -(stagger - 0.5) * 0.34;
           const rows = Math.cos((m + phase) * Math.PI * 7.0);
           d += rows * 0.64 * drive.abs * smoothstep(0.04, 0.26, m) * (1 - smoothstep(0.74, 0.98, m));

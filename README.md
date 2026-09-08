@@ -1,5 +1,12 @@
 # Insertion — a physique genetics plate
 
+**Latest anatomy update:** biceps/calf belly transport, muscle-border-driven
+development, corrected atlas projection, volume-preserving skinning, cleaner
+skin, and equal-material comparisons. Use **Short belly**, **Long belly**, or
+**Compare biceps**, then switch between **Skin** and **Neutral clay**. The
+[quality notes](docs/ANATOMY_QUALITY.md) describe the implementation, validation
+and remaining visual limitations; this is still an illustrative model.
+
 An interactive 3D figure whose muscle insertion points and skeleton you can
 change with sliders, pose in ten IFBB poses, and measure with a tape.
 
@@ -69,12 +76,13 @@ rest cage (13,378 quads)
   -> sculpted morph targets        params.js    size, frame, body composition
   -> authored trait correctives    params.js    real insertion endpoint sculpts
   -> procedural fallback           regions.js   only for missing endpoint pairs
+  -> belly profiles / transport    muscle-forms.js  biceps and calves
   -> definition / softening        regions.js   lean sharpens, fat blurs
   -> Catmull-Clark subdivision     subdiv.js    59,292 vertices
-  -> measured anatomical relief    anatomy.bin  the surface of a real dissection
-  -> abdominal wall                figure.js    the one thing the scan lacks
+  -> atlas-derived surface relief  anatomy.bin  projected reference anatomy
+  -> abdominal wall / skin bridge  figure.js    inscriptions and smooth transitions
   -> normals
-  -> skeleton rebuilt from the same cage
+  -> skeleton from the morphed cage before muscle reshaping
 ```
 
 Five things in there are worth knowing about.

@@ -75,6 +75,7 @@ export async function runSteps(page, steps, dir = SHOTS) {
     if (s.pin) await page.evaluate(() => window.__app?.pin());
     if (s.bg !== undefined) await page.evaluate(v => window.__app?.bg(v), s.bg);
     if (s.regions !== undefined) await page.evaluate(v => window.__app?.debugRegions(v), s.regions);
+    if (s.surface) await page.evaluate(v => window.__app.surface(v), s.surface);
     if (s.bench) console.log('BENCH ' + JSON.stringify(await page.evaluate(() => window.__app.bench())));
     if (s.probe) console.log('PROBE ' + JSON.stringify(await page.evaluate(() => window.__app.headProbe())));
     if (s.mat) await page.evaluate(m => window.__mat && window.__mat(m), s.mat);
@@ -116,5 +117,8 @@ if (process.argv[1].endsWith('shots.mjs')) {
     const info = await page.evaluate(() => window.__app?.info?.() ?? window.__info?.() ?? null);
     if (info) console.log(JSON.stringify(info));
   }, { width: W, height: H, page: arg('page', '/') });
-  if (errors.length) { console.log('\n--- page errors ---'); errors.forEach(e => console.log(e)); }
+  if (errors.length) {
+    console.log('\n--- page errors ---'); errors.forEach(e => console.log(e));
+    process.exitCode = 1;
+  }
 }
