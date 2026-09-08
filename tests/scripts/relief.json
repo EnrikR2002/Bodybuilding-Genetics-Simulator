@@ -1,0 +1,6 @@
+[
+ { "label": "relief-front", "set": { "mass": 0.82, "bodyFat": 0.12, "backThickness": 0.7, "legMass": 0.75 }, "pose": "relaxed", "view": 0, "wait": 1200 },
+ { "label": "relief-back",  "view": 180, "wait": 400 },
+ { "label": "relief-side",  "view": -90, "wait": 400 },
+ { "label": "relief-threeq","view": -38, "wait": 400 }
+]

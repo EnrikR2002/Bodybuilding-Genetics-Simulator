@@ -70,6 +70,16 @@ export class Stage {
     rim2.position.set(225, 150, -160);
     this.scene.add(rim2);
 
+    this.lights = { key, fill, rim, rim2 };
+    /* how far round from the camera each light sits, and how high, in the
+       same order — set once so `lookFrom` only has to rotate them */
+    this._rig = [
+      { light: key, offset: 0.60, height: 245, radius: 205 },
+      { light: fill, offset: -1.15, height: 120, radius: 255 },
+      { light: rim, offset: 2.55, height: 190, radius: 250 },
+      { light: rim2, offset: -2.40, height: 150, radius: 275 },
+    ];
+
     /* ---- floor: catches the shadow, plus a pool of warm light ---- */
     const floor = new Mesh(new CircleGeometry(320, 64), new ShadowMaterial({ opacity: 0.46 }));
     floor.rotation.x = -Math.PI / 2;
@@ -112,12 +122,13 @@ export class Stage {
       const gtao = new GTAOPass(scene, camera, 1, 1);
       gtao.output = GTAOPass.OUTPUT.Default;
       gtao.blendIntensity = 1.0;
-      /* radius is in world units, and this scene measures in centimetres:
-         6 cm is about the width of the gap between a pec and a front delt,
-         which is exactly the scale of shadow a physique needs */
+      /* radius is in world units, and this scene measures in centimetres.
+         Four is the width of the groove between two heads of a quadriceps or
+         between a pec and a front delt — the scale the measured surface works
+         at. Six, the old value, blurred those into one soft gradient. */
       gtao.updateGtaoMaterial({
-        radius: 6.0, distanceExponent: 1.6, thickness: 4.0,
-        scale: 2.2, samples: 16, distanceFallOff: 0.6, screenSpaceRadius: false,
+        radius: 4.0, distanceExponent: 1.5, thickness: 3.0,
+        scale: 2.6, samples: 16, distanceFallOff: 0.5, screenSpaceRadius: false,
       });
       gtao.updatePdMaterial({ lumaPhi: 10, depthPhi: 2, normalPhi: 3.5, radius: 4, rings: 2, samples: 16 });
       composer.addPass(gtao);
@@ -139,6 +150,29 @@ export class Stage {
     this.composer.setSize(w, h);
     this.camera.aspect = w / h;
     this.camera.updateProjectionMatrix();
+  }
+
+  /* ---------------------------------------------------------------------- *
+     Turn the lights with the camera.
+
+     A fixed rig lights one side of a body. Walk round to the back and the key
+     is now behind the figure, the back is lit by rims alone, and every muscle
+     on it flattens out — which is not what happens in a studio, because the
+     photographer moves the light when the athlete turns.
+
+     The whole rig therefore rotates with the viewing angle, keeping the key a
+     little over half a radian off the camera axis. That angle is the one that
+     matters: light straight down the lens erases every shadow, and a shadow
+     falling across the next muscle along is the only thing that separates them.
+   * ---------------------------------------------------------------------- */
+  lookFrom(azimuth) {
+    for (const r of this._rig) {
+      const a = azimuth + r.offset;
+      r.light.position.set(Math.sin(a) * r.radius, r.height, Math.cos(a) * r.radius);
+      r.light.updateMatrixWorld();
+    }
+    /* the shadow camera has to follow the key or the figure walks out of it */
+    this.key.shadow.camera.updateProjectionMatrix();
   }
 
   /* flip the AO pass to show only what it computes — used to check the

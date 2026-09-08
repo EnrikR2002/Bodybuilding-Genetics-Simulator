@@ -51,14 +51,15 @@ const stage = new Stage(canvas, { hdri: '/env/studio.hdr', quality: QUALITY });
    load
  * ======================================================================== */
 loadingText.textContent = 'Loading anatomical mesh';
-const [figure, regionBundle] = await Promise.all([
+const [figure, regionBundle, anatomyBundle] = await Promise.all([
   loadFigure('/models/body.bin', p => { loadingBar.style.width = `${p * 84}%`; }),
   loadBundle('/models/regions.bin'),
+  loadBundle('/models/anatomy.bin'),
 ]);
 loadingText.textContent = 'Deriving muscle map';
 loadingBar.style.width = '90%';
 
-figure.attachRegions(regionBundle);
+figure.attachRegions(regionBundle, anatomyBundle);
 const skin = createSkin({ tone, oil: 0.48 });
 figure.mesh.material = skin;
 figure.bindSkeleton();
@@ -481,6 +482,7 @@ function tick(now) {
                             camTarget.y + Math.sin(el) * dist,
                             camTarget.z + Math.cos(az) * ry);
   stage.camera.lookAt(camTarget);
+  stage.lookFrom(az);
 
   stage.render();
   updateRuler();
@@ -582,20 +584,28 @@ window.__app = {
   debugRegions(on) {
     if (!on) { figure.mesh.material = skin; return; }
     if (!debugMat) {
-      const cage = regionBundle.block(regionBundle.header.debugColor);
-      const sub = new Float32Array(figure.nSubVerts * 3);
-      const L = figure.levels[0];
-      sub.set(cage.subarray(0, L.nVerts * 3));
-      for (let e = 0; e < L.nE; e++) {
-        const a = L.edgeV[e * 2] * 3, b = L.edgeV[e * 2 + 1] * 3, o = (L.nVerts + e) * 3;
-        for (let c = 0; c < 3; c++) sub[o + c] = (cage[a + c] + cage[b + c]) * 0.5;
-      }
-      const q = L.quads;
-      for (let f = 0; f < L.nF; f++) {
-        const o = (L.nVerts + L.nE + f) * 3;
-        for (let c = 0; c < 3; c++)
-          sub[o + c] = (cage[q[f * 4] * 3 + c] + cage[q[f * 4 + 1] * 3 + c] +
-                        cage[q[f * 4 + 2] * 3 + c] + cage[q[f * 4 + 3] * 3 + c]) * 0.25;
+      /* `on === 'anatomy'` shows the dissection's own territories instead of
+         the bone-derived ones — the map that has to be checked by eye. */
+      let sub;
+      if (on === 'anatomy') {
+        /* already stored per render vertex, so it needs no carrying up */
+        sub = anatomyBundle.block(anatomyBundle.header.debugColor);
+      } else {
+        const cage = regionBundle.block(regionBundle.header.debugColor);
+        sub = new Float32Array(figure.nSubVerts * 3);
+        const L = figure.levels[0];
+        sub.set(cage.subarray(0, L.nVerts * 3));
+        for (let e = 0; e < L.nE; e++) {
+          const a = L.edgeV[e * 2] * 3, b = L.edgeV[e * 2 + 1] * 3, o = (L.nVerts + e) * 3;
+          for (let c = 0; c < 3; c++) sub[o + c] = (cage[a + c] + cage[b + c]) * 0.5;
+        }
+        const q = L.quads;
+        for (let f = 0; f < L.nF; f++) {
+          const o = (L.nVerts + L.nE + f) * 3;
+          for (let c = 0; c < 3; c++)
+            sub[o + c] = (cage[q[f * 4] * 3 + c] + cage[q[f * 4 + 1] * 3 + c] +
+                          cage[q[f * 4 + 2] * 3 + c] + cage[q[f * 4 + 3] * 3 + c]) * 0.25;
+        }
       }
       const rc = new Float32Array(figure.nRender * 3);
       for (let r = 0; r < figure.nRender; r++) {
@@ -604,7 +614,9 @@ window.__app = {
       }
       figure.geometry.setAttribute('color', new BufferAttribute(rc, 3));
       debugMat = new MeshBasicMaterial({ vertexColors: true });
+      debugMat.userData.kind = on;
     }
+    if (debugMat.userData.kind !== on) { debugMat = null; return this.debugRegions(on); }
     figure.mesh.material = debugMat;
   },
   figure, stage, rig,

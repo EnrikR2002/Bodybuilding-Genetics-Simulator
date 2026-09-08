@@ -219,6 +219,9 @@ export function applyParams(M, p) {
   return {
     mass, legMass, back, fat, flex, flare, chestUp, vacuum, lean,
     authored,
+    /* Where the two rows of the abdominal wall sit relative to each other.
+       Nothing moves it but the genes you were born with. */
+    abStagger: g('abStagger'),
     /* how far to blend toward the smoothed mesh: definition disappearing */
     soften: clamp((fat - 0.12) * 1.55, 0, 1) * 0.55 * (1 - flex * 0.25),
     /* and how far to blend away from it: definition arriving. Lean and full

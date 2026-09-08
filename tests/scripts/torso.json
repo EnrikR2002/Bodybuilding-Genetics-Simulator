@@ -1,0 +1,7 @@
+[
+ { "label": "torso-front", "set": { "mass": 0.85, "bodyFat": 0.08, "backThickness": 0.75, "legMass": 0.8, "flex": 0.5 }, "pose": "relaxed", "view": 0, "zoom": 0.42, "target": [0, 120, 0], "wait": 1200 },
+ { "label": "torso-threeq", "view": -38, "zoom": 0.42, "target": [0, 120, 0], "wait": 400 },
+ { "label": "torso-back", "view": 180, "zoom": 0.42, "target": [0, 122, 0], "wait": 400 },
+ { "label": "arm-close", "view": -34, "zoom": 0.30, "target": [-34, 122, 4], "wait": 400 },
+ { "label": "leg-close", "view": 0, "zoom": 0.40, "target": [0, 65, 0], "wait": 400 }
+]

@@ -1,0 +1,6 @@
+[
+ { "label": "amap-front", "set": { "mass": 0.8, "bodyFat": 0.12 }, "pose": "relaxed", "regions": "anatomy", "view": 0, "wait": 1000 },
+ { "label": "amap-back",  "view": 180, "wait": 350 },
+ { "label": "amap-side",  "view": -90, "wait": 350 },
+ { "label": "amap-threeq","view": -38, "wait": 350 }
+]

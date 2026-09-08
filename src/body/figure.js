@@ -24,6 +24,38 @@ import { RegionField } from './regions.js';
 import { applyParams } from './params.js';
 
 export const CM = 10;              /* MakeHuman decimetres -> centimetres */
+/* Depth in centimetres of the crease the shader draws where one muscle hands
+   over to the next. Four millimetres is a fold in skin; more is a cut. */
+const ATLAS_CREASE = 0.30;
+
+/* ---------------------------------------------------------------------------
+   The abdominal wall.
+
+   Everything else on this figure is measured off scanned anatomy. This one
+   feature is not, because the scan does not contain it: BodyParts3D modelled
+   the rectus abdominis as a smooth strap and left out the tendinous
+   inscriptions that cross it and the linea alba that splits it. Those lines
+   are most of what anyone means by abs.
+
+   `t` runs 0 at the ribs to 1 at the pubis, along the muscle's own length.
+   Three inscriptions cross the upper two thirds and a fourth sits near the
+   navel; below that the muscle runs uninterrupted, which is why the lowest
+   pair of blocks is always the long one.
+   --------------------------------------------------------------------------- */
+const AB_ROWS = [0.17, 0.35, 0.53, 0.67];
+const AB_SEGMENT = 0.18;
+function abWall(t, midline) {
+  /* nothing above the ribs or below the pubis */
+  if (t < -0.05 || t > 1.05) return 0;
+  let cut = midline * 0.42;
+  for (const c of AB_ROWS) {
+    const d = (t - c) / 0.030;
+    if (d * d < 12) cut = Math.max(cut, Math.exp(-d * d) * 0.34);
+  }
+  /* the rows fade out where the muscle disappears under the ribs */
+  const ends = Math.min(1, Math.max(0, t / 0.10)) * Math.min(1, Math.max(0, (1.02 - t) / 0.10));
+  return cut * ends;
+}
 
 export async function loadFigure(url, onProgress) {
   const bundle = await loadBundle(url, onProgress);
@@ -171,8 +203,8 @@ export class Figure {
     return g;
   }
 
-  attachRegions(regionBundle) {
-    this.regions = new RegionField(regionBundle, this);
+  attachRegions(regionBundle, anatomyBundle) {
+    this.regions = new RegionField(regionBundle, this, anatomyBundle);
 
     /* Two extra per-vertex channels the skin shader needs.
 
@@ -188,6 +220,7 @@ export class Figure {
     this._restEdge = new Float32Array(this.nCage);
     this.subCurv = new Float32Array(this.nSubVerts);
     this.subAnatomy = new Float32Array(this.nSubVerts);
+    this.subDisplace = new Float32Array(this.nSubVerts);
     this.rCavity = new Float32Array(this.nRender);
     this.geometry.setAttribute('aCavity', new BufferAttribute(this.rCavity, 1));
     this.rAnatomy = new Float32Array(this.nRender);
@@ -328,12 +361,42 @@ export class Figure {
        planes from being averaged back into the inflated base surface. */
     const anatomy = this.regions?.anatomy?.current;
     if (anatomy) {
-      this.subdivideScalar(anatomy, this.subAnatomy);
+      this.subdivideScalar(anatomy, this.subDisplace);
+      this.subdivideScalar(this.regions.anatomy.line, this.subAnatomy);
+      /* The measured surface, added here rather than on the control cage.
+         Render resolution is the only place a tendinous inscription or the
+         split between two heads of a muscle exists at all: averaged down to
+         the cage it comes back as one smooth slab, which is exactly what the
+         figure used to look like. */
+      const atlas = this.regions.anatomy.atlas;
+      if (atlas) {
+        const gain = this.regions.anatomy.atlasGain;
+        const rowGain = this.regions.anatomy.rowGain;
+        /* The two rows rarely line up left to right, and how far out of step
+           they sit is decided before anyone trains. Half a segment either way
+           covers the range real people show. */
+        const shift = (this.regions.anatomy.rowStagger - 0.5) * AB_SEGMENT * 0.5;
+        for (let v = 0; v < this.nSubVerts; v++) {
+          if (!atlas.covered[v]) continue;
+          const g = gain[atlas.drive[v]];
+          if (g <= 0.001) continue;
+          let d = atlas.relief[v] * g;
+          let crease = atlas.border[v] * ATLAS_CREASE * g;
+          if (atlas.owner[v] === atlas.rectus && rowGain > 0.001) {
+            const cut = abWall(atlas.along[v] + shift * atlas.side[v],
+                               atlas.midline[v]) * rowGain;
+            d -= cut;
+            crease += cut;
+          }
+          this.subDisplace[v] -= d;
+          this.subAnatomy[v] += crease;
+        }
+      }
       for (let v = 0; v < this.nSubVerts; v++) {
         /* AnatomyCorrectives stores centimetres. A groove deeper than about
            four millimetres reads as a cut in skin, so keep the render-scale
            share close to physical size instead of amplifying the coarse mask. */
-        const o = v * 3, d = this.subAnatomy[v] * 1.05;
+        const o = v * 3, d = this.subDisplace[v] * 1.05;
         sub[o] -= this.subNormals[o] * d;
         sub[o + 1] -= this.subNormals[o + 1] * d;
         sub[o + 2] -= this.subNormals[o + 2] * d;

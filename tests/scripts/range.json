@@ -1,0 +1,6 @@
+[
+ { "label": "range-untrained", "set": { "mass": 0.15, "legMass": 0.15, "backThickness": 0.2, "bodyFat": 0.55, "flex": 0.0 }, "pose": "relaxed", "view": 0, "zoom": 0.62, "target": [0, 105, 0], "wait": 1200 },
+ { "label": "range-average", "set": { "mass": 0.45, "legMass": 0.45, "backThickness": 0.45, "bodyFat": 0.30, "flex": 0.2 }, "view": 0, "zoom": 0.62, "target": [0, 105, 0], "wait": 500 },
+ { "label": "range-lean", "set": { "mass": 0.70, "legMass": 0.70, "backThickness": 0.6, "bodyFat": 0.12, "flex": 0.3 }, "view": 0, "zoom": 0.62, "target": [0, 105, 0], "wait": 500 },
+ { "label": "range-contest", "set": { "mass": 0.95, "legMass": 0.9, "backThickness": 0.85, "bodyFat": 0.03, "flex": 0.6 }, "view": 0, "zoom": 0.62, "target": [0, 105, 0], "wait": 500 }
+]

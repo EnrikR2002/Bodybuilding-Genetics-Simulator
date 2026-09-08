@@ -5,7 +5,9 @@
   "type": "module",
   "scripts": {
     "assets": "node tools/fetch-assets.mjs",
-    "bake": "node tools/bake-mesh.mjs && node tools/bake-regions.mjs",
+    "bake": "node tools/bake-mesh.mjs && node tools/bake-regions.mjs && node tools/bake-anatomy.mjs",
+    "anatomy:rays": "node tools/export-anatomy-rays.mjs",
+    "anatomy:bake": "node tools/bake-anatomy.mjs",
     "sculpt:export": "node tools/export-sculpt-cage.mjs",
     "sculpt:import": "node tools/import-corrective.mjs",
     "studio:landmarks": "node tools/export-rig-landmarks.mjs",

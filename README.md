@@ -47,7 +47,8 @@ topology-matched endpoints.
 | MakeHuman `base.obj` | CC0 | the body: 13,378 quads, quad-dominant, UV-unwrapped |
 | MakeHuman `default.mhskel` + `default_weights.mhw` | CC0 | 163-bone rig and skin weights |
 | MakeHuman morph targets (144 of them) | CC0 | mass, body fat, frame, limb lengths, girths |
-| Z-Anatomy / BodyParts3D superficial muscles | CC BY-SA 4.0 / CC BY-SA 2.1 Japan | anatomical outlines, posterior surface planes, and lat insertion endpoints |
+| Z-Anatomy / BodyParts3D superficial muscles | CC BY-SA 4.0 / CC BY-SA 2.1 Japan | the measured surface: 46 muscles and bones that reach the skin, plus the lat insertion endpoints |
+| Z-Anatomy / BodyParts3D skeleton | CC BY-SA 4.0 / CC BY-SA 2.1 Japan | joint centres, so the atlas and the production rig share one bone space |
 | Blender Studio realistic human base by Julien Kaspar | CC BY | authoring and topology reference; not shipped as the runtime cage |
 | Poly Haven `brown_photostudio_02` | CC0 | studio HDRI for image-based lighting |
 
@@ -65,17 +66,18 @@ Every shape change runs the same chain, start to finish, inside one frame:
 
 ```
 rest cage (13,378 quads)
-  -> sculpted morph targets        params.js   size, frame, body composition
-  -> authored trait correctives    params.js   real insertion endpoint sculpts
-  -> atlas surface relief          params.js   separated posterior muscle planes
-  -> procedural fallback           regions.js  only for missing endpoint pairs
-  -> definition / softening        regions.js  lean sharpens, fat blurs
-  -> Catmull-Clark subdivision     subdiv.js   107,024 triangles
+  -> sculpted morph targets        params.js    size, frame, body composition
+  -> authored trait correctives    params.js    real insertion endpoint sculpts
+  -> procedural fallback           regions.js   only for missing endpoint pairs
+  -> definition / softening        regions.js   lean sharpens, fat blurs
+  -> Catmull-Clark subdivision     subdiv.js    59,292 vertices
+  -> measured anatomical relief    anatomy.bin  the surface of a real dissection
+  -> abdominal wall                figure.js    the one thing the scan lacks
   -> normals
   -> skeleton rebuilt from the same cage
 ```
 
-Four things in there are worth knowing about.
+Five things in there are worth knowing about.
 
 **The skeleton is derived from the mesh.** MakeHuman stores each joint as a
 group of helper vertices sitting inside the body. Those vertices are part of the
@@ -95,6 +97,10 @@ angle around, and does the rig already agree this vertex belongs to that limb.
 The rig check is what stops the biceps region leaking onto the ribs.
 `shots/regions-front.png` is the debug render used to check it.
 
+**The surface itself is measured off a dissection.** This is the part that
+decides whether the figure reads as a body or as a shop mannequin, and it is
+described in full in the next section.
+
 **Body fat and definition are the same operation with the sign flipped.** Fat
 blends the surface toward a Laplacian-smoothed copy of itself; being lean and
 full blends it away. That is what actually happens to a physique between April
@@ -109,6 +115,70 @@ figure gets bigger without ever losing its shape. The two macro axes are also
 capped short of their maximum, because MakeHuman's max-muscle-max-weight sculpt
 is a strongman — a barrel with no waist — and the muscle map does a better job
 of the last of the size, because it shapes rather than inflates.
+
+---
+
+## Where the muscle shape comes from
+
+A muscle map made of arcs and bands around a bone can place a belly. It cannot
+know that the lateral head of the triceps ends in a flat tendon plane, that the
+vastus medialis drops lower than everything beside it, or where the serratus
+interleaves with the obliques. Formulas do not contain that. A dissection does.
+
+So the production surface is not described. It is measured.
+
+1. **`npm run anatomy:rays`** writes one question per skin vertex — a ray aimed
+   inward at the body, in the frame of the bone that vertex sits on. It asks at
+   render resolution, not cage resolution: the control cage spends most of its
+   vertices on a face and two hands and leaves the whole trunk about two
+   thousand, which is far too coarse to hold a tendinous inscription.
+
+2. **`project_anatomy_rays.py`** fires those rays at the Z-Anatomy dissection in
+   Blender and marches each one through every layer it meets. Marching matters:
+   the external oblique's aponeurosis is draped over the whole rectus abdominis
+   and the iliotibial tract runs down the outside of the vastus lateralis, so
+   stopping at the first surface names the sheet and never names the muscle.
+
+3. **`npm run anatomy:bake`** turns the answers into `public/models/anatomy.bin`.
+   The useful signal is not how far a structure stands off its bone — that is
+   mostly limb thickness, which the body already has. It is what is left after
+   the shape of the limb is taken away: bellies stand proud, the gaps between
+   them fall away, flat tendons read as flat.
+
+Bone space is what makes this legal. The two bodies do not stand the same way —
+the atlas arm hangs almost straight down, the production arm is out at forty
+degrees, and the atlas forearm is supinated — so comparing them in world space
+is useless. Comparing them in bone space is exact, because "sixty percent of the
+way down the upper arm, forty degrees round from the front" means the same thing
+in both. `tools/blender/export_atlas_joints.py` finds the atlas joint centres
+from its own skeleton so the two frames can be built the same way.
+
+Three corrections stand between the raw measurement and the skin, and each one
+is a fact about bodies rather than a fudge:
+
+- **A limb is an offset, tapering cylinder.** A femur does not run down the
+  middle of a thigh, and the atlas femur and the production thigh bone do not
+  sit at quite the same place inside their legs. Left in, that mismatch reads as
+  "every muscle on the inside of the leg is sunken". It is fitted and removed.
+- **Skin bridges.** The dissection has cavities the skin never enters: the gap
+  between two ribs, the space behind a tendon, the sub-centimetre gaps between
+  the slips of the pectoralis. Anything finer than about a centimetre is fat and
+  fascia, not shape, and is filtered out.
+- **The atlas is an ordinary person.** A stage-lean back separates further than
+  any cadaver does, so the measured relief scales up with development rather
+  than being capped — a bigger muscle makes a deeper groove beside it.
+
+Run `node tests/shots.mjs --script tests/scripts/anatomy-map.json` to see the
+muscle territories painted on the body. That render, not the numbers, is how
+the projection gets checked.
+
+### The one thing the dissection does not contain
+
+BodyParts3D modelled the rectus abdominis as a smooth strap. It has no
+tendinous inscriptions and no linea alba, which between them are most of what
+anyone means by abs. Those lines are therefore authored, in `figure.js`, at the
+same render resolution as everything else — and one of them is a genetic
+slider, so they have to stay adjustable anyway.
 
 ---
 

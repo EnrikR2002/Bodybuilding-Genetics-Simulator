@@ -16,8 +16,33 @@ const smoothstep = (a, b, x) => {
 };
 const gaussian = (d, sigma) => Math.exp(-(d * d) / (2 * sigma * sigma));
 
+/* How much of the measured relief a fully lean, fully developed body shows.
+   One means the skin sits exactly where the dissection says the muscle is. */
+const ATLAS_GAIN = 1.0;
+/* And how far past that a competition physique is allowed to go. The
+   dissection is of an ordinary person; a stage-lean back separates further
+   than any cadaver does. */
+const ATLAS_CEILING = 1.75;
+
+
+/* Which condition slider each structure answers to. A dissection does not
+   know about training; the app does. */
+const DRIVER = {
+  upper: ['deltoid_ant', 'deltoid_lat', 'deltoid_post', 'biceps_long',
+          'biceps_short', 'brachialis', 'triceps_long', 'triceps_lat',
+          'triceps_med', 'forearm_flex', 'forearm_ext', 'pec_upper',
+          'pec_lower', 'sternomastoid', 'clavicle_b', 'sternum_b'],
+  back: ['lat', 'trap_upper', 'trap_mid', 'rhomboids', 'teres', 'infraspinatus',
+         'erectors', 'scapula_b'],
+  legs: ['glutes', 'glute_med', 'it_band', 'rectus_fem', 'vastus_lat',
+         'vastus_med', 'adductors', 'sartorius', 'ham_lat', 'ham_med',
+         'gastroc_med', 'gastroc_lat', 'soleus', 'tibialis', 'peroneals',
+         'patella_b', 'tibia_b'],
+  trunk: ['serratus', 'obliques', 'rectus_abs', 'iliac_b', 'ribs_b'],
+};
+
 export class AnatomyCorrectives {
-  constructor(regionField, figure) {
+  constructor(regionField, figure, anatomyBundle) {
     this.n = regionField.nCage;
     this.normal = regionField.restNormal;
     this.adjOff = regionField.adjOff;
@@ -33,8 +58,53 @@ export class AnatomyCorrectives {
       trunk: new Float32Array(this.n),
     };
     this.current = new Float32Array(this.n);
+    /* `current` moves the surface; `line` only tells the shader where the
+       narrow intermuscular creases are. They have to be separate: a belly a
+       centimetre proud is a shape, not a crease, and colouring it like one
+       turns a back into camouflage. */
+    this.line = new Float32Array(this.n);
     this._author();
     this._finishMaps();
+    this._attachAtlas(anatomyBundle);
+  }
+
+  /* ---------------------------------------------------------------------- *
+     The measured surface.
+
+     Everything above this line is generated: valleys inferred from where one
+     bone-derived mask hands over to the next. It is a decent guess and it is
+     the only thing available where the dissection does not reach — the hands,
+     the face, the feet.
+
+     Where the dissection does reach, guessing stops. `anatomy.bin` carries the
+     real height of the real structure over every square centimetre of trunk
+     and limb, measured off scanned anatomy, so the generated field is turned
+     down to a trace underneath it and the measured one takes over.
+   * ---------------------------------------------------------------------- */
+  _attachAtlas(bundle) {
+    this.atlas = null;
+    this.atlasGain = new Float32Array(4);
+    if (!bundle) return;
+    const H = bundle.header;
+    const names = ['upper', 'back', 'legs', 'trunk'];
+    const byGroup = H.groups.map(g => {
+      const i = names.findIndex(k => DRIVER[k].includes(g));
+      return i < 0 ? 0 : i;
+    });
+    const owner = bundle.block(H.owner);
+    const drive = new Uint8Array(H.nSub);
+    for (let v = 0; v < H.nSub; v++) drive[v] = owner[v] < 0 ? 0 : byGroup[owner[v]];
+    this.atlas = {
+      nSub: H.nSub,
+      relief: bundle.block(H.relief),
+      covered: bundle.block(H.covered),
+      border: bundle.block(H.border),
+      along: bundle.block(H.along),
+      side: bundle.block(H.side),
+      midline: bundle.block(H.midline),
+      rectus: H.rectusGroup,
+      owner, drive, names,
+    };
   }
 
   /* Expand a sparse region to cage-wide membership and longitudinal maps. */
@@ -255,11 +325,8 @@ export class AnatomyCorrectives {
     this._midline('upper', 0.34, ['pec_inner.L', 'pec_inner.R'], 0.112, 0.04, 0.96);
 
     /* Linea alba, semilunaris, four tendinous rows and serratus digitations. */
-    this._both(this._blocks, 'trunk', 0.25, 'rectus_abs.$', [0.02, 0.25, 0.49, 0.73, 0.96], 0.060);
-    this._midline('trunk', 0.40, ['rectus_abs.L', 'rectus_abs.R'], 0.100, 0.02, 0.98);
     this._both(this._boundary, 'trunk', 0.18, 'rectus_abs.$', 'obliques.$');
     this._both(this._boundary, 'trunk', 0.11, 'obliques.$', 'serratus.$');
-    this._both(this._cross, 'trunk', 0.50, 'rectus_abs.$', [0.13, 0.37, 0.61, 0.84], 0.032, 0.58);
     this._both(this._blocks, 'trunk', 0.07, 'serratus.$', [0.29, 0.56, 0.83], 0.058);
     this._both(this._cross, 'trunk', 0.11, 'serratus.$', [0.16, 0.43, 0.70], 0.042, 0.65);
 
@@ -308,14 +375,50 @@ export class AnatomyCorrectives {
       legs: lean * clamp(0.18 + ctx.legRelief * 0.78, 0, 1.20),
       trunk: ctx.lean * clamp(0.22 + ctx.relief * 0.58, 0, 1.10),
     };
+    /* The abdominal wall answers to leanness more sharply than anything else
+       on the body: a centimetre of fat over it and the rows are simply gone. */
+    this.rowGain = ctx.lean * clamp(0.26 + ctx.relief * 0.66, 0, 1.15);
+    this.rowStagger = ctx.abStagger ?? 0.5;
     const N = this.normal;
     const current = this.current;
+    const line = this.line;
+    const atlas = this.atlas;
+    /* Relief is what a lean, full muscle shows and what a layer of fat hides.
+       It is the same axis the rest of the app already calls definition, so it
+       is driven by the same numbers rather than a new one.
+
+       The measured field itself is applied after subdivision, by the figure.
+       It is stored at render resolution, and averaging it down to the control
+       cage would throw away the whole reason for measuring it there. All that
+       is settled here is how strongly each part of the body shows it. */
+    if (atlas) {
+      /* A bigger muscle does not only stand further off the bone — the groove
+         beside it gets deeper at the same time, because the muscle either side
+         of the groove has grown and the groove has not.
+
+         So the measured relief is not capped where the generated valleys are.
+         Without that, a competition-weight back gets three centimetres of
+         smooth outward push from the size sliders and nine millimetres of
+         separation on top, and reads as one inflated dome. */
+      const raw = [
+        lean * clamp(0.20 + ctx.relief * 1.05, 0, ATLAS_CEILING),
+        lean * clamp(0.18 + ctx.relief * (0.55 + ctx.back * 0.70), 0, ATLAS_CEILING),
+        lean * clamp(0.18 + ctx.legRelief * 1.05, 0, ATLAS_CEILING),
+        ctx.lean * clamp(0.22 + ctx.relief * 0.85, 0, ATLAS_CEILING),
+      ];
+      for (let i = 0; i < 4; i++) this.atlasGain[i] = raw[i] * ATLAS_GAIN;
+    }
     current.fill(0);
+    line.fill(0);
     for (let v = 0; v < this.n; v++) {
       let cm = 0;
       for (const [name, map] of Object.entries(this.maps)) cm += map[v] * drives[name];
       cm *= this.sourceGain;
+      /* Where the dissection reaches, the generated valleys are a guess about
+         the same anatomy and would only fight it. Keep a trace, no more. */
+      if (atlas && atlas.covered[v]) cm *= 0.22;
       current[v] = cm;
+      line[v] = cm;
       if (Math.abs(cm) < 0.002) continue;
       /* A quarter of the sculpt changes the cage and therefore the physical
          cross-section. The remaining detail is applied after subdivision,

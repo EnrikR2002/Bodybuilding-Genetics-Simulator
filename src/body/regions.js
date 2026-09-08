@@ -84,7 +84,7 @@ const DRIVER = {
 };
 
 export class RegionField {
-  constructor(bundle, figure) {
+  constructor(bundle, figure, anatomyBundle) {
     this.h = bundle.header;
     this.figure = figure;
     this.regions = this.h.regions.map(r => ({
@@ -107,7 +107,7 @@ export class RegionField {
     /* scratch: the displacement field, built then smoothed then applied */
     this.disp = new Float32Array(this.nCage * 3);
     this.disp2 = new Float32Array(this.nCage * 3);
-    this.anatomy = new AnatomyCorrectives(this, figure);
+    this.anatomy = new AnatomyCorrectives(this, figure, anatomyBundle);
     /* anchors the callouts hang off, filled in during deform */
     this.anchors = {};
   }
