@@ -4,9 +4,9 @@
   "version": "2.0.0",
   "type": "module",
   "scripts": {
-    "test": "node --test tests/anatomy.test.mjs",
+    "test": "node --test tests/freeman.test.mjs",
     "assets": "node tools/fetch-assets.mjs",
-    "bake": "node tools/bake-mesh.mjs && node tools/bake-regions.mjs && node tools/bake-anatomy.mjs",
+    "bake": "node tools/bake-freeman.mjs",
     "anatomy:rays": "node tools/export-anatomy-rays.mjs",
     "anatomy:bake": "node tools/bake-anatomy.mjs",
     "sculpt:export": "node tools/export-sculpt-cage.mjs",
@@ -15,10 +15,13 @@
     "sculpt:lats": "node tools/author-lat-correctives.mjs",
     "sculpt:back": "node tools/author-back-anatomy.mjs",
     "textures": "node tools/bake-textures.mjs",
-    "dev": "vite",
+    "dev": "node tools/dev-server.mjs",
     "build": "vite build",
     "preview": "vite preview --port 4173",
-    "shots": "node tests/shots.mjs"
+    "shots": "node tests/shots.mjs",
+    "test:legacy": "node --test tests/anatomy.test.mjs",
+    "bake:legacy": "node tools/bake-mesh.mjs && node tools/bake-regions.mjs && node tools/bake-anatomy.mjs",
+    "test:browser": "node tests/freeman-browser.mjs"
   },
   "dependencies": {
     "three": "^0.180.0"

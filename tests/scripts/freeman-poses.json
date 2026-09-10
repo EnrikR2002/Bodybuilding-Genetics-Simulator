@@ -1,0 +1,7 @@
+[
+ {"label":"poses-front-double","pose":"frontDouble","view":"front"},
+ {"label":"poses-back-double","pose":"backDouble","view":"back"},
+ {"label":"poses-front-lat","pose":"latSpread","view":"front"},
+ {"label":"poses-rear-lat","pose":"rearLat","view":"back"},
+ {"label":"poses-double-side","pose":"frontDouble","view":"side"}
+]

@@ -15,7 +15,7 @@ import {
   Scene, PerspectiveCamera, WebGLRenderer, DirectionalLight, Color, Mesh,
   CircleGeometry, ShadowMaterial, PMREMGenerator, ACESFilmicToneMapping,
   SRGBColorSpace, PCFSoftShadowMap, Vector2, MeshBasicMaterial, CanvasTexture,
-  EquirectangularReflectionMapping, Fog, DoubleSide,
+  EquirectangularReflectionMapping, Fog, DoubleSide, OrthographicCamera,
 } from 'three';
 import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader.js';
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
@@ -26,7 +26,7 @@ import { OutputPass } from 'three/examples/jsm/postprocessing/OutputPass.js';
 import { SMAAPass } from 'three/examples/jsm/postprocessing/SMAAPass.js';
 
 export class Stage {
-  constructor(canvas, { hdri = '/env/studio.hdr', quality = 1 } = {}) {
+  constructor(canvas, { hdri = '/env/studio.hdr', quality = 1, orthographic = false } = {}) {
     this.renderer = new WebGLRenderer({
       canvas, antialias: false, alpha: false, powerPreference: 'high-performance',
     });
@@ -39,7 +39,7 @@ export class Stage {
 
     this.scene = new Scene();
     this.scene.background = backdrop();
-    this.camera = new PerspectiveCamera(30, 1, 4, 3000);
+    this.camera = orthographic ? new OrthographicCamera(-100,100,100,-100,4,3000) : new PerspectiveCamera(30, 1, 4, 3000);
 
     /* ---- lights ---- */
     /* A harder key and less ambient wash. Filling a body evenly from every

@@ -1,102 +1,33 @@
-# Anatomy and rendering changes
+﻿# Freeman anatomy and quality notes
 
-The September 2026 update improves the existing MakeHuman / Z-Anatomy pipeline.
-It is still an illustrative physique model, not a validated reconstruction of
-an individual athlete or a finished photorealistic character asset.
+The main app now uses the supplied Mike Freeman sculpt directly. Its neutral, lean surface preserves the author's evaluated multiresolution mesh, rather than adding a projected anatomy layer to the old MakeHuman figure.
 
-## What changes with the controls
+## Geometry and posing
 
-- Biceps belly length uses a continuous profile in humeral coordinates, fitted
-  over the current distal arm radius. Gastrocnemius length resamples the
-  existing calf surface. Shortening removes distal fullness and redistributes
-  it proximally; lengthening carries fullness toward the distal joint. Atlas
-  relief is transported with each belly. This is a runtime approximation, not
-  an artist-authored endpoint pair or an exact muscle-volume simulation.
-- Biceps peak shape redistributes central fullness independently of belly
-  length. The longitudinal compensation approximates constant volume.
-- Additional development follows distance to the atlas's actual muscle
-  borders. Overlapping generic regions are restrained so several muscles do
-  not inflate the same back or shoulder patch.
-- Abdominal segments, inscriptions and stagger are geometry. Stagger zero
-  aligns the rows; increasing it offsets the two sides. The inscriptions are
-  registered below the template's pec fold. A continuous displacement layer
-  softens the discrete atlas borders before normals are recomputed.
-- The rig is derived before muscle reshaping, so changing a belly does not
-  move a joint inferred from surface vertices. Bone-width and length morphs
-  still change the rig normally.
+The runtime body contains 154,442 vertices and 308,864 triangles. The export includes the original eye and eyebrow geometry, a 21-bone inspection rig and normalized four-influence skin weights. Hair is omitted from the viewer. The rest-pose arm landmarks are measured against the sculpt's actual shoulder, elbow and forward-reaching wrist positions.
 
-The biceps has both a short and a long anatomical head. Those names should not
-be confused with a shorter or longer visible muscle belly. The study controls
-describe belly length, and deliberately make no claims about measurements of
-Arnold Schwarzenegger or Sergio Oliva. See the
-[NCBI anatomy reference](https://www.ncbi.nlm.nih.gov/books/NBK519538/) and the
-[distal biceps anatomical study](https://pmc.ncbi.nlm.nih.gov/articles/PMC4622363/).
+The app evaluates dual-quaternion deformation when the user changes a preset or pose, then recomputes normals from the resulting surface. This avoids presenting interpolated rest-pose shading as muscle detail and avoids repeated skinning during camera motion. The supported poses are the artist's original stance, a controlled curl, front/back double biceps and front/rear lat spreads. These are authored for the Freeman rig in `src/freeman/poses.js`; the previous app's pose catalogue remains separate.
 
-## Rendering and inspection
+Raised arms include clavicle elevation and matching shoulder-support rotation. A local relaxation pass softens stretched axilla folds. Bodybuilding poses also use a continuous finger-curl corrective and a smooth lateral lat expansion. These are approximate surface corrections, not independently articulated fingers or simulated scapulae. Pose directions resolve against the edited skeleton to preserve limb lengths. See [the visual pose review](POSE_REVIEW.md).
 
-- Volume-preserving dual-quaternion skinning is shared by skin, clay, shadow
-  and ambient-occlusion passes. CPU picking uses the equivalent transform.
-- The upper arm is oriented toward the elbow flexion plane; twist is shared
-  through the humerus. Double-biceps targets raise the elbows, and hand curl
-  is reduced to avoid folding fingers through the palm.
-- Inner clavicle skin weights transfer support to the thorax, and three
-  connected-edge smoothing passes ease the upper-body weight transitions.
-  This removes the raised patches beside the neck during arm elevation.
-- Fine skin bumps now use view-space surface derivatives. The previous shader
-  added an object-space gradient to a view-space normal. Excessive cavity
-  pigmentation and roughness noise have been reduced.
-- Each eye has its own iris and pupil coordinates.
-- Skin and neutral-clay modes support equal-material comparisons. Atlas mode
-  is a **reference map**, not a dynamically relabelled muscle segmentation.
-- A pinned figure includes the same anatomical layers as the live figure and
-  solves subsequent poses against its own proportions.
-- Callouts use render vertices and the same skinning transform as the body.
-  The biceps and calf anchors move along the current belly, instead of staying
-  attached to a neutral peak on one rigid bone.
+Belly controls transport the existing surface along the humerus or lower leg, with smooth angular and longitudinal falloffs. A shorter belly redistributes some fullness proximally; a longer belly extends fullness toward the distal interval. A separate flexed shape and biceps-profile control alter the contour. Bone landmarks are independent of those belly controls. Frame presets deform the skeleton and surface together.
 
-## Projection correction
+Lat sweep, pec spacing, abdominal stagger and trap profile are localized sculpt-space deformations. Development adds regional volume. Definition blends toward a smoothed version of the same topology and adds surface coverage, so a softer physique does not retain the same sharp separations at a larger radius.
 
-Atlas ray hits are restricted to structures appropriate to their bone chain.
-An arm intersecting a torso ray is not accepted as rib-cage anatomy, and torso
-projection stops before the head. Rebuild with `npm run anatomy:bake`; the
-corrected bundle is included under `public/models/`.
+## Rendering and comparison
+
+Skin uses a physical material with restrained procedural variation and fine surface noise. It is not a scanned albedo, roughness or subsurface texture set. Neutral sculpt removes skin colour variation to aid shape inspection. Both finishes retain the posing-brief mask. Studio HDR illumination, directional lights, shadows and desktop ambient occlusion reveal the underlying forms.
+
+Orthographic projection keeps a pinned and current physique at the same apparent scale and angle. Camera-relative separation keeps them beside one another when orbiting. Each comparison owns separate geometry, materials and bone state; editing the current physique does not change the pinned surface. Both follow the same pose and finish controls.
 
 ## Verification
 
-```sh
-npm run bake
-npm test
-npm run build
-node tests/visual-review.mjs
-node tests/interaction-review.mjs
-```
+`npm test` checks asset completeness, normalized weights, exact neutral lean surface preservation, visible insertion displacements with fixed joints, finite geometry and normals at every preset endpoint in all six poses, combined extremes, reversible posing, limb lengths, joint placement and comparison isolation.
 
-Numeric tests cover fixed joints, finite and continuous endpoints, reduction
-of visible insertion differences under fat, measurement isolation, all ten
-poses at frame extremes, normalized skin weights, moving callout anchors, and
-preservation of radius under a 180-degree twist.
-The browser review checks equal-state comparison geometry and exercises actual
-study buttons and material selectors. Screenshots cover torso, limbs, body
-composition, lat endpoints, the principal poses and biceps endpoints in clay.
-The interaction review also covers editing a pinned comparison, posed callouts
-and the narrow-screen study controls.
-These checks do not establish anatomical or clinical validity.
+`npm run test:browser` exercises the rendered desktop/mobile interface, checks for a visible model rather than only a loaded page, verifies stable canvas sizing, presets, snapshot isolation, matching finishes, camera changes and mobile overflow. It also selects every bodybuilding pose, verifies the rear camera presets, preserves the selected pose in comparisons and projects the surface vertices to check framing. Screenshots are written to `shots/` for visual review; passing numerical tests alone does not establish anatomical realism.
 
-## Remaining quality work
+## Limits
 
-The generic base still limits the quality of the pec-to-deltoid transition,
-axilla, distal arm, hands, nipples, quadriceps and abdominal wall. Some extreme
-poses still show pinching or excessive stretching. Smooth interpolation and
-finite vertices do not imply a production-quality sculpt. The skin is a
-procedural approximation, not scanned skin or physically simulated subsurface
-scattering. Forearm vascular paths are not individually anatomically authored.
+This is an illustrative surface model, not a validated biomechanical simulation. The endpoints are procedural deformations of one artist's sculpt, not individually sculpted or measured human variants. Tendons, individual internal muscle heads and attachment sites are not separate volumetric anatomy. Volume compensation is approximate. Frame and development presets are qualitative, not predictions of strength, achievable muscularity, training response or body-fat percentage.
 
-The next quality gate is an anatomy artist's review of topology-matched
-bodybuilder sculpts, including pose correctives and all remaining genetic
-endpoints. The local Blender installation and OBJ import/export path already
-support that workflow; a new MCP connection is not needed to use them.
-
-A more muscular source candidate, PixelPete's CC0 Mike Freeman model, was
-identified from its published preview. Its download currently requires
-BlendSwap sign-in. See [source intake notes](../assets-src/mike-freeman/README.md).
-It has not been downloaded, tested or integrated.
+In particular, a shorter visible biceps belly should not be called a short *head*: the two anatomical heads are a separate distinction. No athlete measurements are inferred from appearance. A fully photorealistic character would additionally require authored skin textures, more detailed hand/pose rigs and artist-reviewed corrective shapes across the full motion range.
