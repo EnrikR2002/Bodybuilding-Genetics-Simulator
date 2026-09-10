@@ -85,7 +85,9 @@ export class Stage {
     floor.rotation.x = -Math.PI / 2;
     floor.receiveShadow = true;
     this.scene.add(floor);
-    this.scene.add(lightPool());
+    this.floor = floor;
+    this.pool = lightPool();
+    this.scene.add(this.pool);
 
     this.envReady = this._loadEnv(hdri);
     this._buildComposer(quality);
@@ -175,6 +177,15 @@ export class Stage {
     this.key.shadow.camera.updateProjectionMatrix();
   }
 
+  /* Apply one of the LIGHTING presets by id. Each preset owns the backdrop,
+     exposure, light colours and intensities and the rig offsets. */
+  setLighting(id) {
+    const preset = LIGHTING.find((l) => l.id === id) ?? LIGHTING[0];
+    preset.apply(this);
+    this.lighting = preset.id;
+    return this;
+  }
+
   /* flip the AO pass to show only what it computes — used to check the
      occlusion is really landing in the armpits and not just tinting */
   debugAO(on) {
@@ -185,16 +196,36 @@ export class Stage {
   render() { this.composer.render(); }
 }
 
+/* Lighting presets for the physique studio. `apply(stage)` sets everything
+   it cares about, so switching presets never leaves one preset's state on
+   another. */
+export const LIGHTING = [
+  {
+    id: 'studio', label: 'Studio',
+    apply(stage) {
+      const { lights: l } = stage;
+      stage.scene.background = backdrop([[0, '#253037'], [0.48, '#202a30'], [1, '#151e24']]);
+      stage.renderer.toneMappingExposure = 0.96;
+      l.key.color.set(0xf0f6ff); l.key.intensity = 2.1;
+      l.fill.color.set(0xbed6e4); l.fill.intensity = 0.26;
+      l.rim.color.set(0xd6e8e1); l.rim.intensity = 1.15;
+      l.rim2.color.set(0xb9c4ff); l.rim2.intensity = 0.45;
+      stage._rig[0].offset = 0.75;
+      stage.pool.visible = false;
+      Object.assign(stage.key.shadow.camera, { left: -210, right: 210 });
+      stage.key.shadow.camera.updateProjectionMatrix();
+      stage.key.shadow.normalBias = 0.35;
+    },
+  },
+];
+
 /* the seamless backdrop the figure stands against */
-function backdrop() {
+function backdrop(stops = [[0, '#2b2537'], [0.34, '#221d2c'], [0.72, '#131019'], [1, '#0a080d']]) {
   const c = document.createElement('canvas');
   c.width = 8; c.height = 256;
   const g = c.getContext('2d');
   const grad = g.createLinearGradient(0, 0, 0, 256);
-  grad.addColorStop(0.00, '#2b2537');
-  grad.addColorStop(0.34, '#221d2c');
-  grad.addColorStop(0.72, '#131019');
-  grad.addColorStop(1.00, '#0a080d');
+  for (const [at, color] of stops) grad.addColorStop(at, color);
   g.fillStyle = grad;
   g.fillRect(0, 0, 8, 256);
   const t = new CanvasTexture(c);

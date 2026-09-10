@@ -16,7 +16,8 @@ import { fileURLToPath } from 'node:url';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const SHOTS = path.join(ROOT, 'shots');
-const PORT = 5188;
+/* PORT lets parallel checkouts run their own dev servers side by side. */
+const PORT = +(process.env.PORT || 5188);
 
 const argv = process.argv.slice(2);
 const arg = (k, d) => { const i = argv.indexOf('--' + k); return i < 0 ? d : argv[i + 1]; };

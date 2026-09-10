@@ -1,9 +1,9 @@
-import { CanvasTexture, SRGBColorSpace } from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { Stage } from "../render/stage.js";
 import { installVolumeSkinning } from "../render/skinning.js";
 import { loadFreeman, Freeman, DEFAULT } from "./model.js";
 import { POSES, POSE_BY_ID } from "./poses.js";
+import { TRAITS as CATALOGUE } from "./traits.js";
 installVolumeSkinning();
 const $ = (id) => document.getElementById(id);
 const state = { ...DEFAULT };
@@ -21,35 +21,7 @@ const stage = new Stage($("cv"), {
   quality: innerWidth < 700 ? 0 : 1,
   orthographic: true,
 });
-function backdrop() {
-  const c = document.createElement("canvas");
-  c.width = 4;
-  c.height = 256;
-  const x = c.getContext("2d"),
-    g = x.createLinearGradient(0, 0, 0, 256);
-  g.addColorStop(0, "#253037");
-  g.addColorStop(0.48, "#202a30");
-  g.addColorStop(1, "#151e24");
-  x.fillStyle = g;
-  x.fillRect(0, 0, 4, 256);
-  const t = new CanvasTexture(c);
-  t.colorSpace = SRGBColorSpace;
-  return t;
-}
-stage.scene.background = backdrop();
-stage.renderer.toneMappingExposure = 0.96;
-stage.lights.key.color.set(0xf0f6ff);
-stage.lights.key.intensity = 2.1;
-stage.lights.fill.color.set(0xbed6e4);
-stage.lights.fill.intensity = 0.26;
-stage.lights.rim.color.set(0xd6e8e1);
-stage.lights.rim.intensity = 1.15;
-stage.lights.rim2.intensity = 0.45;
-stage._rig[0].offset = 0.75;
-for (const obj of [...stage.scene.children])
-  if (obj.isMesh && obj.material.isMeshBasicMaterial) stage.scene.remove(obj);
-Object.assign(stage.key.shadow.camera, { left: -210, right: 210 });
-stage.key.shadow.normalBias = 0.35;
+stage.setLighting("studio");
 const orbit = new OrbitControls(stage.camera, $("cv"));
 orbit.enableDamping = true;
 orbit.dampingFactor = 0.09;
@@ -73,127 +45,9 @@ new ResizeObserver(() => {
   if (figure) fit();
 }).observe($("stage"));
 
-const TRAITS = [
-  [
-    "genetics",
-    "bicepInsertion",
-    "Biceps belly length",
-    ["Short", "Medium", "Long"],
-    "The visible belly and the tendon interval above the elbow.",
-  ],
-  [
-    "genetics",
-    "bicepPeak",
-    "Biceps profile",
-    ["Flatter", "Balanced", "Peaked"],
-    "Peak shape is independent of belly length.",
-  ],
-  [
-    "genetics",
-    "latInsertion",
-    "Lat sweep",
-    ["High", "Medium", "Low"],
-    "Where the lower lat contour meets the waist.",
-  ],
-  [
-    "genetics",
-    "pecGap",
-    "Sternal gap",
-    ["Narrow", "Medium", "Wide"],
-    "The space between the inner edges of the pecs.",
-  ],
-  [
-    "genetics",
-    "abStagger",
-    "Abdominal alignment",
-    ["Even", "Subtle", "Staggered"],
-    "The offset between the two rows of the abdominal wall.",
-  ],
-  [
-    "genetics",
-    "calfInsertion",
-    "Calf belly length",
-    ["Short", "Medium", "Long"],
-    "A higher belly leaves a longer Achilles interval.",
-  ],
-  [
-    "genetics",
-    "trapHeight",
-    "Trap profile",
-    ["Low", "Medium", "High"],
-    "The upper contour between the neck and shoulders.",
-  ],
-  [
-    "frame",
-    "clavicle",
-    "Shoulder frame",
-    ["Narrow", "Medium", "Wide"],
-    "Shoulder spacing changes the upper-body silhouette.",
-  ],
-  [
-    "frame",
-    "ribcage",
-    "Rib cage",
-    ["Shallow", "Medium", "Deep"],
-    "The underlying breadth and depth of the torso.",
-  ],
-  [
-    "frame",
-    "hipWidth",
-    "Pelvis width",
-    ["Narrow", "Medium", "Wide"],
-    "The lower frame changes the apparent V-taper.",
-  ],
-  [
-    "frame",
-    "torsoLength",
-    "Torso length",
-    ["Short", "Medium", "Long"],
-    "Torso proportion relative to the limbs.",
-  ],
-  [
-    "frame",
-    "armLength",
-    "Arm length",
-    ["Short", "Medium", "Long"],
-    "The same muscle form on a different arm span.",
-  ],
-  [
-    "frame",
-    "legLength",
-    "Leg length",
-    ["Short", "Medium", "Long"],
-    "Leg length relative to the torso.",
-  ],
-  [
-    "condition",
-    "mass",
-    "Upper-body development",
-    ["Lighter", "Athletic", "Fuller"],
-    "Changes overall development while retaining sculpted forms.",
-  ],
-  [
-    "condition",
-    "legMass",
-    "Leg development",
-    ["Lighter", "Athletic", "Fuller"],
-    "The volume of the thighs and lower legs.",
-  ],
-  [
-    "condition",
-    "backThickness",
-    "Back development",
-    ["Lighter", "Athletic", "Fuller"],
-    "Thickness through the upper and middle back.",
-  ],
-  [
-    "condition",
-    "bodyFat",
-    "Definition",
-    ["Lean", "Moderate", "Soft"],
-    "Surface coverage and the visibility of muscle separation.",
-  ],
-];
+// [tab, key, label, stops, note] rows for the current controls.
+const TAB = { insertions: "genetics", frame: "frame", development: "condition", condition: "condition" };
+const TRAITS = CATALOGUE.map((t) => [TAB[t.group], t.key, t.label, t.stops, t.note]);
 const COPY = {
   bicepInsertion: [
     "A compact belly leaves more room above the elbow. Flex the arm to see how the shorter outline changes the peak.",
@@ -251,7 +105,7 @@ function changed() {
   figure.update(state).setSurface(surface, tone);
   $("height").textContent = Math.round(figure.height);
   $("shoulders").textContent = Math.round(
-    figure.heads[6].distanceTo(figure.heads[13]),
+    figure.joint("upperarm.L").distanceTo(figure.joint("upperarm.R")),
   );
   if (previousHeight !== figure.height || silhouetteRadius(figure) > previousRadius + 0.5) fit();
   if (reference)

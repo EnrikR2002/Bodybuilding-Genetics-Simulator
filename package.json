@@ -4,7 +4,7 @@
   "version": "2.0.0",
   "type": "module",
   "scripts": {
-    "test": "node --test tests/freeman.test.mjs",
+    "test": "node --test tests/freeman.test.mjs tests/freeman-anatomy.test.mjs tests/freeman-measure.test.mjs tests/freeman-pose.test.mjs",
     "assets": "node tools/fetch-assets.mjs",
     "bake": "node tools/bake-freeman.mjs",
     "anatomy:rays": "node tools/export-anatomy-rays.mjs",
@@ -21,7 +21,8 @@
     "shots": "node tests/shots.mjs",
     "test:legacy": "node --test tests/anatomy.test.mjs",
     "bake:legacy": "node tools/bake-mesh.mjs && node tools/bake-regions.mjs && node tools/bake-anatomy.mjs",
-    "test:browser": "node tests/freeman-browser.mjs"
+    "test:browser": "node tests/freeman-browser.mjs",
+    "anatomy:freeman": "node tools/bake-freeman-anatomy.mjs"
   },
   "dependencies": {
     "three": "^0.180.0"
