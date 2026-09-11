@@ -207,6 +207,9 @@ export const STRUCTURES = [
 /* Small neighbours folded into a vocabulary structure. */
 export const MERGE = {
   "Coracobrachialis muscle": "biceps_short",
+  // shows through gaps in the atlas' external oblique aponeurosis; on the skin
+  // it is the oblique wall either way, and the vocabulary has one oblique
+  "Internal abdominal oblique muscle": "external_oblique",
 };
 
 /* Sheets the skin shows through, never the owner of a patch of skin. */

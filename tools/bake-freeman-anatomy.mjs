@@ -593,6 +593,39 @@ const facingStats = [0, 0];
     rows.filter(([, r]) => r.other).slice(0, 30).map(fmt).join("  "));
   console.log("  vocabulary owners before cleaning: " + rows.filter(([, r]) => !r.other).map(fmt).join("  "));
 }
+/* --probe: the whole ray stack at named skin points, for tuning the rules.
+   Each probe finds the skin where a line along `dir` through `target` leaves
+   the body, then prints what the cast ray from that vertex crosses. */
+if (ARGS.has("--probe")) {
+  const PROBES = [
+    { name: "rectus abdominis, upper", target: [5, 114, 0], dir: [0, 0, 1] },
+    { name: "rectus abdominis, lower", target: [5, 98, 0], dir: [0, 0, 1] },
+    { name: "linea alba", target: [0.3, 108, 0], dir: [0, 0, 1] },
+    { name: "oblique flank", target: [14, 104, 0], dir: [0.8, 0, 0.6] },
+    { name: "serratus", target: [15, 124, 0], dir: [0.6, 0, 0.8] },
+    { name: "lumbar erector", target: [4.5, 104, 0], dir: [0, 0, -1] },
+    { name: "teres major", target: [15, 131, 0], dir: [0, 0, -1] },
+    { name: "infraspinatus", target: [11, 138, 0], dir: [0, 0, -1] },
+    { name: "brachialis (lower lateral arm)", target: [32.5, 128.5, -3.2], dir: [0.5, 0.5, 0.707] },
+    { name: "mid lateral arm", target: [28, 133, -3.5], dir: [0.6, 0.6, 0.5] },
+  ];
+  const hits = [];
+  const nm = (ii) => (INST[ii].s >= 0 ? `${STRUCTURES[INST[ii].s].name}.${INST[ii].side}` : INST[ii].name);
+  for (const pr of PROBES) {
+    const d = norm(pr.dir), o = add(pr.target, mul(d, 60));
+    const hit = freemanBVH.rayFirst(o[0], o[1], o[2], -d[0], -d[1], -d[2], 120, hits);
+    if (!hit) { console.log(`  probe ${pr.name}: missed the sculpt`); continue; }
+    const bw = [1 - hit.u - hit.v, hit.u, hit.v];
+    const v = fm.index[hit.tri * 3 + bw.indexOf(Math.max(...bw))];
+    const nx = NRM[v * 3], ny = NRM[v * 3 + 1], nz = NRM[v * 3 + 2];
+    atlasBVH.rayAll(P[v * 3] + nx * RAY_OUT, P[v * 3 + 1] + ny * RAY_OUT, P[v * 3 + 2] + nz * RAY_OUT, -nx, -ny, -nz, RAY_OUT + RAY_IN, hits);
+    hits.sort((a, b) => a.t - b.t);
+    const f = (a) => a.map((x) => x.toFixed(1)).join(",");
+    console.log(`  probe ${pr.name}: v${v} at ${f([P[v * 3], P[v * 3 + 1], P[v * 3 + 2]])} n ${f([nx, ny, nz])}` +
+      ` -> ${hitInst[v] >= 0 ? nm(hitInst[v]) : "nothing"}` + (masked[v] ? " (masked)" : ""));
+    console.log("    " + hits.map((h) => `${(h.t - RAY_OUT).toFixed(2)}${h.facing < 0 ? "in" : "out"}:${nm(WI[h.tri])}`).join("  "));
+  }
+}
 
 /* ======================================================================== *
    4. clean
@@ -846,7 +879,7 @@ stamp("wrote public/models/freeman-anatomy.{json,bin}");
 }
 
 // ---- review renders ----
-if (ARGS.has("--shots") || ARGS.has("--overlay") || ARGS.has("--atlas")) review();
+if (["--shots", "--overlay", "--atlas", "--focus"].some((a) => ARGS.has(a))) review();
 
 /* ======================================================================== *
    helpers
@@ -1166,6 +1199,48 @@ function review() {
     run("anatomy-map-along", path.join(BUILD, "review-along.rgba"));
   }
   if (ARGS.has("--overlay")) run("anatomy-overlay", null, { overlays, xray: 0.45 });
+  if (ARGS.has("--focus")) {
+    // A few structures at a time in fixed colours (red, orange, yellow, blue,
+    // magenta, green, cyan, purple, white, brown, in list order); the rest of
+    // the map light grey, unlabelled skin darker.
+    stamp("rendering focus sets");
+    const FOCUS = {
+      back: ["trapezius_upper", "trapezius_middle", "trapezius_lower", "latissimus", "teres_major",
+        "infraspinatus", "erector_spinae", "deltoid_posterior", "rhomboid", "gluteus_medius"],
+      torso: ["pectoralis_clavicular", "pectoralis_sternal", "serratus", "rectus_abdominis", "deltoid_anterior",
+        "external_oblique", "bone_sternum", "sternocleidomastoid", "bone_clavicle", "latissimus"],
+      arm: ["biceps_long", "biceps_short", "brachialis", "triceps_long", "triceps_lateral",
+        "brachioradialis", "triceps_medial", "forearm_flexors", "forearm_extensors", "deltoid_lateral"],
+      thigh: ["rectus_femoris", "vastus_lateralis", "vastus_medialis", "adductors", "tensor_fasciae_latae",
+        "sartorius", "gracilis", "biceps_femoris", "semitendinosus", "semimembranosus"],
+      calf: ["gastrocnemius_medial", "gastrocnemius_lateral", "soleus", "tibialis_anterior", "patellar_tendon",
+        "fibularis", "bone_tibia", "bone_patella", "calcaneal_tendon", "gluteus_maximus"],
+    };
+    const COLORS = [[230, 40, 40], [245, 140, 20], [240, 220, 30], [40, 90, 230], [220, 40, 200],
+      [40, 180, 60], [40, 210, 220], [130, 60, 200], [250, 250, 250], [140, 80, 40]];
+    const whole = (list) => list.map((v) => ({ ...v, target: [0, 92, 0], scale: 188 }));
+    const VIEWS = {
+      back: whole([{ name: "back", az: 180, el: 0 }, { name: "back-threequarter", az: 218, el: 8 }, { name: "side", az: 90, el: 0 }]),
+      torso: whole([{ name: "front", az: 0, el: 0 }, { name: "threequarter", az: 38, el: 8 }, { name: "side", az: 90, el: 0 }]),
+      arm: [{ name: "front", az: 0, el: 0 }, { name: "back", az: 180, el: 0 }, { name: "top", az: 90, el: 45 }, { name: "under", az: 20, el: -35 }]
+        .map((v) => ({ ...v, target: [31, 127, 0], scale: 60 })),
+      thigh: whole([{ name: "front", az: 0, el: 0 }, { name: "back", az: 180, el: 0 }, { name: "side", az: 90, el: 0 }, { name: "medial", az: -60, el: 0 }]),
+      calf: whole([{ name: "front", az: 0, el: 0 }, { name: "back", az: 180, el: 0 }, { name: "side", az: 90, el: 0 }]),
+    };
+    for (const [set, names] of Object.entries(FOCUS)) {
+      const col = new Uint8Array(N * 4);
+      for (let v = 0; v < N; v++) {
+        const id = muscle[v];
+        const k = id ? names.indexOf(STRUCTURES[(id - 1) >> 1].name) : -1;
+        let c = k >= 0 ? COLORS[k] : id ? grey : [150, 146, 140];
+        if (k >= 0) { const shade = 0.55 + 0.45 * smoothstep(0.5, 1.0, blend[v] / 255); c = c.map((x) => Math.round(x * shade)); }
+        col.set([...c, 255], v * 4);
+      }
+      const file = path.join(BUILD, `review-focus-${set}.rgba`);
+      fs.writeFileSync(file, col);
+      run(`anatomy-focus-${set}`, file, { views: VIEWS[set] });
+    }
+  }
   if (ARGS.has("--atlas")) {
     // The warped dissection itself, coloured like the map, without the sculpt:
     // where it disagrees with the map, the casting rules are at fault; where
