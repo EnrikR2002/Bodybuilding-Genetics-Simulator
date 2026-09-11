@@ -39,7 +39,7 @@ import { execFileSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { readFreeman } from "./read-freeman.mjs";
 import { buildContext } from "../src/freeman/shape/context.js";
-import { STRUCTURES, MERGE, TRANSPARENT, BONE_SEGMENT, skinSegment } from "./freeman-anatomy-table.mjs";
+import { STRUCTURES, MERGE, TRANSPARENT, SEE_THROUGH, BONE_SEGMENT, skinSegment } from "./freeman-anatomy-table.mjs";
 import {
   TriangleBVH, DistanceField, geodesic,
   sub, add, mul, dot, cross, len, norm, clamp, smoothstep,
@@ -126,6 +126,18 @@ const SCALE = freemanTop / atlasTop;
 for (const o of OBJ) for (let i = 0; i < o.pos.length; i++) o.pos[i] *= SCALE;
 const centroidX = (o) => { let s = 0; for (let i = 0; i < o.pos.length; i += 3) s += o.pos[i]; return s / o.nv; };
 for (const o of OBJ) o.sideX = o.side || (centroidX(o) >= 0 ? "L" : "R");
+/* BodyParts3D meshes do not agree on winding: about a third face inward. The
+   cast tells entry from exit by the facing of the triangle it crosses, so
+   every structure is turned to face outward (positive signed volume). */
+{
+  let flipped = 0, solid = 0;
+  for (const o of OBJ) {
+    if (o.kind !== "muscle" && o.kind !== "bone") continue;
+    solid++;
+    if (orientOutward(o.pos, o.tri)) flipped++;
+  }
+  stamp(`turned ${flipped} of ${solid} inward-facing structures outward`);
+}
 stamp(`atlas ${atlasTop.toFixed(1)} cm tall -> scale ${SCALE.toFixed(4)}; ${OBJ.length} objects`);
 
 /* ======================================================================== *
@@ -417,6 +429,7 @@ for (const side of SIDES) {
   o[2] = e[2] = front + 0.2;
   const half = Math.max(1.4, (ext(O, 0)[1] - ext(O, 0)[0]) * 0.5);
   const box = boxMesh(o, e, half, 0.35);
+  orientOutward(box.pos, box.tri);
   const inst = instance(`patellar_tendon.${side}`, { s: sIndex("patellar_tendon"), side });
   inst.parts.push({ o: { pos: box.pos, nv: box.pos.length / 3, side, sideX: side, base: "patellar ligament band" }, tri: box.tri });
 }
@@ -555,6 +568,9 @@ const facingStats = [0, 0];
       if (inst.s >= 0 && regionWeight(v, STRUCTURES[inst.s].regions) < REGION_MIN) continue;
       const thick = e.exit - e.t;
       if (thick < SHEET && entries.some((f, j) => j > k && f.t - e.t < SHEET_GAP && !INST[f.ii].transparent)) continue;
+      const see = inst.s >= 0 && SEE_THROUGH[STRUCTURES[inst.s].name];
+      if (see && thick < see.thick && entries.some((f, j) => j > k && INST[f.ii].s >= 0 &&
+          see.under.includes(STRUCTURES[INST[f.ii].s].name) && f.t - e.exit < see.gap)) continue;
       owner = e;
       break;
     }
@@ -884,6 +900,26 @@ if (["--shots", "--overlay", "--atlas", "--focus"].some((a) => ARGS.has(a))) rev
 /* ======================================================================== *
    helpers
  * ======================================================================== */
+/* Flip a mesh's triangles in place if its signed volume is negative
+   (normals facing inward). Returns true if it flipped. */
+function orientOutward(p, t) {
+  let cx = 0, cy = 0, cz = 0;
+  const nv = p.length / 3;
+  for (let i = 0; i < p.length; i += 3) { cx += p[i]; cy += p[i + 1]; cz += p[i + 2]; }
+  cx /= nv; cy /= nv; cz /= nv;
+  let vol = 0;
+  for (let k = 0; k < t.length; k += 3) {
+    const a = t[k] * 3, b = t[k + 1] * 3, c = t[k + 2] * 3;
+    const ax = p[a] - cx, ay = p[a + 1] - cy, az = p[a + 2] - cz;
+    const bx = p[b] - cx, by = p[b + 1] - cy, bz = p[b + 2] - cz;
+    const qx = p[c] - cx, qy = p[c + 1] - cy, qz = p[c + 2] - cz;
+    vol += ax * (by * qz - bz * qy) + ay * (bz * qx - bx * qz) + az * (bx * qy - by * qx);
+  }
+  if (vol >= 0) return false;
+  for (let k = 0; k < t.length; k += 3) { const s = t[k + 1]; t[k + 1] = t[k + 2]; t[k + 2] = s; }
+  return true;
+}
+
 function vertexNormals(pos, tri) {
   const n = new Float32Array(pos.length);
   for (let t = 0; t < tri.length; t += 3) {

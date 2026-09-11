@@ -215,6 +215,17 @@ export const MERGE = {
 /* Sheets the skin shows through, never the owner of a patch of skin. */
 export const TRANSPARENT = ["Iliotibial tract"];
 
+/* Aponeuroses the atlas models as part of a muscle mesh. Where a ray crosses
+   less than `thick` cm of `over` and one of `under` starts within `gap` cm
+   below it, the skin shows the muscle underneath: the external oblique's
+   aponeurosis over the rectus abdominis (the anterior rectus sheath, two
+   layers of ~4 mm in the atlas), and the latissimus' thoracolumbar
+   aponeurosis over the lumbar erectors (~8 mm). Measured with --probe. */
+export const SEE_THROUGH = {
+  external_oblique: { under: ["rectus_abdominis"], thick: 0.7, gap: 1.2 },
+  latissimus: { under: ["erector_spinae"], thick: 1.1, gap: 1.0 },
+};
+
 /* Bones by the limb segment that carries them, for the skeleton-driven
    part of the registration. Everything else belongs to the trunk. */
 export const BONE_SEGMENT = [
