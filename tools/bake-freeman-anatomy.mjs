@@ -36,6 +36,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { execFileSync } from "node:child_process";
+import { createHash } from "node:crypto";
 import { readFreeman } from "./read-freeman.mjs";
 import { buildContext } from "../src/freeman/shape/context.js";
 import { STRUCTURES, MERGE, TRANSPARENT, BONE_SEGMENT, skinSegment } from "./freeman-anatomy-table.mjs";
@@ -298,7 +299,15 @@ stamp("displacement field");
 const DG = { lo: [-78, -4, -30], cell: 2, nx: 0, ny: 0, nz: 0, d: null };
 DG.nx = Math.ceil(156 / DG.cell) + 1; DG.ny = Math.ceil(190 / DG.cell) + 1; DG.nz = Math.ceil(60 / DG.cell) + 1;
 DG.d = new Float32Array(DG.nx * DG.ny * DG.nz * 3);
-{
+// the grid only changes when the registration does: cache it by its inputs
+const DG_KEY = createHash("sha1").update(new Uint8Array(skinP.buffer)).update(new Uint8Array(disp.buffer))
+  .update(new Uint8Array(ok.buffer)).update(JSON.stringify([DG.lo, DG.cell, DG.nx, DG.ny, DG.nz])).digest("hex");
+const DG_FILE = path.join(BUILD, "displacement.f32");
+if (fs.existsSync(DG_FILE + ".key") && fs.readFileSync(DG_FILE + ".key", "utf8") === DG_KEY) {
+  const b = fs.readFileSync(DG_FILE);
+  DG.d.set(new Float32Array(b.buffer.slice(b.byteOffset, b.byteOffset + b.byteLength)));
+  stamp("  displacement field from cache");
+} else {
   const okIdx = []; for (let i = 0; i < ok.length; i++) if (ok[i]) okIdx.push(i);
   const pts = new Float32Array(okIdx.length * 3), dsp = new Float32Array(okIdx.length * 3);
   okIdx.forEach((i, k) => { pts.set(skinP.subarray(i * 3, i * 3 + 3), k * 3); dsp.set(disp.subarray(i * 3, i * 3 + 3), k * 3); });
@@ -317,6 +326,8 @@ DG.d = new Float32Array(DG.nx * DG.ny * DG.nz * 3);
     const o = ((z * DG.ny + y) * DG.nx + x) * 3;
     DG.d[o] = sx / sw; DG.d[o + 1] = sy / sw; DG.d[o + 2] = sz / sw;
   }
+  fs.writeFileSync(DG_FILE, Buffer.from(DG.d.buffer));
+  fs.writeFileSync(DG_FILE + ".key", DG_KEY);
 }
 function displace(x, y, z, out) {
   let fx = (x - DG.lo[0]) / DG.cell, fy = (y - DG.lo[1]) / DG.cell, fz = (z - DG.lo[2]) / DG.cell;
@@ -1029,7 +1040,7 @@ function snapToGrooves(labels, band) {
    teeth from the ray grid and the atlas triangulation straighten out and
    specks shrink away; a sparse top-4 list per vertex keeps it cheap.
    Returns the number of vertices that changed label. */
-let meanEdge = 0;
+var meanEdge;   // var: hoisted, the main code above calls smoothBorders first
 function smoothBorders(labels, sigma) {
   const { offsets, list } = ADJ;
   if (!meanEdge) {
