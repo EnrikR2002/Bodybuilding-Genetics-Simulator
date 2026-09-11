@@ -220,11 +220,15 @@ export const TRANSPARENT = ["Iliotibial tract"];
    below it, the skin shows the muscle underneath: the external oblique's
    aponeurosis over the rectus abdominis (the anterior rectus sheath, two
    layers of ~4 mm in the atlas), and the latissimus' thoracolumbar
-   aponeurosis over the lumbar erectors (~8 mm). Measured with --probe. */
-export const SEE_THROUGH = {
-  external_oblique: { under: ["rectus_abdominis"], thick: 0.7, gap: 1.2 },
-  latissimus: { under: ["erector_spinae"], thick: 1.1, gap: 1.0 },
-};
+   aponeurosis over the lumbar erectors (~8 mm). Measured with --probe.
+   The third is a pose correction: the cadaver's arm hangs, so its
+   latissimus drapes over the teres major; with Freeman's arm out and a
+   trained teres, the teres belly shows above the lat's thin upper edge. */
+export const SEE_THROUGH = [
+  { over: "external_oblique", under: ["rectus_abdominis"], thick: 0.7, gap: 1.2 },
+  { over: "latissimus", under: ["erector_spinae"], thick: 1.1, gap: 1.0 },
+  { over: "latissimus", under: ["teres_major"], thick: 1.6, gap: 1.5 },
+];
 
 /* Small or narrow structures that border smoothing would otherwise erode:
    at the final label decision their diffused weight counts this many times.

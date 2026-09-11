@@ -405,6 +405,7 @@ for (const [a, name] of Object.entries(MERGE)) byAtlasName.set(a, STRUCTURES.fin
 const sIndex = (name) => STRUCTURES.findIndex((s) => s.name === name);
 const PERSIST_OF = new Float32Array(NS + 2).fill(1);   // by label + 1 (label -1 = nothing, NS = other)
 for (const [name, f] of Object.entries(PERSIST)) PERSIST_OF[sIndex(name) + 1] = f;
+const SEE_THROUGH_BY = STRUCTURES.map((s) => SEE_THROUGH.filter((r) => r.over === s.name));
 
 /* An instance is one sided structure (or one "other" object) in the cast. */
 const INST = [];
@@ -605,10 +606,16 @@ const facingStats = [0, 0];
       // sheet only to another vocabulary structure, never to unnamed depth
       if (thick < SHEET && entries.some((f, j) => j > k && f.t - e.t < SHEET_GAP && !INST[f.ii].transparent &&
           (inst.s < 0 || INST[f.ii].s >= 0))) continue;
-      const see = inst.s >= 0 && SEE_THROUGH[STRUCTURES[inst.s].name];
-      if (see && thick < see.thick && entries.some((f, j) => j > k && INST[f.ii].s >= 0 &&
-          see.under.includes(STRUCTURES[INST[f.ii].s].name) && f.t - e.exit < see.gap)) continue;
-      owner = e;
+      // a named aponeurosis hands the skin straight to the muscle it covers,
+      // past anything unnamed in between (serratus posterior, transversus)
+      let below = null;
+      if (inst.s >= 0) for (const r of SEE_THROUGH_BY[inst.s]) {
+        if (thick >= r.thick) continue;
+        below = entries.find((f, j) => j > k && INST[f.ii].s >= 0 &&
+          r.under.includes(STRUCTURES[INST[f.ii].s].name) && f.t - e.exit < r.gap);
+        if (below) break;
+      }
+      owner = below || e;
       break;
     }
     if (!owner) continue;
@@ -713,12 +720,7 @@ for (let v = 0; v < N; v++) {
   const s = INST[hitInst[v]].s;
   base[v] = s >= 0 ? s : OTHER;
 }
-// the distal biceps: where the ray measured a thin cord near the elbow
-const BT = sIndex("biceps_tendon");
-for (let v = 0; v < N; v++) {
-  const s = base[v];
-  if ((s === sIndex("biceps_long") || s === sIndex("biceps_short")) && hitAlong[v] > 0.78 && hitThick[v] < 1.1) base[v] = BT;
-}
+const BT = sIndex("biceps_tendon");   // carved from the distal biceps once `along` is known
 const sideOf = (v) => (P[v * 3] >= 0 ? 0 : 1);
 
 function majority(labels, passes) {
@@ -838,6 +840,44 @@ const idOf = (s, side) => 1 + s * 2 + side;
 const muscle = new Uint8Array(N), muscle2 = new Uint8Array(N), blend = new Uint8Array(N).fill(255), alongOut = new Uint8Array(N);
 for (let v = 0; v < N; v++) if (base[v] >= 0 && base[v] < NS && !masked[v]) muscle[v] = idOf(base[v], sideOf(v));
 
+stamp("along");
+const along = new Float32Array(N).fill(NaN);
+for (let v = 0; v < N; v++) {
+  if (!muscle[v]) continue;
+  const inst = hitInst[v] >= 0 ? INST[hitInst[v]] : null;
+  if (inst && inst.s === base[v] && Number.isFinite(hitAlong[v])) along[v] = hitAlong[v];
+}
+smoothWithin(along, muscle, 12);
+// pool the two sides, as for the labels
+for (let v = 0; v < N; v++) {
+  const m = MIR[v];
+  if (m <= v || !muscle[v] || !muscle[m] || ((muscle[v] - 1) >> 1) !== ((muscle[m] - 1) >> 1)) continue;
+  const a = (along[v] + along[m]) / 2;
+  along[v] = a; along[m] = a;
+}
+
+/* The distal biceps tendon. The atlas biceps thins from 1.5 cm at along 0.7
+   to 0.6 cm at 0.8 (the "biceps skin by along" diagnostic): the belly ends
+   and the tendon runs on into the elbow pit. Skin of either head beyond
+   BT_START becomes biceps_tendon, with its own 0 → 1; the heads keep the
+   atlas' along, so their skin ends near BT_START. */
+const BT_START = 0.78;
+{
+  const bl = sIndex("biceps_long"), bs = sIndex("biceps_short");
+  let carved = 0;
+  for (let v = 0; v < N; v++) {
+    if ((base[v] !== bl && base[v] !== bs) || !(along[v] >= BT_START)) continue;
+    base[v] = BT; muscle[v] = idOf(BT, sideOf(v)); carved++;
+  }
+  for (const side of [0, 1]) {
+    let hi = BT_START;
+    for (let v = 0; v < N; v++) if (base[v] === BT && sideOf(v) === side) hi = Math.max(hi, along[v]);
+    for (let v = 0; v < N; v++) if (base[v] === BT && sideOf(v) === side) along[v] = (along[v] - BT_START) / Math.max(hi - BT_START, 1e-3);
+  }
+  stamp(`  biceps tendon: ${carved} vertices beyond along ${BT_START}`);
+}
+for (let v = 0; v < N; v++) alongOut[v] = muscle[v] ? Math.round(255 * clamp(Number.isFinite(along[v]) ? along[v] : 0.5)) : 0;
+
 stamp("soft borders");
 {
   // distance from each vertex to the nearest border of its own region
@@ -862,31 +902,6 @@ stamp("soft borders");
     blend[v] = Math.round(255 * (0.5 + 0.5 * smoothstep(0, BORDER, d)));
   }
 }
-
-stamp("along");
-const along = new Float32Array(N).fill(NaN);
-for (let v = 0; v < N; v++) {
-  if (!muscle[v]) continue;
-  const inst = hitInst[v] >= 0 ? INST[hitInst[v]] : null;
-  if (inst && inst.s === base[v] && Number.isFinite(hitAlong[v])) along[v] = hitAlong[v];
-}
-// the two derived structures are rescaled over their own extent
-for (const s of [BT]) {
-  for (const side of [0, 1]) {
-    let lo = Infinity, hi = -Infinity;
-    for (let v = 0; v < N; v++) if (base[v] === s && sideOf(v) === side && Number.isFinite(hitAlong[v])) { lo = Math.min(lo, hitAlong[v]); hi = Math.max(hi, hitAlong[v]); }
-    for (let v = 0; v < N; v++) if (base[v] === s && sideOf(v) === side) along[v] = Number.isFinite(hitAlong[v]) ? (hitAlong[v] - lo) / Math.max(hi - lo, 1e-3) : NaN;
-  }
-}
-smoothWithin(along, muscle, 12);
-// pool the two sides, as for the labels
-for (let v = 0; v < N; v++) {
-  const m = MIR[v];
-  if (m <= v || !muscle[v] || !muscle[m] || ((muscle[v] - 1) >> 1) !== ((muscle[m] - 1) >> 1)) continue;
-  const a = (along[v] + along[m]) / 2;
-  along[v] = a; along[m] = a;
-}
-for (let v = 0; v < N; v++) alongOut[v] = muscle[v] ? Math.round(255 * clamp(Number.isFinite(along[v]) ? along[v] : 0.5)) : 0;
 
 stamp("landmarks");
 const landmarks = {};
