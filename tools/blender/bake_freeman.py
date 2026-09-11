@@ -210,7 +210,8 @@ for v in mesh.vertices:
         w.extend((b, hp * share) for b, share in hand.distribute(pcm).items())
     merged = {}
     for b, x in w: merged[b] = merged.get(b, 0.0) + x
-    w = sorted(merged.items(), key=lambda a: -a[1])[:4]
+    # the hand share is a difference of sums; never let float noise go negative
+    w = sorted(((b, x) for b, x in merged.items() if x > 1e-7), key=lambda a: -a[1])[:4]
     if not w or w[0][1] <= 0: raise RuntimeError('Missing heat weights on vertex ' + str(v.index))
     total = sum(x[1] for x in w)
     weights.extend([x[1] / total for x in w] + [0] * (4 - len(w))); indices.extend([x[0] for x in w] + [0] * (4 - len(w)))
