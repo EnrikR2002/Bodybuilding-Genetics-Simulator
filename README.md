@@ -1,8 +1,14 @@
-﻿# Insertion — Physique Studio
+# Insertion — Physique Studio
 
-An interactive study of how muscle belly length and skeletal proportions change a physique. The current app uses the **Mike Freeman sculpt by Péter Józsa Jr. (PixelPete)**, supplied in the project ZIP and released by its author under CC0.
+A studio tool for seeing how genetics shape a physique: where each muscle
+starts and stops, and the skeleton it hangs on. Change one trait and see
+exactly what it changes, measured off a real anatomical sculpt.
 
-The old MakeHuman figure has been replaced in the main app by the actual Freeman surface: 154,442 vertices and 308,864 triangles. The chest, abdominal wall, back, quadriceps, calves and forearms come from that sculpt. The neutral lean preset retains its original surface.
+The figure is the **Mike Freeman sculpt by Péter Józsa Jr. (PixelPete)**, CC0:
+154,442 vertices of hand-sculpted anatomy. A muscle map projected from the
+**Z-Anatomy** dissection tells every trait which muscle each point of the skin
+belongs to, so an insertion trait moves the sculpted belly the artist made,
+not a generic bump.
 
 ## Run
 
@@ -11,44 +17,67 @@ npm install
 npm run dev
 ```
 
-Open **http://localhost:5188**. The runtime mesh and studio environment are included; no MCP, account, downloaded fonts or Blender installation is needed to run the app.
+Open **http://localhost:5188**. Everything the app needs is in the repository.
 
-## Explore
+## What you can do
 
-- **Muscles:** short/medium/long biceps and calf bellies, biceps profile, lat sweep, sternal gap, abdominal alignment and trap profile.
-- **Frame:** three presets for shoulder spacing, rib cage, pelvis width, torso length, arm length and leg length.
-- **Condition:** upper-body, leg and back development, plus lean/moderate/soft definition.
-- **Compare extremes:** compare the lowest and highest preset of the selected muscle, frame or condition trait while keeping every other trait the same.
-- **Pin current physique:** keep a snapshot while changing the current figure. Both use the same surface, pose, scale and viewing angle.
-- **Inspect arms / calves:** focus the camera on the selected region. Drag to orbit, scroll or pinch to zoom, and use **Fit to view** to return to the full physique.
-- **Pose:** anatomy stance, flexed arms, front/back double biceps, and front/rear lat spreads. Rear poses open at the back view; orbit to inspect any angle. Pinned comparisons follow the selected pose. **Skin / Neutral sculpt** provides two ways to read the surface.
+- **23 traits on continuous sliders**, grouped as *given* (set at birth) and
+  *earned* (training and diet):
+  - Insertions: biceps belly length and peak, triceps long head, sternal gap,
+    ab alignment, ab segments (four / six / eight), lat insertion, trap height,
+    quad teardrop, calf insertion.
+  - Frame: clavicle width, rib cage, pelvis width, waist width, torso, arm and
+    leg length, joint size, head size.
+  - Development and condition: upper-body mass, back density, leg mass, body fat.
+  Each slider has a notch at the sculpt's own value; double-click to return.
+- **Twelve poses**, including all the mandatory bodybuilding poses, with real
+  fists and flexed biceps.
+- **Compare**: pin a physique as A and keep editing B, side by side or with A
+  drawn as a contour ghost over B. *Compare extremes* shows one trait at both
+  ends in the pose and view that show it best.
+- **Looks**: studio, competition stage, dramatic and clinical lighting; skin,
+  stage tan with oil, sculpt clay and a colour-coded muscle map. Hovering a
+  trait highlights the muscles it is about.
+- **Numbers**: height, weight from the body's volume, body fat, FFMI, the Adonis
+  index and other ratios, a tape measure taken off the real surface, Casey
+  Butt's and John McCallum's published targets, insertion readouts (for example
+  how far above the elbow the biceps belly ends) and judge's notes. Labels on
+  the body show the active trait's measurement.
+- **Archetypes** and a **Roll genetics** button that draws every given trait
+  from a bell curve and shows its percentile.
+- **Share**: the address bar always holds the full physique, pose and look;
+  *Copy link* shares it, *Export PNG* saves the view. Press **?** for shortcuts.
 
-Biceps *belly length* is distinct from the anatomically named short and long heads. These presets illustrate surface variation; they are not measurements of Arnold Schwarzenegger, Sergio Oliva or another person. See [the model and quality notes](docs/ANATOMY_QUALITY.md) for the approximation boundaries.
+The presets are archetypes, not measurements of any real person, and the
+numbers describe this sculpt, not a prediction of anyone's potential. See
+[the measurement notes](docs/MEASUREMENTS.md) for every formula and its source.
 
-## Validate
+## Check it
 
 ```sh
-npm test
-npm run test:browser
+npm test               # model, anatomy map, measurements, poses, frame
+npm run test:browser   # drives the real interface on desktop and a phone
 npm run build
 ```
 
-Browser checks require Playwright Chromium (`npx playwright install chromium` if it is not installed). They exercise the real controls on desktop and mobile, check that the canvas actually contains a visible model, and save screenshots under `shots/`. `npm run shots -- --label review --views front,side,back,threeq` captures additional views.
+`npm run test:browser` needs Playwright's Chromium
+(`npx playwright install chromium`). Screenshots go to `shots/`; for example
+`npm run shots -- --script tests/scripts/insertions.json --w 1400 --h 1000`
+renders every insertion trait at both ends.
 
-`npm run shots -- --script tests/scripts/freeman-poses.json --w 1200 --h 1000` captures the four bodybuilding poses and a side inspection. See the [pose review](docs/POSE_REVIEW.md) for visual findings and remaining model improvements.
+## Rebuild the data
 
-## Rebuild the sculpt
+- `npm run bake` re-bakes the rig and skin weights from the sculpt in Blender
+  (`BLENDER_PATH` or `.tools/blender-runtime/`). The surface and vertex order
+  are checked byte for byte against the previous bake.
+- `npm run anatomy:freeman` re-projects the Z-Anatomy atlas onto the sculpt;
+  it needs the atlas in `.assets-cache/`. See [the anatomy map notes](docs/ANATOMY_MAP.md).
 
-The original archive has been extracted into `assets-src/mike-freeman/source/`. Keep its author licence alongside the Blender file. To regenerate the runtime mesh and rig:
+How the code is organised, and the rules every change keeps, are in
+[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
-```sh
-npm run bake
-```
+## Credits
 
-The script uses `BLENDER_PATH`, the local `.tools/blender-runtime/` installation, or `blender` on PATH. The bake evaluates the original multiresolution sculpt at level 2, creates the measured inspection rig and weights, and exports a softened surface target for the definition presets. It does not overwrite the original Blender file.
-
-Current app code lives in `src/freeman/`; the shared renderer lives in `src/render/`. The previous MakeHuman pipeline remains available in the repository for reference and under `npm run bake:legacy` / `npm run test:legacy`. It is not imported by the current app. Its old pose scripts and interaction reviews target the legacy interface.
-
-## Attribution
-
-[Freeman asset and licence](assets-src/mike-freeman/README.md). The original author licence is also distributed as `public/models/freeman-LICENSE.txt`. The studio environment and legacy assets retain their existing source notices.
+- Sculpt: Péter Józsa Jr., CC0 ([licence](public/models/freeman-LICENSE.txt), [notes](assets-src/mike-freeman/README.md)).
+- Muscle map: derived from Z-Anatomy (CC BY-SA 4.0) and BodyParts3D, DBCLS
+  (CC BY-SA 2.1 Japan); see [its licence](public/models/freeman-anatomy-LICENSE.txt).

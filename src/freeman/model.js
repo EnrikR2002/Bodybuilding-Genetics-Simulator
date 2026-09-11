@@ -124,7 +124,7 @@ export class Freeman {
     defs.forEach((d, i) => {
       for (const [vec, src] of [[this.heads[i], d.head], [this.tails[i], d.tail]]) {
         tmp[0] = src[0]; tmp[1] = src[1]; tmp[2] = src[2];
-        frameTransform(this.ctx, s, tmp, this.boneArm[i]);
+        frameTransform(this.ctx, s, tmp, this.boneArm[i], d.name === "head" ? 1 : 0);
         vec.fromArray(tmp);
       }
     });
@@ -139,7 +139,7 @@ export class Freeman {
     for (const e of this.extras) {
       const ep = e.geometry.attributes.position;
       ep.array.set(e.userData.base);
-      frameTransform(this.ctx, s, ep.array, 0);
+      frameTransform(this.ctx, s, ep.array, 0, 1);
       for (let o = 1; o < ep.array.length; o += 3) if (ep.array[o] > top) top = ep.array[o];
       ep.needsUpdate = true;
     }

@@ -42,12 +42,12 @@ smoothPosition, smoothNormal, extraPosition*, extraIndex*, anatomy }`.
 |---|---|
 | Trait catalogue | `src/freeman/traits.js` — keys, groups, defaults, stops, notes, presets |
 | Figure core | `src/freeman/model.js`, `src/freeman/shape/context.js`, `src/freeman/shape/index.js` |
-| Shape stages | `src/freeman/shape/{arms,legs,torso,back,condition,frame}.js` |
-| Rig and poses | `tools/blender/bake_freeman.py`, `src/freeman/{pose,poses,bones,geometry}.js` |
-| Anatomy map | `tools/blender/project_freeman_anatomy.py`, `tools/bake-freeman-anatomy.mjs`, `src/freeman/anatomy.js`, `public/models/freeman-anatomy.*` |
-| Rendering | `src/render/stage.js`, `src/freeman/materials.js` |
-| Interface | `index.html`, `src/freeman/app.js`, `src/freeman/studio.css`, `src/freeman/ui/*` (except the two below) |
-| Measurements | `src/freeman/measure.js`, `src/freeman/ui/metrics.js`, `src/freeman/ui/callouts.js`, `src/freeman/ui/analysis.css` |
+| Shape stages | `src/freeman/shape/{arms,legs,torso,back,condition,frame}.js`; `shape/muscle.js` finds a trait's muscle in the anatomy map (soft masks, bone coordinates) |
+| Rig and poses | `tools/blender/bake_freeman.py`, `tools/fix-freeman-weights.mjs` (cleans the baked skin weights), `src/freeman/{pose,poses,bones,geometry}.js` |
+| Anatomy map | `tools/blender/project_freeman_anatomy.py`, `tools/bake-freeman-anatomy.mjs`, `tools/freeman-anatomy-*.mjs`, `src/freeman/anatomy.js`, `public/models/freeman-anatomy.*` (CC BY-SA, see its licence file) |
+| Rendering | `src/render/stage.js` (lighting presets), `src/freeman/materials.js` (surfaces, anatomy overlay, ghost) |
+| Interface | `index.html`, `src/freeman/app.js`, `src/freeman/studio.css`, `src/freeman/ui/controls.js` (sliders), `src/freeman/ui/share.js` (URL state) |
+| Measurements | `src/freeman/measure.js`, `src/freeman/ui/metrics.js`, `src/freeman/ui/callouts.js`, `src/freeman/ui/analysis.css`; formulas in `docs/MEASUREMENTS.md` |
 
 When parallel work is under way each worker owns one row and edits nothing
 outside it. If you need a change in a file you do not own, put a clear

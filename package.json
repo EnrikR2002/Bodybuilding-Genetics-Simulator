@@ -4,7 +4,7 @@
   "version": "2.0.0",
   "type": "module",
   "scripts": {
-    "test": "node --test tests/freeman.test.mjs tests/freeman-anatomy.test.mjs tests/freeman-measure.test.mjs tests/freeman-pose.test.mjs",
+    "test": "node --test tests/freeman.test.mjs tests/freeman-anatomy.test.mjs tests/freeman-measure.test.mjs tests/freeman-pose.test.mjs tests/freeman-frame.test.mjs",
     "assets": "node tools/fetch-assets.mjs",
     "bake": "node tools/bake-freeman.mjs",
     "anatomy:rays": "node tools/export-anatomy-rays.mjs",

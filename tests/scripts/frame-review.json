@@ -1,0 +1,202 @@
+[
+ {
+  "label": "fr-01-waist-0",
+  "set": {
+   "waist": 0
+  },
+  "pose": "relaxed",
+  "view": 0,
+  "zoom": 0.3333333333333333,
+  "target": [
+   0,
+   108,
+   4
+  ],
+  "canvas": true,
+  "surface": "clay",
+  "lighting": "studio"
+ },
+ {
+  "label": "fr-01-waist-1",
+  "set": {
+   "waist": 1
+  },
+  "pose": "relaxed",
+  "view": 0,
+  "zoom": 0.3333333333333333,
+  "target": [
+   0,
+   108,
+   4
+  ],
+  "canvas": true,
+  "surface": "clay",
+  "lighting": "studio"
+ },
+ {
+  "label": "fr-02-joints-arm-0",
+  "set": {
+   "boneThickness": 0
+  },
+  "pose": "relaxed",
+  "view": 0,
+  "zoom": 0.2777777777777778,
+  "target": [
+   26,
+   100,
+   4
+  ],
+  "canvas": true,
+  "surface": "clay",
+  "lighting": "studio"
+ },
+ {
+  "label": "fr-02-joints-arm-1",
+  "set": {
+   "boneThickness": 1
+  },
+  "pose": "relaxed",
+  "view": 0,
+  "zoom": 0.2777777777777778,
+  "target": [
+   26,
+   100,
+   4
+  ],
+  "canvas": true,
+  "surface": "clay",
+  "lighting": "studio"
+ },
+ {
+  "label": "fr-03-joints-leg-0",
+  "set": {
+   "boneThickness": 0
+  },
+  "pose": "relaxed",
+  "view": 0,
+  "zoom": 0.3333333333333333,
+  "target": [
+   0,
+   30,
+   0
+  ],
+  "canvas": true,
+  "surface": "clay",
+  "lighting": "studio"
+ },
+ {
+  "label": "fr-03-joints-leg-1",
+  "set": {
+   "boneThickness": 1
+  },
+  "pose": "relaxed",
+  "view": 0,
+  "zoom": 0.3333333333333333,
+  "target": [
+   0,
+   30,
+   0
+  ],
+  "canvas": true,
+  "surface": "clay",
+  "lighting": "studio"
+ },
+ {
+  "label": "fr-04-head-0",
+  "set": {
+   "headSize": 0
+  },
+  "pose": "relaxed",
+  "view": 0,
+  "zoom": 0.3888888888888889,
+  "target": [
+   0,
+   150,
+   0
+  ],
+  "canvas": true,
+  "surface": "clay",
+  "lighting": "studio"
+ },
+ {
+  "label": "fr-04-head-1",
+  "set": {
+   "headSize": 1
+  },
+  "pose": "relaxed",
+  "view": 0,
+  "zoom": 0.3888888888888889,
+  "target": [
+   0,
+   150,
+   0
+  ],
+  "canvas": true,
+  "surface": "clay",
+  "lighting": "studio"
+ },
+ {
+  "label": "fr-05-mass-0",
+  "set": {
+   "mass": 0
+  },
+  "pose": "relaxed",
+  "view": 0,
+  "zoom": 1.0555555555555556,
+  "target": [
+   0,
+   95,
+   0
+  ],
+  "canvas": true,
+  "surface": "clay",
+  "lighting": "studio"
+ },
+ {
+  "label": "fr-05-mass-1",
+  "set": {
+   "mass": 1
+  },
+  "pose": "relaxed",
+  "view": 0,
+  "zoom": 1.0555555555555556,
+  "target": [
+   0,
+   95,
+   0
+  ],
+  "canvas": true,
+  "surface": "clay",
+  "lighting": "studio"
+ },
+ {
+  "label": "fr-06-vacuum-0",
+  "set": {},
+  "pose": "relaxed",
+  "view": 0,
+  "zoom": 0.3333333333333333,
+  "target": [
+   0,
+   112,
+   4
+  ],
+  "canvas": true,
+  "surface": "clay",
+  "lighting": "studio"
+ },
+ {
+  "label": "fr-06-vacuum-1",
+  "set": {},
+  "pose": "vacuum",
+  "view": 0,
+  "zoom": 0.3333333333333333,
+  "target": [
+   0,
+   112,
+   4
+  ],
+  "canvas": true,
+  "surface": "clay",
+  "lighting": "studio"
+ }
+]

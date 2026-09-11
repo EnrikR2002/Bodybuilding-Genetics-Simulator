@@ -40,10 +40,12 @@ export function applyPoseShape(ctx, state, pose, out, rig) {
     stage.applyPose?.(ctx, region, state, pose, out, rig);
 }
 
-/* Transform joints or extra meshes with the same frame edit as the surface. */
-export function frameTransform(ctx, state, arr, arm = 0) {
+/* Transform joints or extra meshes with the same frame edit as the surface.
+   `head` is 1 for points that belong to the head (eyes, eyebrows, the head
+   bone), so head size carries them along. */
+export function frameTransform(ctx, state, arr, arm = 0, head = 0) {
   const P = frameParams(ctx, state);
   if (P.neutral) return arr;
-  for (let o = 0; o < arr.length; o += 3) framePoint(P, arr, o, arm);
+  for (let o = 0; o < arr.length; o += 3) framePoint(P, arr, o, arm, head);
   return arr;
 }

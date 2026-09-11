@@ -380,7 +380,7 @@ function poseExtras(fig, Whead, headRest, headPosed) {
     const pos = e.geometry.attributes.position, nor = e.geometry.attributes.normal;
     const restNormal = (e.userData.restNormal ??= nor.array.slice());
     pos.array.set(e.userData.base);
-    frameTransform(fig.ctx, fig.state, pos.array, 0);
+    frameTransform(fig.ctx, fig.state, pos.array, 0, 1); // the eyes belong to the head: head size carries them
     nor.array.set(restNormal);
     if (Whead) {
       const V = new Vector3();

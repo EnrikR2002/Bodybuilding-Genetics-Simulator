@@ -8,6 +8,17 @@
    relaxed surface normal, which never follows a crease into a fold.
    --------------------------------------------------------------------------- */
 import { smooth } from "./context.js";
+import { softMask } from "./muscle.js";
+
+/* How much of a vertex is muscle belly, softened: 1 on a belly, ~0 on tendon,
+   bone and joints. Mass grows where muscle is, so knees, elbows, shins and
+   collarbones do not inflate with it. Null without the anatomy map. */
+function muscleCover(ctx) {
+  if (!ctx.anatomy) return null;
+  const names = [...new Set(ctx.anatomy.muscles.slice(1).map((n) => n.replace(/\.(L|R)$/, "")))]
+    .filter((n) => !n.startsWith("bone_") && !n.endsWith("_tendon"));
+  return softMask(ctx, names, { passes: 24, rings: 12 }).field;
+}
 
 export const coverage = {
   id: "coverage",
@@ -42,12 +53,14 @@ export const volume = {
     const { base, normal, arm, hand, n } = ctx;
     const muscle = new Float32Array(n), back = new Float32Array(n), fat = new Float32Array(n),
       legs = new Uint8Array(n);
+    const cover = muscleCover(ctx);
     for (let v = 0; v < n; v++) {
       const y = base[v * 3 + 1], front = normal[v * 3 + 2];
       const handK = 1 - smooth(0.05, 0.65, hand[v]);
       const torso = (1 - arm[v]) * smooth(99, 110, y) * (1 - smooth(145, 156, y));
-      muscle[v] = 2 * smooth(14, 30, y) * (1 - smooth(150, 165, y)) * handK;
-      back[v] = 1.5 * torso * smooth(0.1, 0.8, -front) * handK;
+      const belly = cover ? 0.35 + 0.65 * Math.min(1, cover[v]) : 1;
+      muscle[v] = 2 * smooth(14, 30, y) * (1 - smooth(150, 165, y)) * handK * belly;
+      back[v] = 1.5 * torso * smooth(0.1, 0.8, -front) * handK * belly;
       fat[v] = 2.4 * smooth(13, 40, y) * (1 - smooth(149, 168, y))
         * (0.55 + 0.8 * smooth(93, 105, y) * (1 - smooth(117, 129, y)))
         * (1 - arm[v] * 0.5) * handK;

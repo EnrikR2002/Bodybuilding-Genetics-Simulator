@@ -41,7 +41,23 @@ export default {
       // straight across each rectus half, fading at the linea alba and the lateral border
       groove[i] = w * Math.exp(-(((y - BELOW - 0.1 * ax) / 0.6) ** 2)) * smooth(0.9, 2.2, ax) * (1 - smooth(7, 9.5, ax));
     }
-    return { pec: pec.verts, medial, rect: rv, band, fill, groove };
+    // the vacuum: the abdominal wall drawn in under the ribs
+    const wall = softMask(ctx, ["rectus_abdominis", "external_oblique"], { passes: 12, rings: 6 });
+    const vac = pick(wall.field, wall.verts).map((w, i) => {
+      const y = base[wall.verts[i] * 3 + 1];
+      return w * smooth(95, 102, y) * (1 - smooth(113, 121, y));
+    });
+    return { pec: pec.verts, medial, rect: rv, band, fill, groove, wall: wall.verts, vac };
+  },
+  applyPose(ctx, r, s, pose, out) {
+    if (!r || !pose.vacuum) return;
+    const m = ctx.smoothNormal, k = pose.vacuum * 1.8 * (1 - s.bodyFat * 0.4);
+    for (let i = 0; i < r.wall.length; i++) {
+      const w = r.vac[i] * k;
+      if (!w) continue;
+      const o = r.wall[i] * 3;
+      out[o] -= m[o] * w; out[o + 1] -= m[o + 1] * w; out[o + 2] -= m[o + 2] * w;
+    }
   },
   apply(ctx, r, s, out) {
     if (!r || (s.pecGap === 0.5 && s.abStagger === 0.5 && s.abCount === 0.5)) return;
