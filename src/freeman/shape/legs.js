@@ -1,59 +1,68 @@
 /* ---------------------------------------------------------------------------
    Legs: calf insertion and quad teardrop.
 
-   Calf insertion transports the sculpted gastrocnemius along the shin on the
-   back of the leg. A high calf ends the belly early and leaves a long Achilles
-   interval; a low calf carries the belly toward the ankle. The knee and ankle
-   joints never move.
+   Calf insertion slides the distal end of both gastrocnemius heads, as found
+   in the anatomy map, along the shin: a high calf ends early over a long
+   Achilles tendon, a low calf carries the belly toward the ankle. The quad
+   teardrop moves the whole vastus medialis up or down the femur. Knee and
+   ankle joints never move.
    --------------------------------------------------------------------------- */
-import { clamp, mix, smooth, select } from "./context.js";
+import { clamp, smooth } from "./context.js";
+import { softMask, boneCoords, quantile, pick } from "./muscle.js";
 
-const A = 0.1, B = 0.66;
-const endFor = (value) => (value < 0.5 ? mix(0.52, B, value * 2) : mix(B, 0.77, (value - 0.5) * 2));
+function calf(ctx, side) {
+  const mine = softMask(ctx, ["gastrocnemius_medial", "gastrocnemius_lateral"], { side, passes: 4, rings: 2 });
+  const move = softMask(ctx, ["gastrocnemius_medial", "gastrocnemius_lateral", "calcaneal_tendon", "soleus"],
+    { side, passes: 8, rings: 5 });
+  if (!mine || !move) return null;
+  const bone = ctx.bones[`shin.${side}`];
+  const c = boneCoords(bone, move.verts, ctx.base);
+  const own = pick(mine.field, move.verts), ts = [];
+  own.forEach((w, i) => { if (w > 0.8) ts.push(c.t[i]); });
+  return { bone, verts: move.verts, move: pick(move.field, move.verts), own, ...c,
+    t0: quantile(ts, 0.03), t1: quantile(ts, 0.97), joint: 0.93 };
+}
 
-function limb(ctx, side) {
-  const b = ctx.bones[`shin.${side}`], ax = b.axis;
-  // "back" is -Z with the shin axis component removed
-  let fx = ax[0] * ax[2], fy = ax[1] * ax[2], fz = -1 + ax[2] * ax[2];
-  const l = Math.hypot(fx, fy, fz);
-  return { side, sign: side === "L" ? 1 : -1, head: b.head, axis: ax, length: b.length,
-    front: [fx / l, fy / l, fz / l] };
+function teardrop(ctx, side) {
+  const m = softMask(ctx, ["vastus_medialis"], { side, passes: 10, rings: 6 });
+  if (!m) return null;
+  return { bone: ctx.bones[`thigh.${side}`], verts: m.verts, move: pick(m.field, m.verts) };
 }
 
 export default {
   id: "legs",
   traits: ["calfInsertion", "quadTeardrop"],
   prepare(ctx) {
-    return {
-      limbs: [limb(ctx, "L"), limb(ctx, "R")],
-      verts: select(ctx, (v) => ctx.leg[v] > 0.4 && ctx.base[v * 3 + 1] < 60),
-    };
+    if (!ctx.anatomy) return null;
+    return ["L", "R"].map((side) => ({ calf: calf(ctx, side), vmo: teardrop(ctx, side) }));
   },
-  apply(ctx, r, s, out) {
-    const value = s.calfInsertion;
-    if (value === 0.5) return;
-    const end = endFor(value), definition = 1 - s.bodyFat * 0.72;
-    const growK = Math.sqrt((B - A) / (end - A)) - 1;
-    for (const v of r.verts) {
-      const o = v * 3;
-      for (const L of r.limbs) {
-        const px = out[o], py = out[o + 1], pz = out[o + 2];
-        if (px * L.sign < 2) continue;
-        const dx = px - L.head[0], dy = py - L.head[1], dz = pz - L.head[2], ax = L.axis;
-        const t = (dx * ax[0] + dy * ax[1] + dz * ax[2]) / L.length;
-        if (t < 0.1 || t > 1.03) continue;
-        const rx = dx - ax[0] * t * L.length, ry = dy - ax[1] * t * L.length, rz = dz - ax[2] * t * L.length;
-        const rr = Math.hypot(rx, ry, rz);
-        if (rr < 0.1 || rr > 15) continue;
-        const angular = smooth(-0.12, 0.72, (rx * L.front[0] + ry * L.front[1] + rz * L.front[2]) / rr);
-        const target = t + (end - B) * smooth(A, B, t) * (1 - smooth(B, 1, t));
-        const gate = angular * smooth(0.1, 0.25, t) * (1 - smooth(0.92, 1.02, t)) * definition;
-        const along = (target - t) * L.length * gate;
-        const belly = Math.sin(Math.PI * clamp((t - A) / (B - A)));
-        const growth = growK * Math.max(0, rr - 3.2) * belly * gate / rr;
-        out[o] += ax[0] * along + rx * growth;
-        out[o + 1] += ax[1] * along + ry * growth;
-        out[o + 2] += ax[2] * along + rz * growth;
+  apply(ctx, sides, s, out) {
+    if (!sides || (s.calfInsertion === 0.5 && s.quadTeardrop === 0.5)) return;
+    const definition = 1 - s.bodyFat * 0.72;
+    for (const { calf: C, vmo: Q } of sides) {
+      if (C && s.calfInsertion !== 0.5) {
+        const v = s.calfInsertion, { t0, t1, joint } = C, [ax, ay, az] = C.bone.axis, L = C.bone.length;
+        const shift = v < 0.5 ? (v - 0.5) * 2 * 0.13 : (v - 0.5) * 2 * Math.min(0.07, joint - 0.06 - t1);
+        const grow = Math.sqrt((t1 - t0) / Math.max(0.05, t1 + shift - t0)) - 1;
+        for (let i = 0; i < C.verts.length; i++) {
+          const t = C.t[i], o = C.verts[i] * 3;
+          const w = smooth(t0, t1, t) * (1 - smooth(t1, joint, t));
+          const along = shift * w * L * C.move[i] * definition;
+          const u = clamp((t - t0) / (t1 - t0)), bell = u > 0 && u < 1 ? Math.sin(Math.PI * u) : 0;
+          const rl = Math.max(C.rl[i], 0.1);
+          const radial = grow * Math.max(0, rl - 3) * bell * C.own[i] * definition / rl;
+          out[o] += ax * along + C.r[i * 3] * radial;
+          out[o + 1] += ay * along + C.r[i * 3 + 1] * radial;
+          out[o + 2] += az * along + C.r[i * 3 + 2] * radial;
+        }
+      }
+      if (Q && s.quadTeardrop !== 0.5) {
+        const v = s.quadTeardrop, [ax, ay, az] = Q.bone.axis;
+        const d = (v < 0.5 ? (v - 0.5) * 2 * 0.075 : (v - 0.5) * 2 * 0.04) * Q.bone.length * definition;
+        for (let i = 0; i < Q.verts.length; i++) {
+          const o = Q.verts[i] * 3, k = d * Q.move[i];
+          out[o] += ax * k; out[o + 1] += ay * k; out[o + 2] += az * k;
+        }
       }
     }
   },

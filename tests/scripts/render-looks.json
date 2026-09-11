@@ -1,0 +1,8 @@
+[
+ {"label":"look-studio-skin","pose":"relaxed","view":"threeq","surface":"skin","lighting":"studio","set":{}},
+ {"label":"look-stage-tan","pose":"frontDouble","view":"front","surface":"tan","lighting":"stage"},
+ {"label":"look-dramatic-clay","pose":"backDouble","view":"back","surface":"clay","lighting":"dramatic"},
+ {"label":"look-clinical-map","pose":"relaxed","view":"front","surface":"anatomy","lighting":"clinical"},
+ {"label":"look-map-back","pose":"relaxed","view":"back","surface":"anatomy","lighting":"studio"},
+ {"label":"look-focus-biceps","pose":"frontDouble","view":"front","surface":"skin","lighting":"studio","overlay":"bicepInsertion","zoom":0.45,"target":[25,140,0]}
+]

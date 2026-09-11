@@ -199,23 +199,69 @@ export class Stage {
 /* Lighting presets for the physique studio. `apply(stage)` sets everything
    it cares about, so switching presets never leaves one preset's state on
    another. */
+/* Each light: [colour, intensity, offset from the camera (radians), height,
+   radius]. The rig turns with the camera (`lookFrom`), so a preset describes
+   light *relative to the viewer*, the way a photographer places it. */
+function rig(spec) {
+  return (stage) => {
+    const { lights: l } = stage;
+    ['key', 'fill', 'rim', 'rim2'].forEach((name, i) => {
+      const [color, intensity, offset, height, radius] = spec[name];
+      l[name].color.set(color);
+      l[name].intensity = intensity;
+      Object.assign(stage._rig[i], { offset, height, radius });
+    });
+    stage.scene.background = backdrop(spec.backdrop);
+    stage.renderer.toneMappingExposure = spec.exposure;
+    stage.scene.environmentIntensity = spec.env;
+    stage.pool.visible = !!spec.pool;
+    stage.pool.material.opacity = spec.pool ?? 0;
+    stage.floor.material.opacity = spec.floor ?? 0.46;
+    Object.assign(stage.key.shadow.camera, { left: -210, right: 210 });
+    stage.key.shadow.camera.updateProjectionMatrix();
+    stage.key.shadow.normalBias = 0.35;
+    stage.gtao?.updateGtaoMaterial({ scale: spec.ao ?? 2.6 });
+  };
+}
+
 export const LIGHTING = [
   {
     id: 'studio', label: 'Studio',
-    apply(stage) {
-      const { lights: l } = stage;
-      stage.scene.background = backdrop([[0, '#253037'], [0.48, '#202a30'], [1, '#151e24']]);
-      stage.renderer.toneMappingExposure = 0.96;
-      l.key.color.set(0xf0f6ff); l.key.intensity = 2.1;
-      l.fill.color.set(0xbed6e4); l.fill.intensity = 0.26;
-      l.rim.color.set(0xd6e8e1); l.rim.intensity = 1.15;
-      l.rim2.color.set(0xb9c4ff); l.rim2.intensity = 0.45;
-      stage._rig[0].offset = 0.75;
-      stage.pool.visible = false;
-      Object.assign(stage.key.shadow.camera, { left: -210, right: 210 });
-      stage.key.shadow.camera.updateProjectionMatrix();
-      stage.key.shadow.normalBias = 0.35;
-    },
+    note: 'A soft key a little off the lens, cool fill and two rims: reads every form.',
+    apply: rig({
+      key: [0xf0f6ff, 2.1, 0.75, 245, 205], fill: [0xbed6e4, 0.26, -1.15, 120, 255],
+      rim: [0xd6e8e1, 1.15, 2.55, 190, 250], rim2: [0xb9c4ff, 0.45, -2.4, 150, 275],
+      backdrop: [[0, '#253037'], [0.48, '#202a30'], [1, '#151e24']], exposure: 0.96, env: 0.56,
+    }),
+  },
+  {
+    id: 'stage', label: 'Stage',
+    note: 'Competition lighting: hard top light that carves the abs and the pec shelf.',
+    apply: rig({
+      key: [0xfff0da, 3.1, 0.2, 470, 140], fill: [0xffe1c6, 0.34, -0.8, 80, 260],
+      rim: [0xffcf9e, 1.3, 2.7, 280, 230], rim2: [0xffe2c2, 0.95, -2.65, 280, 230],
+      backdrop: [[0, '#1d1712'], [0.55, '#0e0b09'], [1, '#050404']], exposure: 1.02, env: 0.3,
+      pool: 0.45, floor: 0.6, ao: 3.0,
+    }),
+  },
+  {
+    id: 'dramatic', label: 'Dramatic',
+    note: 'Low-key raking side light: every groove between two bellies turns black.',
+    apply: rig({
+      key: [0xf4f6ff, 2.7, 1.45, 255, 220], fill: [0x9fb4d8, 0.07, -1.3, 120, 255],
+      rim: [0xffffff, 1.7, 2.9, 220, 250], rim2: [0xcfe0ff, 1.2, -2.9, 200, 260],
+      backdrop: [[0, '#10151a'], [0.6, '#080b0e'], [1, '#040506']], exposure: 0.92, env: 0.22, ao: 3.2,
+    }),
+  },
+  {
+    id: 'clinical', label: 'Clinical',
+    note: 'Even, neutral light for comparing outlines and measuring.',
+    apply: rig({
+      key: [0xffffff, 1.45, 0.35, 230, 220], fill: [0xffffff, 0.8, -0.65, 160, 250],
+      rim: [0xffffff, 0.35, 2.6, 190, 250], rim2: [0xffffff, 0.25, -2.5, 170, 260],
+      backdrop: [[0, '#3a4046'], [0.5, '#30353a'], [1, '#262a2e']], exposure: 1.0, env: 0.85,
+      floor: 0.3, ao: 1.6,
+    }),
   },
 ];
 

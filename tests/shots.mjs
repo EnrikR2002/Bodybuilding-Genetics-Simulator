@@ -52,8 +52,10 @@ export async function withPage(fn, { width = 900, height = 1150, page: entry = '
   page.on('pageerror', e => errors.push('PAGEERROR ' + e.message));
   page.on('console', m => { if (m.type() === 'error') errors.push('CONSOLE ' + m.text()); });
   try {
-    await page.goto(`http://localhost:${PORT}${entry}`, { waitUntil: 'load' });
-    await page.waitForFunction('window.__ready === true', null, { timeout: 60000 });
+    /* The app loads an 18 MB sculpt inside its module, which holds back the
+       `load` event; wait for the DOM, then for the app's own ready flag. */
+    await page.goto(`http://localhost:${PORT}${entry}`, { waitUntil: 'domcontentloaded' });
+    await page.waitForFunction('window.__ready === true', null, { timeout: 120000 });
     await page.waitForTimeout(400);
     await fn(page, errors);
   } catch (e) {
@@ -84,6 +86,8 @@ export async function runSteps(page, steps, dir = SHOTS) {
     if (s.bg !== undefined) await page.evaluate(v => window.__app?.bg(v), s.bg);
     if (s.regions !== undefined) await page.evaluate(v => window.__app?.debugRegions(v), s.regions);
     if (s.surface) await page.evaluate(v => window.__app.surface(v), s.surface);
+    if (s.lighting) await page.evaluate(v => window.__app.lighting(v), s.lighting);
+    if (s.overlay !== undefined) await page.evaluate(v => window.__app.overlay(v), s.overlay);
     if (s.bench) console.log('BENCH ' + JSON.stringify(await page.evaluate(() => window.__app.bench())));
     if (s.probe) console.log('PROBE ' + JSON.stringify(await page.evaluate(() => window.__app.headProbe())));
     if (s.mat) await page.evaluate(m => window.__mat && window.__mat(m), s.mat);
@@ -95,7 +99,8 @@ export async function runSteps(page, steps, dir = SHOTS) {
     }, [az, s.el ?? 0.05, s.zoom ?? 1, s.target ?? null]);
     await page.waitForTimeout(s.wait ?? 220);
     const f = path.join(dir, s.label + '.png');
-    await page.screenshot({ path: f, clip: s.clip });
+    const clip = s.canvas ? await page.locator('#cv').boundingBox() : s.clip;
+    await page.screenshot({ path: f, clip });
     written.push(f);
     console.log('wrote ' + path.relative(ROOT, f));
     if (s.report) {

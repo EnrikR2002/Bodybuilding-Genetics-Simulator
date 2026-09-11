@@ -1,0 +1,53 @@
+[
+ {
+  "label": "th-2-trapHeight-0",
+  "pose": "relaxed",
+  "view": 180,
+  "zoom": 0.18888888888888888,
+  "target": [
+   0,
+   143,
+   -4
+  ],
+  "canvas": true,
+  "surface": "clay",
+  "lighting": "studio",
+  "set": {
+   "trapHeight": 0
+  }
+ },
+ {
+  "label": "th-2-trapHeight-0.5",
+  "pose": "relaxed",
+  "view": 180,
+  "zoom": 0.18888888888888888,
+  "target": [
+   0,
+   143,
+   -4
+  ],
+  "canvas": true,
+  "surface": "clay",
+  "lighting": "studio",
+  "set": {
+   "trapHeight": 0.5
+  }
+ },
+ {
+  "label": "th-2-trapHeight-1",
+  "pose": "relaxed",
+  "view": 180,
+  "zoom": 0.18888888888888888,
+  "target": [
+   0,
+   143,
+   -4
+  ],
+  "canvas": true,
+  "surface": "clay",
+  "lighting": "studio",
+  "set": {
+   "trapHeight": 1
+  }
+ }
+]

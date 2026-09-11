@@ -1,0 +1,104 @@
+[
+ {
+  "label": "tg-1-latInsertion-0",
+  "pose": "relaxed",
+  "view": 180,
+  "zoom": 0.3111111111111111,
+  "target": [
+   0,
+   121,
+   -6
+  ],
+  "canvas": true,
+  "surface": "clay",
+  "lighting": "studio",
+  "set": {
+   "latInsertion": 0
+  }
+ },
+ {
+  "label": "tg-1-latInsertion-0.5",
+  "pose": "relaxed",
+  "view": 180,
+  "zoom": 0.3111111111111111,
+  "target": [
+   0,
+   121,
+   -6
+  ],
+  "canvas": true,
+  "surface": "clay",
+  "lighting": "studio",
+  "set": {
+   "latInsertion": 0.5
+  }
+ },
+ {
+  "label": "tg-1-latInsertion-1",
+  "pose": "relaxed",
+  "view": 180,
+  "zoom": 0.3111111111111111,
+  "target": [
+   0,
+   121,
+   -6
+  ],
+  "canvas": true,
+  "surface": "clay",
+  "lighting": "studio",
+  "set": {
+   "latInsertion": 1
+  }
+ },
+ {
+  "label": "tg-2-trapHeight-0",
+  "pose": "relaxed",
+  "view": 180,
+  "zoom": 0.18888888888888888,
+  "target": [
+   0,
+   143,
+   -4
+  ],
+  "canvas": true,
+  "surface": "clay",
+  "lighting": "studio",
+  "set": {
+   "trapHeight": 0
+  }
+ },
+ {
+  "label": "tg-2-trapHeight-0.5",
+  "pose": "relaxed",
+  "view": 180,
+  "zoom": 0.18888888888888888,
+  "target": [
+   0,
+   143,
+   -4
+  ],
+  "canvas": true,
+  "surface": "clay",
+  "lighting": "studio",
+  "set": {
+   "trapHeight": 0.5
+  }
+ },
+ {
+  "label": "tg-2-trapHeight-1",
+  "pose": "relaxed",
+  "view": 180,
+  "zoom": 0.18888888888888888,
+  "target": [
+   0,
+   143,
+   -4
+  ],
+  "canvas": true,
+  "surface": "clay",
+  "lighting": "studio",
+  "set": {
+   "trapHeight": 1
+  }
+ }
+]

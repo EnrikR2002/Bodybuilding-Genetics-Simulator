@@ -1,0 +1,342 @@
+[
+ {
+  "label": "tc-01-bicepInsertion-0",
+  "pose": "flex",
+  "view": 0,
+  "zoom": 0.2,
+  "target": [
+   32,
+   146,
+   2
+  ],
+  "canvas": true,
+  "surface": "clay",
+  "lighting": "studio",
+  "set": {
+   "bicepInsertion": 0
+  }
+ },
+ {
+  "label": "tc-01-bicepInsertion-1",
+  "pose": "flex",
+  "view": 0,
+  "zoom": 0.2,
+  "target": [
+   32,
+   146,
+   2
+  ],
+  "canvas": true,
+  "surface": "clay",
+  "lighting": "studio",
+  "set": {
+   "bicepInsertion": 1
+  }
+ },
+ {
+  "label": "tc-02-bicepPeak-0",
+  "pose": "flex",
+  "view": 0,
+  "zoom": 0.2,
+  "target": [
+   32,
+   146,
+   2
+  ],
+  "canvas": true,
+  "surface": "clay",
+  "lighting": "studio",
+  "set": {
+   "bicepPeak": 0
+  }
+ },
+ {
+  "label": "tc-02-bicepPeak-1",
+  "pose": "flex",
+  "view": 0,
+  "zoom": 0.2,
+  "target": [
+   32,
+   146,
+   2
+  ],
+  "canvas": true,
+  "surface": "clay",
+  "lighting": "studio",
+  "set": {
+   "bicepPeak": 1
+  }
+ },
+ {
+  "label": "tc-03-tricepsLength-0",
+  "pose": "relaxed",
+  "view": 180,
+  "zoom": 0.2222222222222222,
+  "target": [
+   22,
+   127,
+   -3
+  ],
+  "canvas": true,
+  "surface": "clay",
+  "lighting": "studio",
+  "set": {
+   "tricepsLength": 0
+  }
+ },
+ {
+  "label": "tc-03-tricepsLength-1",
+  "pose": "relaxed",
+  "view": 180,
+  "zoom": 0.2222222222222222,
+  "target": [
+   22,
+   127,
+   -3
+  ],
+  "canvas": true,
+  "surface": "clay",
+  "lighting": "studio",
+  "set": {
+   "tricepsLength": 1
+  }
+ },
+ {
+  "label": "tc-04-pecGap-0",
+  "pose": "relaxed",
+  "view": 0,
+  "zoom": 0.16666666666666666,
+  "target": [
+   0,
+   134,
+   8
+  ],
+  "canvas": true,
+  "surface": "clay",
+  "lighting": "studio",
+  "set": {
+   "pecGap": 0
+  }
+ },
+ {
+  "label": "tc-04-pecGap-1",
+  "pose": "relaxed",
+  "view": 0,
+  "zoom": 0.16666666666666666,
+  "target": [
+   0,
+   134,
+   8
+  ],
+  "canvas": true,
+  "surface": "clay",
+  "lighting": "studio",
+  "set": {
+   "pecGap": 1
+  }
+ },
+ {
+  "label": "tc-05-abStagger-0",
+  "pose": "relaxed",
+  "view": 0,
+  "zoom": 0.18888888888888888,
+  "target": [
+   0,
+   113,
+   8
+  ],
+  "canvas": true,
+  "surface": "clay",
+  "lighting": "studio",
+  "set": {
+   "abStagger": 0
+  }
+ },
+ {
+  "label": "tc-05-abStagger-1",
+  "pose": "relaxed",
+  "view": 0,
+  "zoom": 0.18888888888888888,
+  "target": [
+   0,
+   113,
+   8
+  ],
+  "canvas": true,
+  "surface": "clay",
+  "lighting": "studio",
+  "set": {
+   "abStagger": 1
+  }
+ },
+ {
+  "label": "tc-06-abCount-0",
+  "pose": "relaxed",
+  "view": 0,
+  "zoom": 0.18888888888888888,
+  "target": [
+   0,
+   113,
+   8
+  ],
+  "canvas": true,
+  "surface": "clay",
+  "lighting": "studio",
+  "set": {
+   "abCount": 0
+  }
+ },
+ {
+  "label": "tc-06-abCount-1",
+  "pose": "relaxed",
+  "view": 0,
+  "zoom": 0.18888888888888888,
+  "target": [
+   0,
+   113,
+   8
+  ],
+  "canvas": true,
+  "surface": "clay",
+  "lighting": "studio",
+  "set": {
+   "abCount": 1
+  }
+ },
+ {
+  "label": "tc-07-latInsertion-0",
+  "pose": "relaxed",
+  "view": 180,
+  "zoom": 0.3111111111111111,
+  "target": [
+   0,
+   121,
+   -6
+  ],
+  "canvas": true,
+  "surface": "clay",
+  "lighting": "studio",
+  "set": {
+   "latInsertion": 0
+  }
+ },
+ {
+  "label": "tc-07-latInsertion-1",
+  "pose": "relaxed",
+  "view": 180,
+  "zoom": 0.3111111111111111,
+  "target": [
+   0,
+   121,
+   -6
+  ],
+  "canvas": true,
+  "surface": "clay",
+  "lighting": "studio",
+  "set": {
+   "latInsertion": 1
+  }
+ },
+ {
+  "label": "tc-08-trapHeight-0",
+  "pose": "relaxed",
+  "view": 180,
+  "zoom": 0.18888888888888888,
+  "target": [
+   0,
+   143,
+   -4
+  ],
+  "canvas": true,
+  "surface": "clay",
+  "lighting": "studio",
+  "set": {
+   "trapHeight": 0
+  }
+ },
+ {
+  "label": "tc-08-trapHeight-1",
+  "pose": "relaxed",
+  "view": 180,
+  "zoom": 0.18888888888888888,
+  "target": [
+   0,
+   143,
+   -4
+  ],
+  "canvas": true,
+  "surface": "clay",
+  "lighting": "studio",
+  "set": {
+   "trapHeight": 1
+  }
+ },
+ {
+  "label": "tc-09-quadTeardrop-0",
+  "pose": "relaxed",
+  "view": 0,
+  "zoom": 0.2222222222222222,
+  "target": [
+   0,
+   56,
+   4
+  ],
+  "canvas": true,
+  "surface": "clay",
+  "lighting": "studio",
+  "set": {
+   "quadTeardrop": 0
+  }
+ },
+ {
+  "label": "tc-09-quadTeardrop-1",
+  "pose": "relaxed",
+  "view": 0,
+  "zoom": 0.2222222222222222,
+  "target": [
+   0,
+   56,
+   4
+  ],
+  "canvas": true,
+  "surface": "clay",
+  "lighting": "studio",
+  "set": {
+   "quadTeardrop": 1
+  }
+ },
+ {
+  "label": "tc-10-calfInsertion-0",
+  "pose": "relaxed",
+  "view": 180,
+  "zoom": 0.24444444444444444,
+  "target": [
+   0,
+   33,
+   -4
+  ],
+  "canvas": true,
+  "surface": "clay",
+  "lighting": "studio",
+  "set": {
+   "calfInsertion": 0
+  }
+ },
+ {
+  "label": "tc-10-calfInsertion-1",
+  "pose": "relaxed",
+  "view": 180,
+  "zoom": 0.24444444444444444,
+  "target": [
+   0,
+   33,
+   -4
+  ],
+  "canvas": true,
+  "surface": "clay",
+  "lighting": "studio",
+  "set": {
+   "calfInsertion": 1
+  }
+ }
+]

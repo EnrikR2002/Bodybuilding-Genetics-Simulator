@@ -1,5 +1,7 @@
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
-import { Stage } from "../render/stage.js";
+import { Stage, LIGHTING } from "../render/stage.js";
+import { SURFACES } from "./materials.js";
+import { idsFor } from "./anatomy.js";
 import { installVolumeSkinning } from "../render/skinning.js";
 import { loadFreeman, Freeman, DEFAULT } from "./model.js";
 import { POSES, POSE_BY_ID } from "./poses.js";
@@ -67,6 +69,8 @@ function controls() {
   )) {
     const el = document.createElement("section");
     el.className = "control";
+    el.onpointerenter = el.onfocusin = () => highlight(key);
+    el.onpointerleave = el.onfocusout = () => highlight(null);
     el.innerHTML = `<div class="control-heading"><label id="label-${key}">${label}</label><span>${choices[Math.round(state[key] * 2)]}</span></div><div class="choices" role="group" aria-labelledby="label-${key}"></div><p>${note}</p>`;
     choices.forEach((name, i) => {
       const b = document.createElement("button");
@@ -171,6 +175,17 @@ function fit() {
   orbit.update();
   // OrbitControls changes orientation after lookAt updates the world matrix.
   // Keep projection/picking valid immediately, even before the next frame.
+  stage.camera.updateMatrixWorld(true);
+}
+/* Frame a region: `height` centimetres of the figure, centred on `center`,
+   seen from the current azimuth. */
+function frameRegion(center, height) {
+  const aspect = stage.camera.aspect, extent = height / 2;
+  Object.assign(stage.camera, { left: -extent * aspect, right: extent * aspect, top: extent, bottom: -extent, zoom: 1 });
+  stage.camera.updateProjectionMatrix();
+  orbit.target.fromArray(center);
+  stage.camera.position.set(center[0] + Math.sin(azimuth) * 450, center[1] + 8, center[2] + Math.cos(azimuth) * 450);
+  orbit.update();
   stage.camera.updateMatrixWorld(true);
 }
 function setPose(p) {
@@ -279,12 +294,22 @@ $("reset").onclick = () => {
   changed();
   setView(0);
 };
+/* Tint the muscles a trait is about (no-op without the anatomy map). */
+function highlight(key) {
+  const t = key && CATALOGUE.find((x) => x.key === key);
+  const focus = t ? idsFor(data?.anatomy, t.muscles) : [];
+  for (const f of [figure, reference]) f?.setOverlay({ mode: focus.length ? "focus" : "off", focus });
+}
+$("surfaceMode").replaceChildren(...SURFACES.filter((s) => s.menu !== false).map((s) => new Option(s.label, s.id)));
+$("surfaceMode").value = surface;
+$("lighting").replaceChildren(...LIGHTING.map((l) => new Option(l.label, l.id)));
+$("lighting").onchange = (e) => stage.setLighting(e.target.value);
 $("surfaceMode").onchange = (e) => {
   surface = e.target.value;
   figure?.setSurface(surface, tone);
   reference?.setSurface(surface, tone);
   $("surface-label").textContent =
-    surface === "clay" ? "SCULPT STUDY" : "SKIN STUDY";
+    `${SURFACES.find((s) => s.id === surface)?.label ?? "Skin"} study`.toUpperCase();
 };
 $("skinTone").onchange = (e) => {
   tone = +e.target.value;
@@ -331,11 +356,11 @@ try {
     pose: setPose,
     view: (a, e, z, target) => {
       setView(a);
-      if (z) {
+      if (target) frameRegion(target, 180 * (z || 1));
+      else if (z) {
         stage.camera.zoom = 1 / z;
         stage.camera.updateProjectionMatrix();
       }
-      if (target) orbit.target.fromArray(target);
     },
     surface: (m) => {
       $("surfaceMode").value = m;
@@ -354,6 +379,11 @@ try {
       source: data.meta.source,
     }),
     state: () => ({ ...state }),
+    lighting: (id) => {
+      $("lighting").value = id;
+      stage.setLighting(id);
+    },
+    overlay: (key) => highlight(key),
   };
   window.__ready = true;
 } catch (e) {

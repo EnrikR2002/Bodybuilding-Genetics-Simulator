@@ -1,36 +1,69 @@
 /* ---------------------------------------------------------------------------
    Front torso: sternal gap, ab alignment and ab segment count.
 
-   Each trait moves the sculpted surface inside a mask on the front of the
-   torso. Masks are measured on the unedited artist surface, so they do not
-   drift as other traits change the figure.
+   The sternal gap moves the medial border of both pecs, as found in the
+   anatomy map, away from or toward the sternum. Ab alignment slides the left
+   and right rectus abdominis in opposite directions, so the sculpted
+   tendinous rows stop lining up.
+
+   Ab segments works with the sculpt's own inscriptions, measured at about
+   112.5, 119 and 125 cm above the navel (which sits near 109 cm). "Four"
+   fills the lowest one. "Eight" adds the inscription real eight-packs have
+   below the navel, with the depth and width measured on the sculpted ones —
+   like the abdominal wall of the earlier app, the one authored form, because
+   the dissection has no tendinous inscriptions to measure.
    --------------------------------------------------------------------------- */
 import { smooth } from "./context.js";
+import { softMask, pick } from "./muscle.js";
+
+const LOWEST = 112.5;   // lowest sculpted inscription (cm)
+const BELOW = 103.4;    // where an eighth-pack inscription sits, below the navel
+const DEPTH = 0.32;     // measured relief of the sculpted inscriptions (cm)
 
 export default {
   id: "torso",
   traits: ["pecGap", "abStagger", "abCount"],
   prepare(ctx) {
-    const { base, normal, arm, n } = ctx, verts = [], pec = [], ab = [];
-    for (let v = 0; v < n; v++) {
-      const x = base[v * 3], y = base[v * 3 + 1], front = normal[v * 3 + 2], ax = Math.abs(x);
-      const torso = (1 - arm[v]) * smooth(99, 110, y) * (1 - smooth(145, 156, y));
-      if (!torso) continue;
-      const p = torso * smooth(0.2, 0.85, front) * smooth(124, 130, y) * (1 - smooth(141, 146, y))
-        * (1 - smooth(3, 11, ax)) * smooth(0.1, 1.8, ax) * Math.sign(x);
-      const a = torso * smooth(0.3, 0.9, front) * (1 - smooth(5, 9, ax)) * smooth(100, 106, y)
-        * (1 - smooth(122, 129, y)) * Math.sign(x);
-      if (p || a) { verts.push(v); pec.push(p); ab.push(a); }
+    if (!ctx.anatomy) return null;
+    const { base } = ctx;
+    const pec = softMask(ctx, ["pectoralis_sternal", "pectoralis_clavicular"], { passes: 8, rings: 5 });
+    const medial = pick(pec.field, pec.verts).map((w, i) => {
+      const x = Math.abs(base[pec.verts[i] * 3]);
+      return w * (1 - smooth(1.5, 8, x)) * smooth(0.15, 1.4, x);
+    });
+    const rect = softMask(ctx, ["rectus_abdominis"], { passes: 6, rings: 4 });
+    const rv = rect.verts, rw = pick(rect.field, rv);
+    const band = new Float32Array(rv.length), fill = new Float32Array(rv.length), groove = new Float32Array(rv.length);
+    for (let i = 0; i < rv.length; i++) {
+      const x = base[rv[i] * 3], y = base[rv[i] * 3 + 1], ax = Math.abs(x), w = rw[i];
+      band[i] = w * smooth(101, 106, y) * (1 - smooth(126, 130, y)) * Math.sign(x);
+      fill[i] = w * Math.exp(-(((y - LOWEST) / 1.6) ** 2));
+      // straight across each rectus half, fading at the linea alba and the lateral border
+      groove[i] = w * Math.exp(-(((y - BELOW - 0.1 * ax) / 0.6) ** 2)) * smooth(0.9, 2.2, ax) * (1 - smooth(7, 9.5, ax));
     }
-    return { verts: Uint32Array.from(verts), pec: Float32Array.from(pec), ab: Float32Array.from(ab) };
+    return { pec: pec.verts, medial, rect: rv, band, fill, groove };
   },
   apply(ctx, r, s, out) {
-    const gap = (s.pecGap - 0.5) * 2.5, stagger = (s.abStagger - 0.5) * 2;
-    if (!gap && !stagger) return;
-    for (let i = 0; i < r.verts.length; i++) {
-      const o = r.verts[i] * 3;
-      out[o] += gap * r.pec[i];
-      out[o + 1] += stagger * r.ab[i];
-    }
+    if (!r || (s.pecGap === 0.5 && s.abStagger === 0.5 && s.abCount === 0.5)) return;
+    const { base, smoothPosition: sp, normal: n } = ctx, definition = 1 - s.bodyFat * 0.6;
+    const gap = (s.pecGap - 0.5) * 2;
+    if (gap)
+      for (let i = 0; i < r.pec.length; i++) {
+        const o = r.pec[i] * 3, w = r.medial[i];
+        if (!w) continue;
+        out[o] += Math.sign(base[o]) * 1.4 * gap * w;
+        out[o + 2] -= 0.35 * gap * w;
+      }
+    const st = (s.abStagger - 0.5) * 2 * 0.9 * definition;
+    const four = Math.max(0, (0.5 - s.abCount) * 2), eight = Math.max(0, (s.abCount - 0.5) * 2) * definition;
+    if (st || four || eight)
+      for (let i = 0; i < r.rect.length; i++) {
+        const o = r.rect[i] * 3;
+        out[o + 1] += st * r.band[i];
+        const f = four * r.fill[i];
+        if (f) for (let k = 0; k < 3; k++) out[o + k] += (sp[o + k] - base[o + k]) * f;
+        const g = -DEPTH * eight * r.groove[i];
+        if (g) for (let k = 0; k < 3; k++) out[o + k] += n[o + k] * g;
+      }
   },
 };
