@@ -6,18 +6,25 @@
    `npm run anatomy:freeman`. Vertex order matches freeman.bin.
 
    Header:
-     { vertices, muscles: ["none", "biceps_long.L", ...],   // id → name, id 0 = none
-       groups:  { "biceps_long": "arm_flexors", ... },      // optional, for colour
+     { vertices, muscles: ["none", "sternocleidomastoid.L", ...],  // id → name, id 0 = none
+       groups:  { "biceps_long": "arm", ... },   // neck | shoulder | chest | arm | abdomen |
+                                                 // back | hip | thigh | lower_leg | bone
        landmarks: { "biceps_long.L": { origin: v, insertion: v, peak: v, centroid: v }, ... },
-       blocks: [{ name, type: "B"|"f", offset, length }] }
+       blocks: [{ name, type: "B", offset, length }] }
+   Ids are 1 + 2 × (vocabulary index) + (0 for .L, 1 for .R); read them from
+   `muscles`, never hard-code them.
 
    Blocks (one value per vertex):
-     muscle   Uint8    primary structure id (0 = no structure: skin over bone, fat, hands, face)
-     muscle2  Uint8    secondary structure id at a border (0 if none)
-     blend    Uint8    weight of the primary, 0..255 (255 = deep inside, ~128 on a border)
-     along    Uint8    0 at the primary's origin → 255 at its insertion
+     muscle   Uint8    primary structure id (0 = no structure: hands, face, feet, genitals,
+                       the linea alba, bone and fat outside the vocabulary)
+     muscle2  Uint8    secondary structure id within ~1.2 cm of a border (0 if none)
+     blend    Uint8    weight of the primary, 0..255 (255 inside, 128 on the border itself)
+     along    Uint8    0 at the primary's origin → 255 at its insertion, measured on the
+                       atlas muscle (a head whose tendon is its own structure, like the
+                       biceps, ends near 200)
 
-   Names use the vocabulary of docs/ARCHITECTURE.md with a .L/.R side.
+   Names use the vocabulary of docs/ARCHITECTURE.md with a .L/.R side; the map is
+   exactly left/right symmetric. Method and limits: docs/ANATOMY_MAP.md.
    --------------------------------------------------------------------------- */
 
 import { BufferAttribute } from "three";
