@@ -35,24 +35,27 @@
    [across the palm, away from the palm, roll toward the fingers, knuckle, tip]. */
 export const GRIPS = {
   fist: {
-    thumb: [34, 16, 42, 34, 34],
-    index: [84, 102, 64, -2], middle: [88, 104, 66, 0], ring: [92, 104, 64, -3], pinky: [96, 100, 62, -7],
+    // fitted so the thumb pad lies across the middle phalanges of index and middle
+    thumb: [22, 27, -12, 27, 85],
+    index: [84, 102, 64, -2], middle: [88, 104, 66, 0], ring: [92, 104, 64, -8], pinky: [96, 100, 62, -12],
   },
   relaxed: {
     thumb: [8, 10, 12, 10, 12],
     index: [16, 26, 14, 2], middle: [20, 30, 16, 0], ring: [24, 34, 18, -1], pinky: [28, 36, 20, -2],
   },
+  /* flat on the obliques: fingers together and a little curved to the waist, thumb along the index */
   flat: {
-    thumb: [-26, -6, 0, 0, -4],
-    index: [2, 4, 2, -2], middle: [2, 4, 2, 0], ring: [3, 5, 2, 1], pinky: [4, 6, 3, 2],
+    thumb: [-8, 0, 0, 6, 6],
+    index: [8, 10, 4, -4], middle: [8, 10, 4, 0], ring: [9, 11, 5, -12], pinky: [10, 12, 6, -15],
   },
   grasp: {
     thumb: [28, 34, 48, 18, 16],
     index: [52, 62, 34, -2], middle: [56, 64, 36, 0], ring: [60, 66, 36, -2], pinky: [64, 64, 34, -5],
   },
+  /* cupping the back of the head */
   clasp: {
-    thumb: [6, 8, 12, 8, 10],
-    index: [28, 22, 12, 1], middle: [30, 24, 12, 0], ring: [32, 26, 14, -1], pinky: [34, 28, 16, -2],
+    thumb: [4, 0, 10, 12, 12],
+    index: [30, 34, 18, -6], middle: [32, 38, 20, 0], ring: [34, 40, 22, -12], pinky: [36, 40, 22, -15],
   },
 };
 
@@ -87,8 +90,9 @@ export const POSES = [
     id: "latSpread", name: "Front lat spread", view: 0, flex: 0.4, spread: 1, vacuum: 0.35, chestUp: 0.85,
     note: "Pure width. Where the lats insert decides whether the sweep starts at the armpit or the waist.",
     body: { chest: [-4, 0, 0] },
-    arm: { shrug: 2, reach: 8, ik: { from: "pelvis", to: [15.5, 17, -3], pole: [1, 0.1, 0.55] },
-      hand: [-0.3, -0.55, 0.78], palm: [-1, 0, 0.1], grip: "flat" },
+    /* palms flat on the obliques, fingers down, elbows driven out and forward */
+    arm: { shrug: 3, reach: 10, ik: { from: "pelvis", to: [17, 20, 0], pole: [1, 0.05, 0.35] },
+      hand: [-0.05, -0.95, 0.3], palm: [-1, 0, 0.05], grip: "flat" },
     leg: { step: [3, 0], turn: 20 },
   },
   {
@@ -122,16 +126,18 @@ export const POSES = [
     id: "rearLat", name: "Rear lat spread", view: 180, flex: 0.4, spread: 1, vacuum: 0.3, chestUp: 0.3,
     note: "The classic cobra. Width here is lat insertion plus clavicle, and neither is trainable.",
     body: { chest: [-2, 0, 0], head: [-4, 0, 0] },
-    arm: { shrug: 2, reach: 10, ik: { from: "pelvis", to: [15.5, 17, -3], pole: [1, 0.1, 0.55] },
-      hand: [-0.3, -0.55, 0.78], palm: [-1, 0, 0.1], grip: "flat" },
+    arm: { shrug: 3, reach: 12, ik: { from: "pelvis", to: [17, 20, 0], pole: [1, 0.05, 0.35] },
+      hand: [-0.05, -0.95, 0.3], palm: [-1, 0, 0.05], grip: "flat" },
     legL: { step: [3, -20], turn: 12, heel: 38 }, legR: { step: [1, 0], turn: 10 },
   },
   {
     id: "absThigh", name: "Abs and thigh", view: 0, flex: 0.3, spread: 0.2, vacuum: 0, chestUp: 0.2,
     note: "Ab insertions on show: blocky and even, or staggered and offset.",
     body: { abdomen: [9, 0, 0], chest: [5, 0, 0], neck: [4, 0, 0], head: [6, 0, 0] },
-    arm: { shrug: 6, ik: { from: "head", to: [6, 6, -11], pole: [1, 0.25, 0.45] },
-      hand: [-0.85, 0.45, -0.1], palm: [-0.1, 0.1, 1], grip: "clasp" },
+    /* hands cupping the back of the head, the left over the right; elbows out */
+    arm: { shrug: 6, hand: [-0.97, 0.05, -0.1], palm: [0, 0.1, 1], grip: "clasp" },
+    armL: { ik: { from: "head", to: [9.5, 3, -13], pole: [1, 0.45, 0.15] } },
+    armR: { ik: { from: "head", to: [9.5, 2.5, -10.8], pole: [1, 0.45, 0.15] } },
     legL: { step: [5, 20], turn: 16 }, legR: { step: [0, -2], turn: 10 },
   },
   {
@@ -139,16 +145,17 @@ export const POSES = [
     note: "Everything contracted at once. Traps and pec insertions dominate the read.",
     body: { abdomen: [8, 0, 0], chest: [10, 0, 0], neck: [-2, 0, 0], head: [2, 0, 0] },
     /* the crab: fists meeting low in front, elbows driven forward and out */
-    arm: { shrug: 14, reach: 16, ik: { from: "pelvis", to: [4.5, 16, 22], pole: [1, 0.25, 0.3] },
-      hand: [-0.85, -0.3, 0.2], palm: [-0.1, 0.35, -0.9], grip: "fist" },
+    arm: { shrug: 14, reach: 16, ik: { from: "pelvis", to: [10.5, 15, 23], pole: [1, 0.3, 0.55] },
+      hand: [-0.85, -0.4, 0.15], palm: [0.05, 0.4, -0.9], grip: "fist" },
     leg: { step: [6, 0], turn: 22, knee: [0.3, 0, 1] }, hips: [0, -2, 0],
   },
   {
     id: "vacuum", name: "Vacuum", view: 0, flex: 0.2, spread: 0.6, vacuum: 1, chestUp: 1,
     note: "Rib cage lifted, waist pulled in, hands behind the head. Structure over mass — the old-school test.",
     body: { abdomen: [-3, 0, 0], chest: [-6, 0, 0], head: [-2, 0, 0] },
-    arm: { shrug: 8, ik: { from: "head", to: [7, 9, -10], pole: [1, 0.55, -0.1] },
-      hand: [-0.85, 0.5, -0.1], palm: [-0.1, 0.1, 1], grip: "clasp" },
+    arm: { shrug: 8, hand: [-0.97, 0.05, -0.1], palm: [0, 0.1, 1], grip: "clasp" },
+    armL: { ik: { from: "head", to: [9.5, 3, -13], pole: [1, 0.55, -0.1] } },
+    armR: { ik: { from: "head", to: [9.5, 2.5, -10.8], pole: [1, 0.55, -0.1] } },
     leg: { step: [0, 0], turn: 12 },
   },
 ];

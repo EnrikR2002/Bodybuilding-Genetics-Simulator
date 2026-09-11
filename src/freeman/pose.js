@@ -70,6 +70,30 @@ function twistOf(q, axis) {
 }
 const perpendicular = (v, axis) => v.clone().addScaledVector(axis, -v.dot(axis)).normalize();
 
+/* The wrist's anatomical range, relative to the sculpt's rest hand (degrees):
+   flexion toward the palm (+) / extension (−), radial (+) / ulnar (−)
+   deviation, and the pronation/supination the forearm can carry. A pose that
+   asks for more is clamped instead of collapsing the wrist. */
+export const WRIST = { flex: [-70, 75], radial: [-35, 20], twist: 140 };
+function limitWrist(rel, f0, palm, sign) {
+  const q = rel.w < 0 ? new Quaternion(-rel.x, -rel.y, -rel.z, -rel.w) : rel.clone();
+  const full = twistOf(q, f0), twist = full.clone();
+  const t = 2 * Math.atan2(full.x * f0.x + full.y * f0.y + full.z * f0.z, full.w);
+  if (Math.abs(t) > WRIST.twist * DEG) twist.setFromAxisAngle(f0, Math.sign(t) * WRIST.twist * DEG);
+  const swing = q.multiply(full.clone().invert());
+  if (swing.w < 0) swing.set(-swing.x, -swing.y, -swing.z, -swing.w);
+  const s = Math.hypot(swing.x, swing.y, swing.z);
+  if (s < 1e-9) return { twist, swing: new Quaternion() };
+  const rv = new Vector3(swing.x, swing.y, swing.z).multiplyScalar(2 * Math.atan2(s, swing.w) / s);
+  const pT = palm.clone().applyQuaternion(full);                 // the palm after pronation
+  const flexAxis = f0.clone().cross(pT).normalize(), devAxis = perpendicular(pT, f0);
+  const flex = clamp(rv.dot(flexAxis), WRIST.flex[0] * DEG, WRIST.flex[1] * DEG);
+  const radial = clamp(sign * rv.dot(devAxis), WRIST.radial[0] * DEG, WRIST.radial[1] * DEG);
+  const out = flexAxis.multiplyScalar(flex).addScaledVector(devAxis, sign * radial);
+  const angle = out.length();
+  return { twist, swing: angle < 1e-9 ? new Quaternion() : new Quaternion().setFromAxisAngle(out.divideScalar(angle), angle) };
+}
+
 /* ---------- once per sculpt -------------------------------------------- */
 export function preparePose(ctx) {
   if (ctx.__pose) return ctx.__pose;
@@ -215,7 +239,8 @@ function footTargets(S, def, prep) {
 
 function poseLegs(S, feet) {
   for (const { side, ankle, Wfoot, Wtoe, knee } of feet) {
-    const hip = S.P[S.i(`thigh.${side}`)];
+    // the posed hip joint (the thigh is not set yet, so carry it with the pelvis)
+    const hip = S.carry("pelvis", S.head(`thigh.${side}`));
     const a = S.length(`thigh.${side}`), b = S.length(`shin.${side}`);
     const { upper, lower } = reach(hip, ankle, a, b, knee);
     const { Wu, Wf } = hinge(S.axis(`thigh.${side}`), S.axis(`shin.${side}`), upper, lower, S.W[0]);
@@ -251,7 +276,8 @@ function poseArm(S, def, side, sign) {
   else if (arm.ik) {
     const ref = arm.ik.from;
     const target = S.P[S.i(ref)].clone().add(mirror(arm.ik.to, sign).applyQuaternion(S.W[S.i(ref)]));
-    ({ upper: u, lower: f } = reach(S.P[S.i(up)], target, S.length(up), S.length(fo), frame(arm.ik.pole)));
+    // from the posed shoulder joint, carried by the clavicle
+    ({ upper: u, lower: f } = reach(S.carry(clav, S.head(up)), target, S.length(up), S.length(fo), frame(arm.ik.pole)));
   } else { u = frame(arm.upper); f = frame(arm.fore); }
   const { Wu, Wf } = hinge(u0, f0, u, f, Wc);
   S.set(up, Wu);
@@ -268,9 +294,11 @@ function poseArm(S, def, side, sign) {
     const pn = arm.palm ? frame(arm.palm) : H.palm.clone().applyQuaternion(Wf);
     Wh = alignFrames(H.axis, H.palm, hd, pn);
   } else Wh = Wf.clone();
-  // Pronation and supination: the twist about the forearm goes to the helper.
-  const rel = Wf.clone().invert().multiply(Wh);
-  S.set(`forearm_twist.${side}`, Wf.clone().multiply(twistOf(rel, f0)));
+  // Pronation and supination go to the twist helper; flexion and deviation
+  // stay within the wrist's range.
+  const wrist = limitWrist(Wf.clone().invert().multiply(Wh), f0, H.palm, sign);
+  S.set(`forearm_twist.${side}`, Wf.clone().multiply(wrist.twist));
+  Wh = Wf.clone().multiply(wrist.swing).multiply(wrist.twist);
   S.set(ha, Wh);
   poseHand(S, side, Wh, H, arm?.grip);
 }
