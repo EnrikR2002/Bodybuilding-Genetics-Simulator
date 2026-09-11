@@ -1,0 +1,4 @@
+[
+ {"label":"ui-09-overlay-biceps","set":{},"compare":"bicepInsertion","mode":"overlay","wait":900},
+ {"label":"ui-10-overlay-lats","mode":"overlay","pin":true,"set":{},"compare":"latInsertion","wait":900}
+]

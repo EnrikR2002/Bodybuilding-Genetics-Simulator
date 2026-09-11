@@ -167,10 +167,13 @@ function ghostMaterial() {
     fragmentShader: /* glsl */ `
       uniform vec3 uColor; varying vec3 vN; varying vec3 vV;
       void main() {
-        float f = pow(1. - abs(dot(normalize(vN), normalize(vV))), 2.2);
-        gl_FragColor = vec4(uColor * (.06 + .9 * f), 1.);
+        // contour lines only: the interior adds nothing, the turning edge glows
+        float f = smoothstep(.55, .93, 1. - abs(dot(normalize(vN), normalize(vV))));
+        gl_FragColor = vec4(uColor * f * .9, 1.);
       }`,
-    transparent: true, depthWrite: false, blending: AdditiveBlending, side: FrontSide,
+    // drawn on top without a depth test: the ghost coincides with the figure
+    // under it almost everywhere, and a depth test would make the two fight
+    transparent: true, depthWrite: false, depthTest: false, blending: AdditiveBlending, side: FrontSide,
   });
 }
 

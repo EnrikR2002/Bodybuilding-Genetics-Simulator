@@ -87,6 +87,10 @@ export async function runSteps(page, steps, dir = SHOTS) {
     if (s.regions !== undefined) await page.evaluate(v => window.__app?.debugRegions(v), s.regions);
     if (s.surface) await page.evaluate(v => window.__app.surface(v), s.surface);
     if (s.lighting) await page.evaluate(v => window.__app.lighting(v), s.lighting);
+    if (s.preset) await page.evaluate(v => window.__app.preset(v), s.preset);
+    if (s.compare) await page.evaluate(v => window.__app.compare(v), s.compare);
+    if (s.mode) await page.evaluate(v => window.__app.compareMode(v), s.mode);
+    if (s.tab) await page.evaluate(v => window.__app.tab(v), s.tab);
     if (s.overlay !== undefined) await page.evaluate(v => window.__app.overlay(v), s.overlay);
     if (s.bench) console.log('BENCH ' + JSON.stringify(await page.evaluate(() => window.__app.bench())));
     if (s.probe) console.log('PROBE ' + JSON.stringify(await page.evaluate(() => window.__app.headProbe())));

@@ -1,0 +1,5 @@
+[
+ {"label":"ui-06-compare-biceps","set":{},"compare":"bicepInsertion","wait":900},
+ {"label":"ui-07-overlay","mode":"overlay","wait":700},
+ {"label":"ui-08-compare-calves","mode":"side","pin":true,"set":{},"compare":"calfInsertion","view":"back","wait":900}
+]

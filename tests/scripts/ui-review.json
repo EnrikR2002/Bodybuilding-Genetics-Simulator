@@ -1,0 +1,7 @@
+[
+ {"label":"ui-01-default","set":{},"view":"front","wait":500},
+ {"label":"ui-02-numbers","tab":"numbers","view":"front","wait":500},
+ {"label":"ui-03-compare-biceps","tab":"traits","compare":"bicepInsertion","wait":900},
+ {"label":"ui-04-overlay","mode":"overlay","wait":700},
+ {"label":"ui-05-classic-stage","mode":"side","pin":true,"set":{},"preset":"classic","lighting":"stage","surface":"tan","pose":"frontDouble","view":"front","wait":700}
+]

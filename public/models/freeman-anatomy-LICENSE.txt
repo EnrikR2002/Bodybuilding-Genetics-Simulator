@@ -1,0 +1,17 @@
+freeman-anatomy.json and freeman-anatomy.bin
+
+A per-vertex map of anatomical structures on the Mike Freeman sculpt,
+projected from the Z-Anatomy atlas (see docs/ANATOMY_MAP.md). It is a derived
+work of the atlas and is distributed under the same licence:
+
+  Creative Commons Attribution-ShareAlike 4.0 International (CC BY-SA 4.0)
+  https://creativecommons.org/licenses/by-sa/4.0/
+
+Required attribution:
+
+  Z-Anatomy — The libre 3D atlas of anatomy — CC BY-SA 4.0.
+  https://github.com/Z-Anatomy/Models-of-human-anatomy
+
+  BodyParts3D — The Database Center for Life Science — CC BY-SA 2.1 Japan.
+
+The sculpt itself (freeman.bin / freeman.json) is CC0; see freeman-LICENSE.txt.

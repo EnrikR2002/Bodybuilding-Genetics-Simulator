@@ -4,148 +4,92 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>Insertion — Physique Studio</title>
+    <meta name="description" content="See how muscle insertions and skeletal frame change a physique, on a real anatomical sculpt." />
     <link rel="stylesheet" href="/src/freeman/studio.css" />
   </head>
   <body>
     <header class="topbar">
-      <a class="brand" href="/" aria-label="Insertion home"
-        ><span class="brand-mark">i.</span> INSERTION
-        <span class="brand-sub">PHYSIQUE STUDIO</span></a
-      >
-      <div class="top-right">
-        <span class="status-dot"></span> Interactive anatomy
-        <button id="reset" class="quiet">Reset physique</button>
+      <a class="brand" href="/" aria-label="Insertion home"><span class="brand-mark">i.</span><span class="brand-name">INSERTION</span><span class="brand-sub">PHYSIQUE STUDIO</span></a>
+      <div class="top-actions">
+        <label class="preset"><span>Archetype</span><select id="preset"></select></label>
+        <button id="roll" class="btn" type="button" title="Draw every given trait from a bell curve">Roll genetics</button>
+        <span class="divider" aria-hidden="true"></span>
+        <button id="share" class="btn quiet" type="button" title="Copy a link to this exact physique">Copy link</button>
+        <button id="png" class="btn quiet" type="button" title="Save the current view as a PNG">Export PNG</button>
+        <button id="reset" class="btn quiet" type="button">Reset</button>
+        <button id="help" class="btn quiet icon" type="button" aria-label="Keyboard shortcuts" title="Keyboard shortcuts (?)">?</button>
       </div>
     </header>
     <main class="workspace">
-      <section class="viewport-panel" aria-label="Interactive physique viewer">
-        <div class="view-heading">
-          <div>
-            <span class="eyebrow">THE ANATOMY OF DIFFERENCE</span>
-            <h1>Built differently.</h1>
-            <p>Explore the structures behind a physique.</p>
-          </div>
-          <button id="compare" class="primary">
-            Compare extremes <span>↗</span>
-          </button>
-        </div>
+      <section class="viewport-panel" aria-label="Physique viewer">
         <div id="stage">
-          <canvas
-            id="cv"
-            aria-label="3D physique. Drag to rotate, scroll to zoom."
-          ></canvas>
-          <div class="stage-label">
-            <span id="surface-label">SKIN STUDY</span
-            ><span id="model-label">01 / Current physique</span>
+          <canvas id="cv" aria-label="3D physique. Drag to rotate, scroll to zoom, right-drag to pan."></canvas>
+          <div id="callouts"></div>
+          <div class="hud hud-tl">
+            <span id="look-label" class="eyebrow">STUDIO · SKIN</span>
+            <span id="model-label">Current physique</span>
           </div>
-          <div id="loading">
-            <span class="loader"></span
-            ><strong>Preparing the anatomical sculpt</strong>
-            <p>Loading muscle detail and the inspection rig.</p>
+          <div class="hud hud-tr">
+            <div class="seg" id="lighting" role="group" aria-label="Lighting"></div>
+            <div class="seg" id="surface" role="group" aria-label="Surface"></div>
+            <div class="tones" id="tone" role="group" aria-label="Skin tone"></div>
           </div>
-          <div id="compare-labels" hidden>
-            <span>SHORT BELLY <small>Pinned reference</small></span
-            ><span>LONG BELLY <small>Current physique</small></span>
+          <div id="compare-labels" hidden></div>
+          <div class="hud hud-bl">
+            <div class="seg" id="views" role="group" aria-label="View">
+              <button type="button" data-view="0">Front</button><button type="button" data-view="-35">¾</button><button type="button" data-view="-90">Side</button><button type="button" data-view="180">Back</button>
+            </div>
+            <button id="spin" class="btn quiet icon" type="button" aria-pressed="false" title="Turntable (T)">⟳</button>
+            <button id="labels" class="btn quiet icon" type="button" aria-pressed="true" title="Labels (L)">⌖</button>
+            <button id="fit" class="btn quiet" type="button">Fit</button>
           </div>
-          <div class="stage-bottom">
-            <span id="gesture-hint">Drag to rotate · Scroll to zoom</span
-            ><button id="fit" class="quiet">Fit to view</button>
-          </div>
+          <div id="toast" role="status" aria-live="polite"></div>
+          <div id="loading"><span class="loader"></span><strong>Preparing the anatomical sculpt</strong><p>154,442 vertices and the projected muscle map.</p></div>
         </div>
-        <div class="view-tools">
-          <div class="segmented" id="views" aria-label="View angle">
-            <button data-view="0" class="active">Front</button
-            ><button data-view="-35">¾ view</button
-            ><button data-view="-90">Side</button
-            ><button data-view="180">Back</button>
-          </div>
-          <div class="tool-divider"></div>
-          <div class="pose-control">
-            <label for="poseSelect">Pose</label>
-            <select id="poseSelect"></select>
-          </div>
-          <button
-            id="spin"
-            class="icon-button"
-            aria-label="Toggle turntable"
-            aria-pressed="false"
-          >
-            ↻
-          </button>
-        </div>
-        <div class="study-card">
-          <div class="study-number">01</div>
+        <nav class="pose-strip" id="poses" aria-label="Pose"></nav>
+        <div class="study">
           <div class="study-copy">
-            <span class="eyebrow" id="study-category">MUSCLE ARCHITECTURE</span>
+            <span class="eyebrow" id="study-category">INSERTIONS · GIVEN</span>
             <h2 id="study-title">Biceps belly length</h2>
-            <p id="study-copy">
-              The same frame can carry a different silhouette. Select a belly
-              length, then compare both extremes in the same pose.
-            </p>
+            <p id="study-copy"></p>
           </div>
-          <button id="focus" class="outline">
-            Inspect arms <span>↗</span>
-          </button>
+          <div class="study-actions">
+            <button id="compare" class="btn primary" type="button">Compare extremes</button>
+            <button id="pin" class="btn" type="button">Pin as A</button>
+            <div class="seg" id="compare-mode" role="group" aria-label="Comparison layout">
+              <button type="button" data-mode="side" aria-pressed="true">Side by side</button><button type="button" data-mode="overlay" aria-pressed="false">Overlay</button>
+            </div>
+            <button id="focus" class="btn" type="button">Inspect ↗</button>
+          </div>
         </div>
       </section>
       <aside class="inspector">
-        <div class="inspector-heading">
-          <span class="eyebrow">YOUR PHYSIQUE</span>
-          <h2>Shape the difference.</h2>
-          <p>Change one trait. See what it changes.</p>
+        <div class="tabs" role="tablist">
+          <button role="tab" type="button" data-tab="traits" aria-selected="true">Traits</button>
+          <button role="tab" type="button" data-tab="numbers" aria-selected="false">Numbers</button>
         </div>
-        <div class="control-tabs" role="tablist">
-          <button role="tab" data-tab="genetics" aria-selected="true">
-            Muscles</button
-          ><button role="tab" data-tab="frame" aria-selected="false">
-            Frame</button
-          ><button role="tab" data-tab="condition" aria-selected="false">
-            Condition
-          </button>
-        </div>
-        <div id="controls"></div>
-        <div class="finish">
-          <span class="eyebrow">SURFACE & LIGHT</span>
-          <div class="finish-row">
-            <label for="surfaceMode">Surface</label
-            ><select id="surfaceMode">
-              <option value="clay">Neutral sculpt</option>
-              <option value="skin" selected>Skin</option>
-            </select>
-          </div>
-          <div class="finish-row">
-            <label for="lighting">Lighting</label><select id="lighting"></select>
-          </div>
-          <div class="finish-row">
-            <label for="skinTone">Skin tone</label
-            ><select id="skinTone">
-              <option value="0">Light</option>
-              <option value="1" selected>Warm</option>
-              <option value="2">Bronze</option>
-              <option value="3">Deep</option>
-            </select>
-          </div>
-          <button id="pin" class="outline full">Pin current physique</button>
-        </div>
-        <div class="facts">
-          <div><span id="height">180</span><small>HEIGHT / CM</small></div>
-          <div>
-            <span id="shoulders">42</span><small>SHOULDER JOINTS / CM</small>
-          </div>
-        </div>
-        <p class="model-note">
-          An illustrative anatomy study. Presets show shape variation; they do
-          not predict an individual's genetics.
-        </p>
-        <a
-          class="attribution"
-          href="/models/freeman-LICENSE.txt"
-          target="_blank"
-          rel="noreferrer"
-          >Sculpt by Péter Józsa Jr. · CC0 ↗</a
-        >
+        <div id="traits-panel" role="tabpanel"></div>
+        <div id="numbers-panel" role="tabpanel" hidden><div id="metrics"></div></div>
+        <p class="model-note">An illustrative anatomy study built on one artist's sculpt. It shows what each trait changes; it does not predict anyone's genetics or potential.</p>
+        <p class="attribution"><a href="/models/freeman-LICENSE.txt" target="_blank" rel="noreferrer">Sculpt: Péter Józsa Jr. · CC0</a> · Muscle map projected from <a href="https://github.com/Z-Anatomy/Models-of-human-anatomy" target="_blank" rel="noreferrer">Z-Anatomy</a> (CC BY-SA 4.0) and BodyParts3D, DBCLS (CC BY-SA 2.1 JP)</p>
       </aside>
     </main>
+    <div id="help-panel" hidden>
+      <div class="help-card" role="dialog" aria-label="Keyboard shortcuts">
+        <h2>Shortcuts</h2>
+        <dl>
+          <dt>1 2 3 4</dt><dd>Front, ¾, side, back</dd>
+          <dt>C</dt><dd>Compare the extremes of the active trait</dd>
+          <dt>P</dt><dd>Pin the current physique as A, or clear</dd>
+          <dt>O</dt><dd>Side by side or overlay</dd>
+          <dt>T</dt><dd>Turntable</dd>
+          <dt>L</dt><dd>Labels on the body</dd>
+          <dt>R</dt><dd>Reset to the sculpt</dd>
+          <dt>Double-click a slider</dt><dd>Back to its default</dd>
+        </dl>
+        <button id="help-close" class="btn" type="button">Close</button>
+      </div>
+    </div>
     <script type="module" src="/src/freeman/app.js"></script>
   </body>
 </html>

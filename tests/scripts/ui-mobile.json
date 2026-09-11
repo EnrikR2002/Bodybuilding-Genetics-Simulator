@@ -1,0 +1,4 @@
+[
+ {"label":"ui-m1-default","set":{},"view":"front","wait":600},
+ {"label":"ui-m2-numbers","tab":"numbers","view":"front","wait":600}
+]
