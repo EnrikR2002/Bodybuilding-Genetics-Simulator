@@ -99,7 +99,8 @@ export const POSES = [
     id: "sideChest", name: "Side chest", view: -90, flex: 0.9, spread: 0.45, vacuum: 0.45, chestUp: 1,
     note: "Turned side-on so rib cage depth and pec thickness read instead of width.",
     body: { pelvis: [0, -8, 0], abdomen: [0, -10, 0], chest: [-4, -14, 0], neck: [0, -12, 0], head: [2, -20, 0] },
-    armR: { reach: 10, upper: [0.12, -0.9, 0.4], fore: [-0.62, -0.02, 0.78], hand: [-0.6, 0.1, 0.78], palm: [0, 0.2, -1], grip: "fist" },
+    /* the near arm squeezed against the ribs, forearm across the abs */
+    armR: { reach: 10, upper: [0.1, -0.93, 0.35], fore: [-0.85, 0.08, 0.5], hand: [-0.8, 0.1, 0.6], palm: [0, 0.2, -1], grip: "fist" },
     armL: { reach: 14, ik: { from: "hand.R", to: [-1.5, 1.5, -1], pole: [0.6, -0.7, 0.2] },
       hand: [-1, 0.1, 0.1], palm: [0, -0.3, -1], grip: "grasp" },
     legR: { step: [-5, 7], turn: 10, heel: 32, knee: [-0.35, 0, 1] },
