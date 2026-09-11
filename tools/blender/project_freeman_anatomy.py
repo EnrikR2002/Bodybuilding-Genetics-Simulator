@@ -44,8 +44,11 @@ SKIP = ('bursa', 'sheath', 'fascia', 'retinacul', 'septum', 'aponeurosis',
         'incisor', 'canine', 'premolar', 'incus', 'malleus', 'stapes',
         'system.g', 'tongue', 'glossus', 'pharyn', 'aryt', 'cricoid',
         'thyroid cartilage', 'epiglott', 'palat', 'conch', 'nasal', 'orbic',
-        'oculi', 'rectus muscle', 'oblique muscle.', 'levator palpebrae',
+        'oculi', 'rectus muscle', 'superior oblique muscle',
+        'inferior oblique muscle', 'levator palpebrae',
         'tarsus', 'trochlea', 'tendinous ring', 'ethmoid', 'vomer', 'sinus')
+# Names that contain a SKIP word but are muscles the skin shows.
+KEEP = ('tensor fasciae latae', 'external abdominal oblique')
 
 
 def base_name(name):
@@ -114,7 +117,8 @@ def extract(out_json, out_bin):
         elif 'Bonus collection' in cols and low.endswith('.j') and len(obj.data.vertices) == 2:
             kind = 'marker'
         elif '4: Muscular system' in cols or '1: Skeletal system' in cols:
-            if len(obj.data.vertices) >= 40 and not any(s in low for s in SKIP):
+            skipped = any(s in low for s in SKIP) and not any(k in low for k in KEEP)
+            if len(obj.data.vertices) >= 40 and not skipped:
                 if not (low.endswith('.j') or low.endswith('.i') or low.endswith('.g')):
                     kind = 'muscle' if '4: Muscular system' in cols else 'bone'
         if kind is None:

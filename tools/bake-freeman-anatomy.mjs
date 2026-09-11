@@ -364,7 +364,7 @@ for (const o of OBJ) {
   const si = byAtlasName.get(o.base);
   if (o.base === "Scapula") {
     // the acromion is its own structure: the lateral end of the scapular spine
-    const m = MARKERS.find((k) => k.base === "Acromion");
+    const m = MARKERS.find((k) => k.name === "Acromion.j");
     const ends = [[m.pos[0], m.pos[1], m.pos[2]], [m.pos[3], m.pos[4], m.pos[5]]].map((p) => (o.sideX === "L" ? [-p[0], p[1], p[2]] : p));
     const onBone = ends.map((e) => nearestDistance(o.pos, e)).reduce((b, d, k) => (d < b.d ? { d, k } : b), { d: Infinity, k: 0 });
     const a = ends[onBone.k];
@@ -423,7 +423,8 @@ function endPoints(spec, inst) {
   if (spec.patch) {
     for (const p of PATCHES) {
       if (p.sideX !== inst.side) continue;
-      if (!spec.patch.some((pre) => p.name.startsWith(pre))) continue;
+      const clean = p.name.replace(/[()]/g, "");
+      if (!spec.patch.some((pre) => clean.startsWith(pre))) continue;
       for (let i = 0; i < p.pos.length; i++) pts.push(p.pos[i]);
     }
     if (pts.length) return subsample(pts, 400);
