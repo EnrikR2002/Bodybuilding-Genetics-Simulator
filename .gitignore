@@ -5,3 +5,4 @@ dist/
 shots/
 .DS_Store
 assets-src/anatomy-reference/build/
+.claude/worktrees/
