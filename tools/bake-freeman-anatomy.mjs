@@ -478,6 +478,7 @@ for (const s of STRUCTURES) for (const side of SIDES)
  * ======================================================================== */
 stamp("measuring along on the atlas muscles");
 function endPoints(spec, inst) {
+  if (spec.joint) return Float32Array.from(JA[`${spec.joint}.${inst.side}`]);   // one atlas joint centre
   const pts = [];
   if (spec.patch) {
     for (const p of PATCHES) {
@@ -486,8 +487,9 @@ function endPoints(spec, inst) {
       if (!spec.patch.some((pre) => clean.startsWith(pre))) continue;
       for (let i = 0; i < p.pos.length; i++) pts.push(p.pos[i]);
     }
-    if (pts.length) return subsample(pts, 400);
-    console.warn(`  WARNING ${inst.key}: no patch ${spec.patch.join(" | ")}; using the structure's extreme`);
+    // patches alone, or patches plus the structure's extreme when both are given
+    if (pts.length && !spec.toward) return subsample(pts, 400);
+    if (!pts.length) console.warn(`  WARNING ${inst.key}: no patch ${spec.patch.join(" | ")}; using the structure's extreme`);
   }
   const dir = spec.toward ?? [0, 1, 0];
   const d = [dir[0] * sgn(inst.side), dir[1], dir[2]];
@@ -827,7 +829,7 @@ tidy(base);
 if (!ARGS.has("--no-snap")) {
   stamp("snapping borders to grooves");
   snapToGrooves(base, 1.8);
-  smoothBorders(base, 0.5);   // the flood leaves ragged edges where there is no groove
+  smoothBorders(base, 0.9);   // the flood leaves ragged edges where there is no groove
   tidy(base);
 }
 
@@ -895,7 +897,7 @@ stamp("soft borders");
   // from a seed of the same label.
   for (let v = 0; v < N; v++) {
     const s = src[v];
-    if (s < 0 || !Number.isFinite(dist[v]) || muscle[s] !== muscle[v]) continue;
+    if (!muscle[v] || s < 0 || !Number.isFinite(dist[v]) || muscle[s] !== muscle[v]) continue;
     const d = dist[v] + 0.25;               // a border lies half an edge beyond its last vertex
     if (d >= BORDER) continue;
     muscle2[v] = other[s];
@@ -1360,14 +1362,14 @@ function review() {
       torso: ["pectoralis_clavicular", "pectoralis_sternal", "serratus", "rectus_abdominis", "deltoid_anterior",
         "external_oblique", "bone_sternum", "sternocleidomastoid", "bone_clavicle", "latissimus"],
       arm: ["biceps_long", "biceps_short", "brachialis", "triceps_long", "triceps_lateral",
-        "brachioradialis", "triceps_medial", "forearm_flexors", "forearm_extensors", "deltoid_lateral"],
+        "brachioradialis", "triceps_medial", "forearm_flexors", "forearm_extensors", "deltoid_lateral", "biceps_tendon"],
       thigh: ["rectus_femoris", "vastus_lateralis", "vastus_medialis", "adductors", "tensor_fasciae_latae",
         "sartorius", "gracilis", "biceps_femoris", "semitendinosus", "semimembranosus"],
       calf: ["gastrocnemius_medial", "gastrocnemius_lateral", "soleus", "tibialis_anterior", "patellar_tendon",
         "fibularis", "bone_tibia", "bone_patella", "calcaneal_tendon", "gluteus_maximus"],
     };
     const COLORS = [[230, 40, 40], [245, 140, 20], [240, 220, 30], [40, 90, 230], [220, 40, 200],
-      [40, 180, 60], [40, 210, 220], [130, 60, 200], [250, 250, 250], [140, 80, 40]];
+      [40, 180, 60], [40, 210, 220], [130, 60, 200], [250, 250, 250], [140, 80, 40], [255, 150, 190]];
     const whole = (list) => list.map((v) => ({ ...v, target: [0, 92, 0], scale: 188 }));
     const VIEWS = {
       back: whole([{ name: "back", az: 180, el: 0 }, { name: "back-threequarter", az: 218, el: 8 }, { name: "side", az: 90, el: 0 }]),

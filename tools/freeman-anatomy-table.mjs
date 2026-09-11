@@ -63,7 +63,8 @@ export const STRUCTURES = [
     origin: { patch: ["Long head of biceps brachii.o"] }, insertion: { patch: ["Biceps brachii muscle.e"] } },
   { name: "biceps_short", group: "arm", regions: "ta",
     atlas: ["Short head of biceps brachii"],
-    origin: { patch: ["Short head of biceps brachii.o"] }, insertion: { patch: ["Biceps brachii muscle.e"] } },
+    // the left short head has no origin patch in the atlas; coracobrachialis shares the coracoid tip
+    origin: { patch: ["Short head of biceps brachii.o", "Coracobrachialis muscle.o"] }, insertion: { patch: ["Biceps brachii muscle.e"] } },
   { name: "biceps_tendon", group: "arm", regions: "a", atlas: [],   // carved from the distal biceps, see bake
     origin: { toward: up }, insertion: { patch: ["Biceps brachii muscle.e"] } },
   { name: "brachialis", group: "arm", regions: "a",
@@ -86,13 +87,14 @@ export const STRUCTURES = [
       "Palmaris longus muscle", "Humeral head of flexor carpi ulnaris", "Ulnar head of flexor carpi ulnaris",
       "Humero-ulnar head of flexor digitorum superficialis", "Radial head of flexor digitorum superficialis",
       "Flexor digitorum profundus", "Flexor pollicis longus", "Pronator quadratus"],
-    origin: { patch: ["Common flexor tendon.o", "Pronator teres.o"] }, insertion: { toward: down } },
+    // the group's far end on the skin is the wrist (its tendons run on to the fingers)
+    origin: { patch: ["Common flexor tendon.o", "Pronator teres.o"] }, insertion: { joint: "wrist" } },
   { name: "forearm_extensors", group: "arm", regions: "a",
     atlas: ["Extensor carpi radialis longus", "Extensor carpi radialis brevis", "Extensor digitorum",
       "Extensor digiti minimi", "Humeral head of extensor carpi ulnaris", "Ulnar head of extensor carpi ulnaris",
       "Abductor pollicis longus", "Extensor pollicis brevis", "Extensor pollicis longus", "Extensor indicis",
       "Anconeus muscle", "Supinator"],
-    origin: { patch: ["Common extensor tendon.o", "Extensor carpi radialis longus.o"] }, insertion: { toward: down } },
+    origin: { patch: ["Common extensor tendon.o", "Extensor carpi radialis longus.o"] }, insertion: { joint: "wrist" } },
   // ---- abdomen ----
   { name: "rectus_abdominis", group: "abdomen", regions: "t",
     atlas: ["Rectus abdominis muscle", "Pyramidalis muscle"],
@@ -112,7 +114,10 @@ export const STRUCTURES = [
     origin: { toward: down }, insertion: { toward: [1, 1, 0] } },
   { name: "latissimus", group: "back", regions: "ta",
     atlas: ["Latissimus dorsi muscle"],
-    origin: { patch: ["Latissimus dorsi muscle.o", "Latissimus dorsi muscle.e"] }, insertion: { toward: [1, 0.6, 0.3] } },
+    // the atlas patches are the iliac crest (.o) and the inferior angle (.e);
+    // the spinal aponeurosis (T7-sacrum) is its most medial edge
+    origin: { patch: ["Latissimus dorsi muscle.o", "Latissimus dorsi muscle.e"], toward: medial },
+    insertion: { toward: [1, 0.6, 0.3] } },
   { name: "teres_major", group: "back", regions: "ta",
     atlas: ["Teres major muscle"],
     origin: { patch: ["Teres major muscle.o"] }, insertion: { toward: [1, 0.6, 0.3] } },
@@ -226,7 +231,7 @@ export const TRANSPARENT = ["Iliotibial tract"];
    trained teres, the teres belly shows above the lat's thin upper edge. */
 export const SEE_THROUGH = [
   { over: "external_oblique", under: ["rectus_abdominis"], thick: 0.7, gap: 1.2 },
-  { over: "latissimus", under: ["erector_spinae"], thick: 1.1, gap: 1.0 },
+  { over: "latissimus", under: ["erector_spinae"], thick: 0.8, gap: 0.75 },
   { over: "latissimus", under: ["teres_major"], thick: 1.6, gap: 1.5 },
 ];
 
