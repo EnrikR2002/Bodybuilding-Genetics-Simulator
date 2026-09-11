@@ -231,8 +231,9 @@ export const TRANSPARENT = ["Iliotibial tract"];
    trained teres, the teres belly shows above the lat's thin upper edge. */
 export const SEE_THROUGH = [
   { over: "external_oblique", under: ["rectus_abdominis"], thick: 0.7, gap: 1.2 },
-  { over: "latissimus", under: ["erector_spinae"], thick: 0.8, gap: 0.75 },
-  { over: "latissimus", under: ["teres_major"], thick: 1.6, gap: 1.5 },
+  // only the lat's aponeurotic, proximal part (along < 0.3) is seen through
+  { over: "latissimus", under: ["erector_spinae"], thick: 1.1, gap: 1.0, alongBelow: 0.3 },
+  { over: "latissimus", under: ["teres_major"], thick: 2.2, gap: 2.0 },
 ];
 
 /* Small or narrow structures that border smoothing would otherwise erode:
@@ -240,7 +241,7 @@ export const SEE_THROUGH = [
    (A 2.5 cm tendon between two big neighbours loses its edges to a 1.2 cm
    blur; this keeps it roughly the width the atlas gives it.) */
 export const PERSIST = {
-  patellar_tendon: 2.0, biceps_tendon: 1.6, calcaneal_tendon: 1.2, teres_major: 1.4,
+  patellar_tendon: 2.0, biceps_tendon: 1.6, calcaneal_tendon: 1.2, teres_major: 1.8,
   bone_acromion: 1.3, bone_patella: 1.3, bone_clavicle: 1.2, bone_iliac: 1.4,
 };
 

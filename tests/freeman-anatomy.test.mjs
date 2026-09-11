@@ -19,6 +19,18 @@ const N = data.meta.vertices;
 const P = data.position;
 const ctx = buildContext(data);
 const NRM = ctx.smoothNormal;
+/* Skin area each vertex stands for (a third of its triangles), cm². The
+   sculpt's density varies sixfold (fine face and neck, coarse back), so
+   sizes are compared as areas, not vertex counts. */
+const AREA = new Float64Array(N);
+for (let t = 0; t < data.index.length; t += 3) {
+  const [a, b, c] = [data.index[t] * 3, data.index[t + 1] * 3, data.index[t + 2] * 3];
+  const ux = P[b] - P[a], uy = P[b + 1] - P[a + 1], uz = P[b + 2] - P[a + 2];
+  const vx = P[c] - P[a], vy = P[c + 1] - P[a + 1], vz = P[c + 2] - P[a + 2];
+  const s = Math.hypot(uy * vz - uz * vy, uz * vx - ux * vz, ux * vy - uy * vx) / 6;
+  AREA[a / 3] += s; AREA[b / 3] += s; AREA[c / 3] += s;
+}
+const areaOf = (names, side) => verticesOf(names, side).reduce((s, v) => s + AREA[v], 0);
 
 const VOCABULARY = [
   "sternocleidomastoid",
@@ -118,7 +130,10 @@ test("the trunk and limbs are labelled; hands, face, feet and genitals are not",
   assert.ok(handLab / hands < 0.02, `hand labelled ${(100 * handLab / hands).toFixed(1)}%`);
   assert.ok(faceLab / face < 0.02, `face labelled ${(100 * faceLab / face).toFixed(1)}%`);
   for (const s of SKIN_SHAPING)
-    for (const side of ["L", "R"]) assert.ok(verticesOf([s], side).length >= 60, `${s}.${side} owns skin`);
+    for (const side of ["L", "R"]) {
+      const a = areaOf([s], side);
+      assert.ok(a >= 8, `${s}.${side} owns ${a.toFixed(1)} cm² of skin`);
+    }
 });
 
 test("left and right structures are balanced and sit on their own side", () => {
@@ -149,6 +164,10 @@ test("biceps sits on the front of the left upper arm, along runs shoulder → el
   assert.ok(r > 0.85, `biceps along vs distance from the shoulder: r = ${r.toFixed(3)}`);
   const lm = A.landmarks["biceps_long.L"];
   assert.ok(onBone(lm.origin, arm).s < onBone(lm.insertion, arm).s, "biceps origin above its insertion");
+  const bt = verticesOf(["biceps_tendon"], "L");
+  assert.ok(bt.length > 10, "the distal biceps tendon is mapped");
+  const meanS = (list) => list.reduce((a, v) => a + onBone(v, arm).s, 0) / list.length;
+  assert.ok(meanS(bt) > meanS(bi) + 0.25, "the tendon lies distal to the bellies, toward the elbow");
 });
 
 test("gastrocnemius is on the back of the lower leg, along runs knee → heel", () => {
@@ -181,7 +200,8 @@ test("rectus abdominis is at the front midline, along runs pubis → ribs", () =
 test("latissimus is on the back and side of the trunk, along runs spine/pelvis → armpit", () => {
   for (const side of ["L", "R"]) {
     const lat = verticesOf(["latissimus"], side);
-    assert.ok(lat.length > 1500);
+    const area = areaOf(["latissimus"], side);
+    assert.ok(area > 250, `the lat is one of the largest structures on the back (${area.toFixed(0)} cm²)`);
     assert.ok(share(lat, (v) => NRM[v * 3 + 2] < 0.3) > 0.9, "facing back or out");
     assert.ok(share(lat, (v) => P[v * 3 + 2] < 6) > 0.9, "behind the front of the chest");
     const lm = A.landmarks[`latissimus.${side}`];

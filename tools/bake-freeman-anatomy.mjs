@@ -570,6 +570,8 @@ const hitAlong = new Float32Array(N).fill(NaN);
 const hitThick = new Float32Array(N);
 const hitDepth = new Float32Array(N);
 const facingStats = [0, 0];
+// the covering structure's own along where the ray crossed it
+const alongAt = (h) => WA[WT[h.tri * 3]] * (1 - h.u - h.v) + WA[WT[h.tri * 3 + 1]] * h.u + WA[WT[h.tri * 3 + 2]] * h.v;
 {
   const hits = [];
   for (let v = 0; v < N; v++) {
@@ -612,7 +614,7 @@ const facingStats = [0, 0];
       // past anything unnamed in between (serratus posterior, transversus)
       let below = null;
       if (inst.s >= 0) for (const r of SEE_THROUGH_BY[inst.s]) {
-        if (thick >= r.thick) continue;
+        if (thick >= r.thick || (r.alongBelow !== undefined && !(alongAt(e.h) < r.alongBelow))) continue;
         below = entries.find((f, j) => j > k && INST[f.ii].s >= 0 &&
           r.under.includes(STRUCTURES[INST[f.ii].s].name) && f.t - e.exit < r.gap);
         if (below) break;
