@@ -103,6 +103,38 @@ const N = ctx.n;
 const P = fm.position;
 const NRM = ctx.smoothNormal;
 const ADJ = ctx.adjacency();
+/* The sculpt is mirror-symmetric (vertex onto vertex within 0.2 mm for 99 %);
+   MIR[v] is the vertex at (-x, y, z). The atlas' two sides are two halves of
+   one real, slightly asymmetric body; the map pools them so Freeman's left
+   and right agree. */
+const MIR = new Int32Array(N);
+{
+  const map = new Map(), key = (x, y, z) => (x + 512) * 1048576 + (y + 512) * 1024 + (z + 512);
+  for (let v = 0; v < N; v++) {
+    const k = key(Math.floor(P[v * 3]), Math.floor(P[v * 3 + 1]), Math.floor(P[v * 3 + 2]));
+    let b = map.get(k);
+    if (!b) map.set(k, (b = []));
+    b.push(v);
+  }
+  let worst = 0, inv = 0;
+  for (let v = 0; v < N; v++) {
+    const x = -P[v * 3], y = P[v * 3 + 1], z = P[v * 3 + 2];
+    const cx = Math.floor(x), cy = Math.floor(y), cz = Math.floor(z);
+    let best = Infinity, bi = v;
+    for (let a = -1; a <= 1; a++) for (let b = -1; b <= 1; b++) for (let c = -1; c <= 1; c++) {
+      const bucket = map.get(key(cx + a, cy + b, cz + c));
+      if (!bucket) continue;
+      for (const w of bucket) {
+        const e = (P[w * 3] - x) ** 2 + (P[w * 3 + 1] - y) ** 2 + (P[w * 3 + 2] - z) ** 2;
+        if (e < best) { best = e; bi = w; }
+      }
+    }
+    MIR[v] = bi;
+    worst = Math.max(worst, Math.sqrt(best));
+  }
+  for (let v = 0; v < N; v++) if (MIR[MIR[v]] === v) inv++;
+  console.log(`  mirror map: worst ${worst.toFixed(2)} cm, ${(100 * inv / N).toFixed(2)}% of vertices pair up exactly`);
+}
 const RIG = Object.fromEntries(fm.meta.bones.map((b) => [b.name, b]));
 const foot = new Float32Array(N);
 for (let v = 0; v < N; v++)
@@ -567,7 +599,10 @@ const facingStats = [0, 0];
       if (inst.transparent) continue;
       if (inst.s >= 0 && regionWeight(v, STRUCTURES[inst.s].regions) < REGION_MIN) continue;
       const thick = e.exit - e.t;
-      if (thick < SHEET && entries.some((f, j) => j > k && f.t - e.t < SHEET_GAP && !INST[f.ii].transparent)) continue;
+      // a thin sheet is seen through to what lies under it; a vocabulary
+      // sheet only to another vocabulary structure, never to unnamed depth
+      if (thick < SHEET && entries.some((f, j) => j > k && f.t - e.t < SHEET_GAP && !INST[f.ii].transparent &&
+          (inst.s < 0 || INST[f.ii].s >= 0))) continue;
       const see = inst.s >= 0 && SEE_THROUGH[STRUCTURES[inst.s].name];
       if (see && thick < see.thick && entries.some((f, j) => j > k && INST[f.ii].s >= 0 &&
           see.under.includes(STRUCTURES[INST[f.ii].s].name) && f.t - e.exit < see.gap)) continue;
@@ -624,6 +659,13 @@ if (ARGS.has("--probe")) {
     { name: "infraspinatus", target: [11, 138, 0], dir: [0, 0, -1] },
     { name: "brachialis (lower lateral arm)", target: [32.5, 128.5, -3.2], dir: [0.5, 0.5, 0.707] },
     { name: "mid lateral arm", target: [28, 133, -3.5], dir: [0.6, 0.6, 0.5] },
+    { name: "teres major, lateral", target: [18, 136, -4], dir: [0.5, 0, -0.866] },
+    { name: "teres major, armpit", target: [20, 138, -4], dir: [0.6, -0.2, -0.77] },
+    { name: "patellar tendon", target: [11.5, 43, -3], dir: [0, 0, 1] },
+    { name: "patellar tendon, low", target: [11.5, 40, -3], dir: [0, 0, 1] },
+    { name: "lower abdomen", target: [10, 92, 0], dir: [0.2, 0, 1] },
+    { name: "groin", target: [13, 96, 0], dir: [0.4, 0, 0.9] },
+    { name: "distal biceps", target: [35.2, 125.8, -3.1], dir: [0.2, 0.35, 0.9] },
   ];
   const hits = [];
   const nm = (ii) => (INST[ii].s >= 0 ? `${STRUCTURES[INST[ii].s].name}.${INST[ii].side}` : INST[ii].name);
@@ -820,6 +862,13 @@ for (const s of [BT]) {
   }
 }
 smoothWithin(along, muscle, 12);
+// pool the two sides, as for the labels
+for (let v = 0; v < N; v++) {
+  const m = MIR[v];
+  if (m <= v || !muscle[v] || !muscle[m] || ((muscle[v] - 1) >> 1) !== ((muscle[m] - 1) >> 1)) continue;
+  const a = (along[v] + along[m]) / 2;
+  along[v] = a; along[m] = a;
+}
 for (let v = 0; v < N; v++) alongOut[v] = muscle[v] ? Math.round(255 * clamp(Number.isFinite(along[v]) ? along[v] : 0.5)) : 0;
 
 stamp("landmarks");
@@ -853,6 +902,13 @@ const landmarks = {};
       peak,
       centroid: nearestTo(verts, mean(verts)),
     };
+  }
+  // the right side is the mirror image of the left wherever the map is
+  for (const name of Object.keys(landmarks)) {
+    if (!name.endsWith(".L")) continue;
+    const right = name.slice(0, -2) + ".R", idR = MUSCLES.indexOf(right);
+    const mirrored = Object.fromEntries(Object.entries(landmarks[name]).map(([k, v]) => [k, MIR[v]]));
+    if (Object.values(mirrored).every((v) => muscle[v] === idR)) landmarks[right] = mirrored;
   }
 }
 
@@ -1128,7 +1184,15 @@ function smoothBorders(labels, sigma) {
   const K = 4, EMPTY = -32768;
   let L = new Int16Array(N * K).fill(EMPTY), W = new Float32Array(N * K);
   let L2 = new Int16Array(N * K), W2 = new Float32Array(N * K);
-  for (let v = 0; v < N; v++) if (!masked[v]) { L[v * K] = labels[v]; W[v * K] = 1; }
+  // start from both sides' evidence: a vertex and its mirror share one list,
+  // always built in the same order, so a mirror pair can never split a tie
+  for (let v = 0; v < N; v++) {
+    if (masked[v]) continue;
+    const m = MIR[v], pair = !masked[m];
+    const a = pair ? Math.min(v, m) : v, b = pair ? Math.max(v, m) : v;
+    L[v * K] = labels[a]; W[v * K] = 1;
+    if (labels[b] !== labels[a]) { W[v * K] = 0.5; L[v * K + 1] = labels[b]; W[v * K + 1] = 0.5; }
+  }
   const tl = new Int16Array(512), tw = new Float32Array(512);
   let n = 0;
   const gather = (u, wgt) => {
@@ -1141,15 +1205,23 @@ function smoothBorders(labels, sigma) {
       tw[j] += W[u * K + k] * wgt;
     }
   };
+  const around = (u, share) => {   // u and its unmasked ring, `share` of the new state
+    let deg = 0;
+    for (let o = offsets[u]; o < offsets[u + 1]; o++) if (!masked[list[o]]) deg++;
+    gather(u, deg ? share * 0.5 : share);
+    for (let o = offsets[u]; o < offsets[u + 1]; o++) if (!masked[list[o]]) gather(list[o], (share * 0.5) / deg);
+  };
   for (let p = 0; p < passes; p++) {
     L2.fill(EMPTY); W2.fill(0);
     for (let v = 0; v < N; v++) {
       if (masked[v]) continue;
-      let deg = 0;
-      for (let o = offsets[v]; o < offsets[v + 1]; o++) if (!masked[list[o]]) deg++;
+      const m = MIR[v], pair = m !== v && !masked[m];
+      if (pair && m < v && MIR[m] === v) {   // the mirror already computed this very state
+        for (let k = 0; k < K; k++) { L2[v * K + k] = L2[m * K + k]; W2[v * K + k] = W2[m * K + k]; }
+        continue;
+      }
       n = 0;
-      gather(v, deg ? 0.5 : 1);
-      for (let o = offsets[v]; o < offsets[v + 1]; o++) if (!masked[list[o]]) gather(list[o], 0.5 / deg);
+      if (pair) { around(Math.min(v, m), 0.5); around(Math.max(v, m), 0.5); } else around(v, 1);
       let sum = 0;
       const top = Math.min(K, n);
       for (let k = 0; k < top; k++) {
