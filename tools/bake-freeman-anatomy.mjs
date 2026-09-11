@@ -470,7 +470,8 @@ for (const side of SIDES) {
 }
 stamp(`${INST.filter((i) => i.s >= 0).length} vocabulary instances, ${INST.filter((i) => i.s < 0).length} other structures`);
 for (const s of STRUCTURES) for (const side of SIDES)
-  if (!INST.some((i) => i.s === sIndex(s.name) && i.side === side) && s.name !== "biceps_tendon")
+  if (!INST.some((i) => i.s === sIndex(s.name) && (i.side === side || i.parts.some((p) => !p.o.side))) &&
+      s.name !== "biceps_tendon")   // a midline object (sternum) serves both sides
     console.warn(`  WARNING no atlas geometry for ${s.name}.${side}`);
 
 /* ======================================================================== *

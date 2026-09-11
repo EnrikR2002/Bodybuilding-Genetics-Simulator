@@ -114,9 +114,11 @@ export const STRUCTURES = [
     origin: { toward: down }, insertion: { toward: [1, 1, 0] } },
   { name: "latissimus", group: "back", regions: "ta",
     atlas: ["Latissimus dorsi muscle"],
-    // the atlas patches are the iliac crest (.o) and the inferior angle (.e);
-    // the spinal aponeurosis (T7-sacrum) is its most medial edge
-    origin: { patch: ["Latissimus dorsi muscle.o", "Latissimus dorsi muscle.e"], toward: medial },
+    // spine and pelvis: the iliac crest patch (.o) and the spinal aponeurosis
+    // (T7-sacrum, the muscle's most medial edge). The small slip from the
+    // scapula's inferior angle (.e) is left out, so along runs monotone
+    // from the spine and pelvis to the armpit.
+    origin: { patch: ["Latissimus dorsi muscle.o"], toward: medial },
     insertion: { toward: [1, 0.6, 0.3] } },
   { name: "teres_major", group: "back", regions: "ta",
     atlas: ["Teres major muscle"],
