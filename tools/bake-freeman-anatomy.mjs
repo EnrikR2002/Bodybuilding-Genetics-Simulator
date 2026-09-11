@@ -564,6 +564,24 @@ const facingStats = [0, 0];
   stamp(`  ${hit} of ${open} unmasked vertices hit anatomy, ${voc} a vocabulary structure; ` +
     `front-facing first hits ${(100 * facingStats[0] / (facingStats[0] + facingStats[1])).toFixed(0)}%`);
 }
+{
+  // who owns the skin, how deep under it the owner starts and how thick it is
+  const owners = new Map();
+  for (let v = 0; v < N; v++) {
+    const ii = hitInst[v];
+    if (ii < 0) continue;
+    const inst = INST[ii];
+    const key = inst.s >= 0 ? STRUCTURES[inst.s].name : inst.name;
+    const rec = owners.get(key) || { n: 0, d: 0, t: 0, other: inst.s < 0 };
+    rec.n++; rec.d += hitDepth[v]; rec.t += Math.min(hitThick[v], RAY_IN);
+    owners.set(key, rec);
+  }
+  const rows = [...owners.entries()].sort((a, b) => b[1].n - a[1].n);
+  const fmt = ([k, r]) => `${k}:${r.n}@${(r.d / r.n).toFixed(1)}/${(r.t / r.n).toFixed(1)}`;
+  console.log("  largest owners outside the vocabulary (vertices@depth/thickness cm): " +
+    rows.filter(([, r]) => r.other).slice(0, 30).map(fmt).join("  "));
+  console.log("  vocabulary owners before cleaning: " + rows.filter(([, r]) => !r.other).map(fmt).join("  "));
+}
 
 /* ======================================================================== *
    4. clean
@@ -676,7 +694,7 @@ function tidy(labels) {
   return dropped;
 }
 for (let i = 0; i < 3; i++) stamp(`  tidy pass ${i + 1}: relabelled ${tidy(base)} vertices`);
-majority(base, 2);
+stamp(`  straightening borders: ${smoothBorders(base, 1.2)} vertices changed (mean edge ${meanEdge.toFixed(2)} cm)`);
 tidy(base);
 
 /* ---- snap borders to the sculpt's grooves ----
@@ -688,6 +706,7 @@ tidy(base);
 if (!ARGS.has("--no-snap")) {
   stamp("snapping borders to grooves");
   snapToGrooves(base, 1.8);
+  smoothBorders(base, 0.5);   // the flood leaves ragged edges where there is no groove
   tidy(base);
 }
 
@@ -816,7 +835,7 @@ stamp("wrote public/models/freeman-anatomy.{json,bin}");
 }
 
 // ---- review renders ----
-if (ARGS.has("--shots") || ARGS.has("--overlay")) review();
+if (ARGS.has("--shots") || ARGS.has("--overlay") || ARGS.has("--atlas")) review();
 
 /* ======================================================================== *
    helpers
@@ -1005,6 +1024,71 @@ function snapToGrooves(labels, band) {
   stamp(`  ${count} vertices in the border band, ${moved} moved into grooves`);
 }
 
+/* Straighten borders: every label's indicator is diffused over the mesh (a
+   Gaussian about `sigma` cm wide) and each vertex takes the strongest. Saw
+   teeth from the ray grid and the atlas triangulation straighten out and
+   specks shrink away; a sparse top-4 list per vertex keeps it cheap.
+   Returns the number of vertices that changed label. */
+let meanEdge = 0;
+function smoothBorders(labels, sigma) {
+  const { offsets, list } = ADJ;
+  if (!meanEdge) {
+    let s = 0, c = 0;
+    for (let v = 0; v < N; v += 5) {
+      if (masked[v]) continue;
+      for (let o = offsets[v]; o < offsets[v + 1]; o++) {
+        const w = list[o];
+        s += Math.hypot(P[w * 3] - P[v * 3], P[w * 3 + 1] - P[v * 3 + 1], P[w * 3 + 2] - P[v * 3 + 2]);
+        c++;
+      }
+    }
+    meanEdge = s / c;
+  }
+  const passes = Math.max(1, Math.round(2 * (sigma / meanEdge) ** 2));
+  const K = 4, EMPTY = -32768;
+  let L = new Int16Array(N * K).fill(EMPTY), W = new Float32Array(N * K);
+  let L2 = new Int16Array(N * K), W2 = new Float32Array(N * K);
+  for (let v = 0; v < N; v++) if (!masked[v]) { L[v * K] = labels[v]; W[v * K] = 1; }
+  const tl = new Int16Array(512), tw = new Float32Array(512);
+  let n = 0;
+  const gather = (u, wgt) => {
+    for (let k = 0; k < K; k++) {
+      const l = L[u * K + k];
+      if (l === EMPTY) break;
+      let j = 0;
+      while (j < n && tl[j] !== l) j++;
+      if (j === n) { tl[n] = l; tw[n] = 0; n++; }
+      tw[j] += W[u * K + k] * wgt;
+    }
+  };
+  for (let p = 0; p < passes; p++) {
+    L2.fill(EMPTY); W2.fill(0);
+    for (let v = 0; v < N; v++) {
+      if (masked[v]) continue;
+      let deg = 0;
+      for (let o = offsets[v]; o < offsets[v + 1]; o++) if (!masked[list[o]]) deg++;
+      n = 0;
+      gather(v, deg ? 0.5 : 1);
+      for (let o = offsets[v]; o < offsets[v + 1]; o++) if (!masked[list[o]]) gather(list[o], 0.5 / deg);
+      let sum = 0;
+      const top = Math.min(K, n);
+      for (let k = 0; k < top; k++) {
+        let b = k;
+        for (let j = k + 1; j < n; j++) if (tw[j] > tw[b]) b = j;
+        const ql = tl[k], qw = tw[k];
+        tl[k] = tl[b]; tw[k] = tw[b]; tl[b] = ql; tw[b] = qw;
+        sum += tw[k];
+      }
+      for (let k = 0; k < top; k++) { L2[v * K + k] = tl[k]; W2[v * K + k] = tw[k] / sum; }
+    }
+    [L, L2] = [L2, L];
+    [W, W2] = [W2, W];
+  }
+  let changed = 0;
+  for (let v = 0; v < N; v++) if (!masked[v] && L[v * K] !== labels[v]) { labels[v] = L[v * K]; changed++; }
+  return changed;
+}
+
 function palette(i) {
   const h = (i * 0.61803398875) % 1, s = 0.55 + 0.35 * ((i * 7) % 3) / 2, val = i % 2 ? 0.78 : 0.97;
   const k = Math.floor(h * 6), f = h * 6 - k, p = val * (1 - s), q = val * (1 - f * s), t = val * (1 - (1 - f) * s);
@@ -1071,5 +1155,26 @@ function review() {
     run("anatomy-map-along", path.join(BUILD, "review-along.rgba"));
   }
   if (ARGS.has("--overlay")) run("anatomy-overlay", null, { overlays, xray: 0.45 });
+  if (ARGS.has("--atlas")) {
+    // The warped dissection itself, coloured like the map, without the sculpt:
+    // where it disagrees with the map, the casting rules are at fault; where
+    // it is itself wrong, the registration is.
+    stamp("rendering the warped dissection");
+    const keep = [];
+    for (let t = 0; t < WI.length; t++) if (!INST[WI[t]].transparent) keep.push(t);
+    const tris = new Uint32Array(keep.length * 3);
+    keep.forEach((t, i) => { tris[i * 3] = WT[t * 3]; tris[i * 3 + 1] = WT[t * 3 + 1]; tris[i * 3 + 2] = WT[t * 3 + 2]; });
+    const col = new Uint8Array((WV.length / 3) * 4).fill(255);
+    for (let t = 0; t < WI.length; t++) {
+      const inst = INST[WI[t]];
+      const c = inst.s >= 0 ? palette(inst.s) : [110, 108, 104];
+      for (let k = 0; k < 3; k++) { const o = WT[t * 3 + k] * 4; col[o] = c[0]; col[o + 1] = c[1]; col[o + 2] = c[2]; }
+    }
+    const files = ["f32", "u32", "rgba"].map((ext) => path.join(BUILD, `review-atlas-all.${ext}`));
+    fs.writeFileSync(files[0], Buffer.from(WV.buffer, WV.byteOffset, WV.byteLength));
+    fs.writeFileSync(files[1], Buffer.from(tris.buffer));
+    fs.writeFileSync(files[2], Buffer.from(col.buffer));
+    run("anatomy-atlas", null, { overlays: [{ verts: files[0], tris: files[1], colors: files[2] }], hide_freeman: true });
+  }
   stamp("review images in shots/");
 }

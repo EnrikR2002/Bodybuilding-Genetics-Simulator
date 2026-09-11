@@ -80,13 +80,18 @@ if cfg.get('colors'):
     col = np.fromfile(cfg['colors'], dtype=np.uint8)
 else:
     col = np.tile(np.array([200, 196, 188, 255], dtype=np.uint8), n)
-make_mesh('Freeman', pos, idx, col)
+if not cfg.get('hide_freeman'):
+    make_mesh('Freeman', pos, idx, col)
 
 for i, ov in enumerate(cfg.get('overlays', [])):
     v = np.fromfile(ov['verts'], dtype=np.float32)
     t = np.fromfile(ov['tris'], dtype=np.uint32)
-    c = np.array(list(ov.get('color', [220, 60, 60])) + [255], dtype=np.uint8)
-    make_mesh('Overlay%d' % i, v, t, np.tile(c, len(v) // 3))
+    if ov.get('colors'):
+        rgba = np.fromfile(ov['colors'], dtype=np.uint8)   # per vertex
+    else:
+        c = np.array(list(ov.get('color', [220, 60, 60])) + [255], dtype=np.uint8)
+        rgba = np.tile(c, len(v) // 3)
+    make_mesh('Overlay%d' % i, v, t, rgba)
 
 scene = bpy.context.scene
 scene.render.engine = 'BLENDER_WORKBENCH'
