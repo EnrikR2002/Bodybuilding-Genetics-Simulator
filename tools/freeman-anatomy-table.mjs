@@ -233,8 +233,9 @@ export const TRANSPARENT = ["Iliotibial tract"];
    trained teres, the teres belly shows above the lat's thin upper edge. */
 export const SEE_THROUGH = [
   { over: "external_oblique", under: ["rectus_abdominis"], thick: 0.7, gap: 1.2 },
-  // only the lat's aponeurotic, proximal part (along < 0.3) is seen through
-  { over: "latissimus", under: ["erector_spinae"], thick: 1.1, gap: 1.0, alongBelow: 0.3 },
+  // only the lat's aponeurotic, proximal fifth (along < 0.2) is seen through:
+  // the lumbar columns, narrowing up to where the lat's fibres begin
+  { over: "latissimus", under: ["erector_spinae"], thick: 1.1, gap: 1.0, alongBelow: 0.2 },
   { over: "latissimus", under: ["teres_major"], thick: 2.2, gap: 2.0 },
 ];
 
