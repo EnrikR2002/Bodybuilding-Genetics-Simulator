@@ -39,7 +39,7 @@ import { execFileSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { readFreeman } from "./read-freeman.mjs";
 import { buildContext } from "../src/freeman/shape/context.js";
-import { STRUCTURES, MERGE, TRANSPARENT, SEE_THROUGH, BONE_SEGMENT, skinSegment } from "./freeman-anatomy-table.mjs";
+import { STRUCTURES, MERGE, TRANSPARENT, SEE_THROUGH, PERSIST, BONE_SEGMENT, skinSegment } from "./freeman-anatomy-table.mjs";
 import {
   TriangleBVH, DistanceField, geodesic,
   sub, add, mul, dot, cross, len, norm, clamp, smoothstep,
@@ -60,7 +60,7 @@ const SHEET = 0.3;          // thinner than this, with muscle under it: an apone
 const SHEET_GAP = 2.5;      // "under it" means within this depth
 const REGION_MIN = 0.25;    // rig weight a region needs before its structures may own skin
 const BORDER = 1.2;         // soft border half-width
-const MIN_ISLAND = 40;      // vertices; smaller islands of a structure are relabelled
+const MIN_ISLAND = 25;      // vertices; smaller islands of a structure are relabelled
 const MAX_HOLE = 220;       // vertices; unlabelled patches up to this size are filled
 const FRONT = [0, 0, 1];
 
@@ -403,6 +403,8 @@ const byAtlasName = new Map();
 STRUCTURES.forEach((s, i) => s.atlas.forEach((a) => byAtlasName.set(a, i)));
 for (const [a, name] of Object.entries(MERGE)) byAtlasName.set(a, STRUCTURES.findIndex((s) => s.name === name));
 const sIndex = (name) => STRUCTURES.findIndex((s) => s.name === name);
+const PERSIST_OF = new Float32Array(NS + 2).fill(1);   // by label + 1 (label -1 = nothing, NS = other)
+for (const [name, f] of Object.entries(PERSIST)) PERSIST_OF[sIndex(name) + 1] = f;
 
 /* An instance is one sided structure (or one "other" object) in the cast. */
 const INST = [];
@@ -644,6 +646,19 @@ const facingStats = [0, 0];
     rows.filter(([, r]) => r.other).slice(0, 30).map(fmt).join("  "));
   console.log("  vocabulary owners before cleaning: " + rows.filter(([, r]) => !r.other).map(fmt).join("  "));
 }
+{
+  // where the atlas biceps turns to tendon: skin count and thickness by along
+  const bins = Array.from({ length: 10 }, () => ({ n: 0, t: 0 }));
+  const bl = sIndex("biceps_long"), bs = sIndex("biceps_short");
+  for (let v = 0; v < N; v++) {
+    const ii = hitInst[v];
+    if (ii < 0 || (INST[ii].s !== bl && INST[ii].s !== bs) || !Number.isFinite(hitAlong[v])) continue;
+    const b = bins[Math.min(9, Math.floor(hitAlong[v] * 10))];
+    b.n++; b.t += Math.min(hitThick[v], RAY_IN);
+  }
+  console.log("  biceps skin by along (vertices@thickness cm): " +
+    bins.map((b, i) => `${(i / 10).toFixed(1)}:${b.n}@${b.n ? (b.t / b.n).toFixed(2) : "-"}`).join("  "));
+}
 /* --probe: the whole ray stack at named skin points, for tuning the rules.
    Each probe finds the skin where a line along `dir` through `target` leaves
    the body, then prints what the cast ray from that vertex crosses. */
@@ -666,6 +681,8 @@ if (ARGS.has("--probe")) {
     { name: "lower abdomen", target: [10, 92, 0], dir: [0.2, 0, 1] },
     { name: "groin", target: [13, 96, 0], dir: [0.4, 0, 0.9] },
     { name: "distal biceps", target: [35.2, 125.8, -3.1], dir: [0.2, 0.35, 0.9] },
+    { name: "lumbar gap, medial", target: [5, 113, 0], dir: [0, 0, -1] },
+    { name: "lumbar gap, lateral", target: [9, 109, 0], dir: [0.2, 0, -1] },
   ];
   const hits = [];
   const nm = (ii) => (INST[ii].s >= 0 ? `${STRUCTURES[INST[ii].s].name}.${INST[ii].side}` : INST[ii].name);
@@ -1237,7 +1254,17 @@ function smoothBorders(labels, sigma) {
     [W, W2] = [W2, W];
   }
   let changed = 0;
-  for (let v = 0; v < N; v++) if (!masked[v] && L[v * K] !== labels[v]) { labels[v] = L[v * K]; changed++; }
+  for (let v = 0; v < N; v++) {
+    if (masked[v]) continue;
+    let best = L[v * K], bw = -1;
+    for (let k = 0; k < K; k++) {
+      const l = L[v * K + k];
+      if (l === EMPTY) break;
+      const w = W[v * K + k] * PERSIST_OF[l + 1];
+      if (w > bw) { bw = w; best = l; }
+    }
+    if (best !== labels[v]) { labels[v] = best; changed++; }
+  }
   return changed;
 }
 
@@ -1335,6 +1362,7 @@ function review() {
       thigh: whole([{ name: "front", az: 0, el: 0 }, { name: "back", az: 180, el: 0 }, { name: "side", az: 90, el: 0 }, { name: "medial", az: -60, el: 0 }]),
       calf: whole([{ name: "front", az: 0, el: 0 }, { name: "back", az: 180, el: 0 }, { name: "side", az: 90, el: 0 }]),
     };
+    let atlasFiles = null;
     for (const [set, names] of Object.entries(FOCUS)) {
       const col = new Uint8Array(N * 4);
       for (let v = 0; v < N; v++) {
@@ -1347,6 +1375,29 @@ function review() {
       const file = path.join(BUILD, `review-focus-${set}.rgba`);
       fs.writeFileSync(file, col);
       run(`anatomy-focus-${set}`, file, { views: VIEWS[set] });
+      if (ARGS.has("--atlas")) {
+        // the same colours on the warped dissection, to tell registration from casting
+        if (!atlasFiles) {
+          const keep = [];
+          for (let t = 0; t < WI.length; t++) if (!INST[WI[t]].transparent) keep.push(t);
+          const tris = new Uint32Array(keep.length * 3);
+          keep.forEach((t, i) => { tris[i * 3] = WT[t * 3]; tris[i * 3 + 1] = WT[t * 3 + 1]; tris[i * 3 + 2] = WT[t * 3 + 2]; });
+          atlasFiles = ["f32", "u32"].map((ext) => path.join(BUILD, `review-focus-atlas.${ext}`));
+          fs.writeFileSync(atlasFiles[0], Buffer.from(WV.buffer, WV.byteOffset, WV.byteLength));
+          fs.writeFileSync(atlasFiles[1], Buffer.from(tris.buffer));
+        }
+        const acol = new Uint8Array((WV.length / 3) * 4).fill(255);
+        for (let t = 0; t < WI.length; t++) {
+          const inst = INST[WI[t]];
+          const k = inst.s >= 0 ? names.indexOf(STRUCTURES[inst.s].name) : -1;
+          const c = k >= 0 ? COLORS[k] : [110, 108, 104];
+          for (let j = 0; j < 3; j++) { const o = WT[t * 3 + j] * 4; acol[o] = c[0]; acol[o + 1] = c[1]; acol[o + 2] = c[2]; }
+        }
+        const af = path.join(BUILD, `review-focus-atlas-${set}.rgba`);
+        fs.writeFileSync(af, acol);
+        run(`anatomy-atlas-focus-${set}`, null,
+          { overlays: [{ verts: atlasFiles[0], tris: atlasFiles[1], colors: af }], hide_freeman: true, views: VIEWS[set] });
+      }
     }
   }
   if (ARGS.has("--atlas")) {

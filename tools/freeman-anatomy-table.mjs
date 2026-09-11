@@ -226,6 +226,15 @@ export const SEE_THROUGH = {
   latissimus: { under: ["erector_spinae"], thick: 1.1, gap: 1.0 },
 };
 
+/* Small or narrow structures that border smoothing would otherwise erode:
+   at the final label decision their diffused weight counts this many times.
+   (A 2.5 cm tendon between two big neighbours loses its edges to a 1.2 cm
+   blur; this keeps it roughly the width the atlas gives it.) */
+export const PERSIST = {
+  patellar_tendon: 2.0, biceps_tendon: 1.6, calcaneal_tendon: 1.2, teres_major: 1.4,
+  bone_acromion: 1.3, bone_patella: 1.3, bone_clavicle: 1.2, bone_iliac: 1.4,
+};
+
 /* Bones by the limb segment that carries them, for the skeleton-driven
    part of the registration. Everything else belongs to the trunk. */
 export const BONE_SEGMENT = [
