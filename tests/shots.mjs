@@ -9,7 +9,7 @@
    node tests/shots.mjs --script tests/scripts/insertions.json
    --------------------------------------------------------------------------- */
 import { chromium } from 'playwright';
-import { spawn } from 'node:child_process';
+import { spawn, spawnSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -60,7 +60,14 @@ export async function withPage(fn, { width = 900, height = 1150, page: entry = '
     errors.push('THREW ' + String(e.message || e).split('\n')[0]);
   } finally {
     await browser.close();
-    if (server) { try { server.kill(); } catch {} }
+    /* On Windows `kill` only ends the shell; take the whole Vite tree down, or
+       its open pipes keep this process alive after the shots are done. */
+    if (server) {
+      try {
+        if (process.platform === 'win32') spawnSync('taskkill', ['/pid', String(server.pid), '/t', '/f']);
+        else server.kill();
+      } catch {}
+    }
   }
   return errors;
 }

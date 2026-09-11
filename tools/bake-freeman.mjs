@@ -8,6 +8,7 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { spawnSync } from "node:child_process";
+import { fixFile } from "./fix-freeman-weights.mjs";
 
 const root = path.resolve(import.meta.dirname, "..");
 const blend = path.join(root, "assets-src/mike-freeman/source/Mike_Freeman.blend");
@@ -58,3 +59,5 @@ before.meta.bones.forEach((bone, i) => {
   if (!now || now.name !== bone.name || now.parent !== bone.parent) restore(`bone ${bone.name} was renamed or moved`);
 });
 console.log(`Surface identical to the previous bake (${names.length} blocks); ${after.meta.bones.length} bones. Backup: ${backup}`);
+// Blender writes raw heat weights; clean them (midline fade, trunk smoothing).
+fixFile(models);
