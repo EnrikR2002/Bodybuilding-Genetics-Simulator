@@ -100,15 +100,43 @@ export function preparePose(ctx) {
   const { base, n } = ctx;
   // The shoulder/axilla transition, where heat weights stretch small sculpt
   // folds into fins under arm elevation. Scaled per side by elevation.
-  const relax = [], weights = [];
+  const relax = [], weights = [], back = [], backWeights = [];
+  const { skinIndex, skinWeight, meta } = ctx.data;
+  const helper = new Set(meta.bones.flatMap((b, i) => (/^upperarm_support./.test(b.name) ? [i] : [])));
+  const arm = [[], []];
   for (let v = 0; v < n; v++) {
     const x = Math.abs(base[v * 3]), y = base[v * 3 + 1];
     const w = smooth(11, 17, x) * (1 - smooth(25, 32, x)) * smooth(123, 132, y) * (1 - smooth(143, 151, y));
     if (w > 0) { relax.push(v); weights.push(w * Math.sign(base[v * 3])); }
+    // Around the armpit and the shoulder cap (deltoid, pec border, teres, lat,
+    // side of the ribs) the skin sits between trunk and arm weights; big arm
+    // swings tear it into seams, creases and flat webs. Its motion is smoothed
+    // there after skinning.
+    const trunk = smooth(7, 13, x) * (1 - smooth(30, 38, x)) * smooth(102, 112, y) * (1 - smooth(148, 156, y))
+      * (1 - smooth(0.6, 0.95, ctx.arm[v]));
+    if (trunk > 0) { back.push(v); backWeights.push(trunk * Math.sign(base[v * 3])); }
+    // Arm skin, for spreading the humeral twist along the upper arm: skinning
+    // twists a vertex by its weight on the humerus and every bone below it,
+    // which jumps from 0 to 1 in a narrow band; the share it should have fades
+    // in from the shoulder to mid-arm.
+    let hs = 0;
+    for (let k = 0; k < 4; k++) if (helper.has(skinIndex[v * 4 + k])) hs += skinWeight[v * 4 + k];
+    if (ctx.arm[v] > 0.05) {
+      const side = base[v * 3] > 0 ? 0 : 1, bone = ctx.bones[`upperarm.${side ? "R" : "L"}`];
+      const t = ((base[v * 3] - bone.head[0]) * bone.axis[0] + (base[v * 3 + 1] - bone.head[1]) * bone.axis[1]
+        + (base[v * 3 + 2] - bone.head[2]) * bone.axis[2]) / bone.length;
+      const extra = smooth(0.05, 0.75, t) * ctx.arm[v] - (ctx.arm[v] - hs);
+      if (Math.abs(extra) > 0.002) arm[side].push(v, extra);
+    }
   }
   const index = {};
   for (const [name, b] of Object.entries(ctx.bones)) index[name] = b.index;
-  ctx.__pose = { index, relax: Uint32Array.from(relax), relaxWeight: Float32Array.from(weights),
+  ctx.__pose = { index,
+    relax: { list: Uint32Array.from(relax), weight: Float32Array.from(weights), passes: 8 },
+    // per side: [vertex, share of the humeral twist to add] pairs
+    twist: arm.map((a) => Float32Array.from(a)),
+    axilla: motionPatch(ctx, back, backWeights, 20, 0.6),
+    behind: { list: Uint32Array.from(back), weight: Float32Array.from(backWeights), passes: 24 },
     // rest heel contact points (sculpt cm) for toes-up pivots; they follow frame edits
     heels: new Float32Array([12.3, 0.8, -8.6, -12.3, 0.8, -8.6]) };
   return ctx.__pose;
@@ -124,6 +152,8 @@ class Solver {
     this.P = fig.heads.map((h) => h.clone());
     this.done = new Uint8Array(this.defs.length);
     this.hips = new Vector3();
+    this.twist = { L: null, R: null };
+    this.behind = { L: 0, R: 0 };
   }
   i(name) {
     const i = this.I[name];
@@ -274,8 +304,8 @@ function poseArm(S, def, side, sign) {
   let u, f;
   if (!arm) { u = u0.clone().applyQuaternion(Wc); f = f0.clone().applyQuaternion(Wc); }
   else if (arm.ik) {
-    const ref = arm.ik.from;
-    const target = S.P[S.i(ref)].clone().add(mirror(arm.ik.to, sign).applyQuaternion(S.W[S.i(ref)]));
+    const ref = arm.ik.from, axes = arm.ik.axes ?? ref;
+    const target = S.P[S.i(ref)].clone().add(mirror(arm.ik.to, sign).applyQuaternion(S.W[S.i(axes)]));
     // from the posed shoulder joint, carried by the clavicle
     ({ upper: u, lower: f } = reach(S.carry(clav, S.head(up)), target, S.length(up), S.length(fo), frame(arm.ik.pole)));
   } else { u = frame(arm.upper); f = frame(arm.fore); }
@@ -284,7 +314,17 @@ function poseArm(S, def, side, sign) {
   // The shoulder helper keeps the swing but only part of the humeral twist.
   const local = Wc.clone().invert().multiply(Wu), twist = twistOf(local, u0);
   const swing = local.clone().multiply(twist.clone().invert());
-  S.set(`upperarm_support.${side}`, Wc.clone().multiply(swing.multiply(new Quaternion().slerp(twist, 0.45))));
+  // The helper only swings; after skinning the humeral twist is faded in down
+  // the upper arm (see spreadTwist), as a chain of twist bones would, instead
+  // of snapping where the humerus weight begins.
+  S.set(`upperarm_support.${side}`, Wc.clone().multiply(swing));
+  const tq = twist.w < 0 ? new Quaternion(-twist.x, -twist.y, -twist.z, -twist.w) : twist;
+  // An arm folded behind the back (humerus down and back, forearm across the
+  // spine) folds the armpit into fins the motion relax cannot flatten; the skin
+  // shape itself is relaxed there too.
+  const fwd = new Vector3(0, 0, 1).applyQuaternion(Wchest), out = new Vector3(sign, 0, 0).applyQuaternion(Wchest);
+  S.behind[side] = smooth(0.05, 0.3, -u.dot(fwd)) * smooth(0.3, 0.7, -f.dot(out)) * (1 - smooth(-0.6, -0.2, u.dot(UP)));
+  S.twist[side] = { angle: 2 * Math.atan2(tq.x * u0.x + tq.y * u0.y + tq.z * u0.z, tq.w), axis: u.clone().normalize(), origin: S.P[S.i(up)].clone() };
   S.set(fo, Wf);
   // Hand orientation from the wanted knuckle and palm directions.
   const H = handFrame(S, side);
@@ -353,11 +393,74 @@ function writeBones(fig, S) {
   });
 }
 
-function relaxShoulders(fig, prep, strength) {
+/* Fade the humeral twist in along the upper arm. */
+function spreadTwist(fig, prep, S) {
+  const p = fig.positions;
+  SIDES.forEach(([side], k) => {
+    const t = S.twist[side];
+    if (!t || Math.abs(t.angle) < 1e-4) return;
+    const list = prep.twist[k], { x: ax, y: ay, z: az } = t.axis, { x: cx, y: cy, z: cz } = t.origin;
+    for (let i = 0; i < list.length; i += 2) {
+      // Rodrigues rotation about the posed humerus through the shoulder joint
+      const o = list[i] * 3, a = t.angle * list[i + 1], c = Math.cos(a), sn = Math.sin(a);
+      const x = p[o] - cx, y = p[o + 1] - cy, z = p[o + 2] - cz, d = (ax * x + ay * y + az * z) * (1 - c);
+      p[o] = cx + x * c + (ay * z - az * y) * sn + ax * d;
+      p[o + 1] = cy + y * c + (az * x - ax * z) * sn + ay * d;
+      p[o + 2] = cz + z * c + (ax * y - ay * x) * sn + az * d;
+    }
+  });
+}
+
+/* Relax the motion, not the shape: smooth how far each vertex of a patch moved
+   in skinning (posed − unposed), so weight borders stop creasing while the
+   sculpted detail rides along untouched. The patch carries its own compact
+   neighbour table (see motionPatch), so the passes stay in cache. */
+function relaxMotion(fig, patch, unposed) {
+  const p = fig.positions, { all, count, offsets, list, weight, passes } = patch;
+  const D = (patch.__d ??= new Float32Array(all.length * 3));
+  for (let i = 0; i < all.length; i++) {
+    const o = all[i] * 3;
+    D[i * 3] = p[o] - unposed[o]; D[i * 3 + 1] = p[o + 1] - unposed[o + 1]; D[i * 3 + 2] = p[o + 2] - unposed[o + 2];
+  }
+  for (let pass = 0; pass < passes; pass++)
+    for (let i = 0; i < count; i++) {
+      // in place (Gauss–Seidel): converges in about half the passes
+      const o0 = offsets[i], o1 = offsets[i + 1], w = weight[i] / (o1 - o0);
+      let x = 0, y = 0, z = 0;
+      for (let o = o0; o < o1; o++) { const n = list[o] * 3; x += D[n]; y += D[n + 1]; z += D[n + 2]; }
+      const j = i * 3;
+      D[j] += (x - (o1 - o0) * D[j]) * w; D[j + 1] += (y - (o1 - o0) * D[j + 1]) * w; D[j + 2] += (z - (o1 - o0) * D[j + 2]) * w;
+    }
+  for (let i = 0; i < count; i++) {
+    const o = all[i] * 3;
+    p[o] = unposed[o] + D[i * 3]; p[o + 1] = unposed[o + 1] + D[i * 3 + 1]; p[o + 2] = unposed[o + 2] + D[i * 3 + 2];
+  }
+}
+
+/* A compact patch: its vertices first, then their outside neighbours, with a
+   neighbour table in local indices. */
+function motionPatch(ctx, verts, weights, passes, rate) {
+  const { offsets: O, list: L } = ctx.adjacency(), local = new Map(), all = Array.from(verts);
+  all.forEach((v, i) => local.set(v, i));
+  const offsets = new Uint32Array(verts.length + 1), list = [];
+  verts.forEach((v, i) => {
+    for (let o = O[v]; o < O[v + 1]; o++) {
+      const n = L[o];
+      if (!local.has(n)) { local.set(n, all.length); all.push(n); }
+      list.push(local.get(n));
+    }
+    offsets[i + 1] = list.length;
+  });
+  return { all: Uint32Array.from(all), count: verts.length, offsets, list: Uint32Array.from(list),
+    weight: Float32Array.from(weights, (w) => Math.abs(w) * rate), passes };
+}
+
+/* Laplacian relax of one skin patch; strength per side [L, R]. */
+function relaxPatch(fig, patch, strength) {
   if (strength[0] <= 0 && strength[1] <= 0) return;
   const p = fig.positions, { offsets, list } = fig.ctx.adjacency();
-  const { relax, relaxWeight } = prep, tmp = (fig.__relaxTmp ??= new Float32Array(relax.length * 3));
-  for (let pass = 0; pass < 8; pass++) {
+  const { list: relax, weight: relaxWeight, passes } = patch, tmp = new Float32Array(relax.length * 3);
+  for (let pass = 0; pass < passes; pass++) {
     for (let i = 0; i < relax.length; i++) {
       const v = relax[i], o0 = offsets[v], o1 = offsets[v + 1];
       let x = 0, y = 0, z = 0;
@@ -431,10 +534,15 @@ export function applyPose(fig, id) {
     fig.root.updateMatrixWorld(true);
     fig.skeleton.update();
     fig.__dq = boneDualQuaternions(fig.skeleton, fig.__dq);
+    const unposed = (fig.__unposed ??= new Float32Array(fig.positions.length));
+    unposed.set(fig.positions);
     skinDualQuaternion(fig.__dq, fig.data.skinIndex, fig.data.skinWeight, fig.positions, fig.positions);
+    spreadTwist(fig, prep, S);
+    relaxMotion(fig, prep.axilla, unposed);
+    relaxPatch(fig, prep.behind, SIDES.map(([side]) => S.behind[side]));
     // shoulder relax scaled by how far each humerus is raised
     const lift = SIDES.map(([side]) => smooth(-0.75, 0.2, UP.dot(S.axis(`upperarm.${side}`).applyQuaternion(S.W[S.i(`upperarm.${side}`)]))));
-    relaxShoulders(fig, prep, lift);
+    relaxPatch(fig, prep.relax, lift);
     const h = S.i("head");
     poseExtras(fig, S.W[h], fig.heads[h], S.P[h]);
   }

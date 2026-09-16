@@ -18,7 +18,9 @@
             upper, fore    humerus and forearm directions in the chest frame
             ik             instead of directions: { from: bone, to: [x,y,z] cm in
                            that bone's posed frame, pole: elbow direction }; the
-                           wrist is placed at the target (limb lengths are kept)
+                           wrist is placed at the target (limb lengths are kept);
+                           `axes: bone` measures the offset along that bone's
+                           posed directions instead (e.g. "chest")
             hand, palm     wrist→knuckle direction and the direction the palm
                            faces (chest frame); the difference to the forearm
                            becomes pronation/supination along the forearm
@@ -60,6 +62,12 @@ export const GRIPS = {
 };
 
 const STANCE = { step: [1.5, 0], turn: 8 };
+/* Lat spreads: fists set on the waist just above the hip bone, knuckles in,
+   shoulders rolled forward so the elbows travel out and in front of the body. */
+const LAT_ARM = { shrug: 0, reach: 16, ik: { from: "pelvis", to: [21, 19, 3], pole: [0.8, 0.1, 0.9] },
+  hand: [-0.75, -0.6, 0.1], palm: [0.1, -0.5, -0.85], grip: "fist" };
+/* Side poses: the near (right) leg bent in front, heel up; weight on the far leg. */
+const SIDE_LEGS = { legR: { step: [-5, 7], turn: 10, heel: 32, knee: [-0.35, 0, 1] }, legL: { step: [0, -2], turn: 12 } };
 
 export const POSES = [
   {
@@ -90,31 +98,31 @@ export const POSES = [
     id: "latSpread", name: "Front lat spread", view: 0, flex: 0.4, spread: 1, vacuum: 0.35, chestUp: 0.85,
     note: "Pure width. Where the lats insert decides whether the sweep starts at the armpit or the waist.",
     body: { chest: [-4, 0, 0] },
-    /* palms flat on the obliques, fingers down, elbows driven out and forward */
-    arm: { shrug: 3, reach: 10, ik: { from: "pelvis", to: [17, 20, 0], pole: [1, 0.05, 0.35] },
-      hand: [-0.05, -0.95, 0.3], palm: [-1, 0, 0.05], grip: "flat" },
+    arm: LAT_ARM,
     leg: { step: [3, 0], turn: 20 },
   },
   {
     id: "sideChest", name: "Side chest", view: -90, flex: 0.9, spread: 0.45, vacuum: 0.45, chestUp: 1,
     note: "Turned side-on so rib cage depth and pec thickness read instead of width.",
-    body: { pelvis: [0, -8, 0], abdomen: [0, -10, 0], chest: [-4, -14, 0], neck: [0, -12, 0], head: [2, -20, 0] },
-    /* the near arm squeezed against the ribs, forearm across the abs */
-    armR: { reach: 10, upper: [0.1, -0.93, 0.35], fore: [-0.85, 0.08, 0.5], hand: [-0.8, 0.1, 0.6], palm: [0, 0.2, -1], grip: "fist" },
-    armL: { reach: 14, ik: { from: "hand.R", to: [-1.5, 1.5, -1], pole: [0.6, -0.7, 0.2] },
-      hand: [-1, 0.1, 0.1], palm: [0, -0.3, -1], grip: "grasp" },
-    legR: { step: [-5, 7], turn: 10, heel: 32, knee: [-0.35, 0, 1] },
-    legL: { step: [0, -2], turn: 12 },
+    body: { pelvis: [0, -8, 0], abdomen: [0, -10, 0], chest: [-4, -14, 0], neck: [0, -8, 0], head: [2, -14, 0] },
+    /* the near elbow tucked at the ribs, its fist across the upper abs; the far
+       hand reaches over and holds the near wrist from below */
+    armR: { reach: 10, ik: { from: "chest", to: [2, -12, 20], pole: [0.4, -1, -0.1] },
+      hand: [-0.9, 0, 0.4], palm: [0.1, 0.8, -0.6], grip: "fist" },
+    armL: { reach: 16, ik: { from: "hand.R", axes: "chest", to: [9, -3, 1], pole: [0.6, -0.7, -0.2] },
+      hand: [-1, 0.05, 0.1], palm: [0, 0.6, -0.8], grip: "grasp" },
+    ...SIDE_LEGS,
   },
   {
     id: "sideTriceps", name: "Side triceps", view: -90, flex: 0.3, spread: 0.35, vacuum: 0.5, chestUp: 0.7,
     note: "The long head of the triceps sets the hang of the arm from this angle.",
-    body: { pelvis: [0, -6, 0], abdomen: [0, -8, 0], chest: [-3, -10, 0], neck: [0, -12, 0], head: [2, -22, 0] },
-    armR: { shrug: -2, upper: [0.06, -0.99, -0.14], fore: [0.02, -0.98, -0.2], hand: [0.02, -0.97, -0.24], palm: [0.1, 0, -1], grip: "fist" },
-    armL: { ik: { from: "hand.R", to: [-1, 1.5, -1.5], pole: [0.7, -0.4, -0.8] },
-      hand: [-1, -0.2, 0], palm: [0, 0, 1], grip: "grasp" },
-    legR: { step: [-5, 7], turn: 10, heel: 32, knee: [-0.35, 0, 1] },
-    legL: { step: [0, -2], turn: 12 },
+    body: { pelvis: [0, -6, 0], abdomen: [0, -8, 0], chest: [-3, -10, 0], neck: [0, -10, 0], head: [2, -18, 0] },
+    /* the near arm locked straight and drawn back, fist in line with the
+       forearm; the far arm crosses the lower back and holds the near wrist */
+    armR: { shrug: -2, upper: [0.08, -0.98, -0.2], fore: [0.02, -0.97, -0.25], hand: [0.02, -0.97, -0.25], palm: [-0.3, 0, -0.95], grip: "fist" },
+    armL: { ik: { from: "hand.R", axes: "chest", to: [6, 0, -4], pole: [0.9, -0.2, -0.3] },
+      hand: [-1, -0.1, 0], palm: [0, 0, 1], grip: "grasp" },
+    ...SIDE_LEGS,
   },
   {
     id: "backDouble", name: "Back double biceps", view: 180, flex: 1, spread: 0.7, vacuum: 0.2, chestUp: 0.2,
@@ -127,8 +135,7 @@ export const POSES = [
     id: "rearLat", name: "Rear lat spread", view: 180, flex: 0.4, spread: 1, vacuum: 0.3, chestUp: 0.3,
     note: "The classic cobra. Width here is lat insertion plus clavicle, and neither is trainable.",
     body: { chest: [-2, 0, 0], head: [-4, 0, 0] },
-    arm: { shrug: 3, reach: 12, ik: { from: "pelvis", to: [17, 20, 0], pole: [1, 0.05, 0.35] },
-      hand: [-0.05, -0.95, 0.3], palm: [-1, 0, 0.05], grip: "flat" },
+    arm: LAT_ARM,
     legL: { step: [3, -20], turn: 12, heel: 38 }, legR: { step: [1, 0], turn: 10 },
   },
   {
@@ -144,10 +151,12 @@ export const POSES = [
   {
     id: "mostMuscular", name: "Most muscular", view: 0, flex: 1, spread: 0.4, vacuum: 0.2, chestUp: 0.45,
     note: "Everything contracted at once. Traps and pec insertions dominate the read.",
-    body: { abdomen: [8, 0, 0], chest: [10, 0, 0], neck: [-2, 0, 0], head: [2, 0, 0] },
-    /* the crab: fists meeting low in front, elbows driven forward and out */
-    arm: { shrug: 14, reach: 16, ik: { from: "pelvis", to: [10.5, 15, 23], pole: [1, 0.3, 0.55] },
-      hand: [-0.85, -0.4, 0.15], palm: [0.05, 0.4, -0.9], grip: "fist" },
+    body: { pelvis: [4, 0, 0], abdomen: [9, 0, 0], chest: [12, 0, 0], neck: [-12, 0, 0], head: [-6, 0, 0] },
+    /* the crab: torso folded over, shoulders shrugged and rolled in, elbows bent
+       hard and flared up and out, knuckles meeting in front of the navel; the
+       head stays up */
+    arm: { shrug: 20, reach: 20, ik: { from: "pelvis", to: [15, 25, 29], pole: [1, 0.7, 0.2] },
+      hand: [-0.9, -0.35, 0.25], palm: [0, -0.2, -1], grip: "fist" },
     leg: { step: [6, 0], turn: 22, knee: [0.3, 0, 1] }, hips: [0, -2, 0],
   },
   {

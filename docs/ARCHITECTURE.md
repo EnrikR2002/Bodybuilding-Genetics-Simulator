@@ -149,8 +149,11 @@ names)` are the API.
 ## Rigging and posing — `pose.js`, `poses.js`
 
 `applyPose(fig, id)`: rest surface → finger curl → stage `applyPose` hooks →
-bone aims → CPU dual-quaternion skinning (`geometry.js`) → shoulder relax →
-normals. Poses live in `poses.js` as `{ id, name, view, flex, spread, ... }`
+bone aims → CPU dual-quaternion skinning (`geometry.js`) → humeral twist
+spread down the upper arm (the shoulder helper only swings) → motion relax
+around the armpit (smooths how far skin moved, keeping sculpt detail) →
+shoulder relax for raised arms and arms folded behind the back → normals.
+An arm `ik` target may add `axes: "chest"` to aim along the chest's directions. Poses live in `poses.js` as `{ id, name, view, flex, spread, ... }`
 and are listed in the UI in array order. The first pose (`anatomy`) is the
 artist's stance and must stay unskinned. Bone names are classified in
 `bones.js`; a new bone must be classified there.

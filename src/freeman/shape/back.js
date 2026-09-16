@@ -9,7 +9,8 @@
    toward the neck.
    --------------------------------------------------------------------------- */
 import { smooth } from "./context.js";
-import { softMask, pick } from "./muscle.js";
+import { softMask, pick, structureWeight, support } from "./muscle.js";
+import { diffuse } from "./context.js";
 
 export default {
   id: "back",
@@ -30,12 +31,21 @@ export default {
       const y = base[trap.verts[i] * 3 + 1];
       return w * smooth(132, 141, y) * (1 - smooth(147, 154, y));
     });
-    const flare = softMask(ctx, ["latissimus", "teres_major"], { passes: 8, rings: 5 });
-    const spread = pick(flare.field, flare.verts).map((w, i) => {
-      const x = base[flare.verts[i] * 3];
-      return w * smooth(5, 13, Math.abs(x)) * Math.sign(x) * (1 - ctx.arm[flare.verts[i]]);
-    });
-    return { lat: lat.verts, lower, trap: trap.verts, upper, flare: flare.verts, spread };
+    // The flare: a broad sweep of the outer lat and teres, widest a hand below
+    // the armpit and gone by the waist. Shaped first, then diffused wide so the
+    // moved skin has no edge against the ribs, the arm or the spine.
+    const lats = structureWeight(ctx, ["latissimus", "teres_major"]), shaped = new Float32Array(ctx.n);
+    for (let v = 0; v < ctx.n; v++) {
+      if (!lats[v]) continue;
+      const x = Math.abs(base[v * 3]), y = base[v * 3 + 1];
+      shaped[v] = lats[v] * smooth(7, 15, x) * smooth(100, 117, y) * (1 - smooth(127, 139, y)) * (1 - smooth(0.3, 0.8, ctx.arm[v]));
+    }
+    const flare = support(ctx, shaped, 30), field = diffuse(ctx, shaped, 90, 0.5, flare);
+    let peak = 0;
+    for (const v of flare) peak = Math.max(peak, field[v]);
+    // the middle of the back stays put: only the outer sweep travels
+    const spread = Float32Array.from(flare, (v) => (field[v] / peak) * (1 - ctx.arm[v]) * smooth(8, 17, Math.abs(base[v * 3])));
+    return { lat: lat.verts, lower, trap: trap.verts, upper, flare, spread };
   },
   apply(ctx, r, s, out) {
     if (!r || (s.latInsertion === 0.5 && s.trapHeight === 0.5)) return;
@@ -65,7 +75,8 @@ export default {
   },
   applyPose(ctx, r, s, pose, out) {
     if (!r || !pose.spread) return;
-    const k = pose.spread * 4.2;
-    for (let i = 0; i < r.flare.length; i++) out[r.flare[i] * 3] += k * r.spread[i];
+    // straight out to the side: the wings widen without swelling the back
+    const k = pose.spread * 5.5;
+    for (let i = 0; i < r.flare.length; i++) out[r.flare[i] * 3] += k * r.spread[i] * Math.sign(ctx.base[r.flare[i] * 3]);
   },
 };

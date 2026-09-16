@@ -493,6 +493,7 @@ try {
     stage,
     set: (o) => { Object.assign(state, DEFAULT, o); ui.percentiles = null; applyState(); },
     pose: (id) => setPose(id),
+    poses: POSE_BY_ID,
     view: (a, e, z, target) => {
       setView(a, false);
       if (target) frameRegion(target, 180 * (z || 1));
